@@ -1,0 +1,86 @@
+.footer{
+    background:#020617;
+    color:white;
+    padding-top:80px;
+}
+
+.footer-container{
+    max-width:1200px;
+    margin:0 auto;
+    padding:0 20px;
+
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr 1fr;
+    gap:40px;
+}
+
+/* 🔥 BRAND */
+
+.footer-brand{
+    max-width:400px;
+}
+
+.footer-logo{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:15px;
+    color:#ff6a00;
+}
+
+.footer-brand p{
+    color:#94a3b8;
+    line-height:1.6;
+}
+
+/* 🔗 LINKS */
+
+.footer-links h4{
+    margin-bottom:15px;
+    font-size:16px;
+}
+
+.footer-links ul{
+    list-style:none;
+    padding:0;
+}
+
+.footer-links li{
+    margin-bottom:10px;
+    color:#94a3b8;
+    font-size:14px;
+}
+
+.footer-links a{
+    color:#94a3b8;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.footer-links a:hover{
+    color:#ff6a00;
+}
+
+/* 🔻 BOTTOM */
+
+.footer-bottom{
+    margin-top:60px;
+    padding:20px;
+    text-align:center;
+    border-top:1px solid rgba(255,255,255,0.05);
+    font-size:13px;
+    color:#64748b;
+}
+
+/* 📱 RESPONSIVE */
+
+@media(max-width:900px){
+    .footer-container{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:500px){
+    .footer-container{
+        grid-template-columns:1fr;
+    }
+}
