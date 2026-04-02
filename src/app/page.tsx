@@ -5,7 +5,6 @@ import Projects from "@/components/projects/Projects"
 import CTA from "@/components/cta/CTA"
 import Contact from "@/components/contact/Contact"
 import Trust from "@/components/trust/Trust"
-import Footer from "@/components/footer/Footer"
 
 export default function Home(){
   return (
@@ -17,7 +16,6 @@ export default function Home(){
       <CTA />
       <Contact />
       <Trust />
-      <Footer />
     </>
   )
 

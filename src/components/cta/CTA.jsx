@@ -6,29 +6,44 @@ export default function CTA(){
   return (
     <section className="cta">
 
-      <div className="cta-container">
+      {/* 🎥 VIDEO FONDO */}
+      <video
+        className="cta-video"
+        src="/videos/hero4.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
 
-        <h2>
-          Lleva tu negocio al siguiente nivel con una solución digital profesional
-        </h2>
+      {/* 🔥 OVERLAY */}
+      <div className="cta-overlay">
 
-        <p>
-          Desarrollo sistemas, e-commerce y plataformas a medida para empresas que quieren crecer de verdad.
-        </p>
+        <div className="cta-container">
 
-        <div className="cta-buttons">
-          <a href="#contacto" className="btn-primary">
-            Solicitar propuesta
-          </a>
+          <h2>
+            Lleva tu negocio al siguiente nivel
+          </h2>
 
-          <a href="#proyectos" className="btn-secondary">
-            Ver proyectos
-          </a>
+          <p>
+            Soluciones digitales reales para empresas que quieren crecer.
+          </p>
+
+          <div className="cta-buttons">
+            <a href="#contacto" className="btn-primary">
+              Solicitar propuesta
+            </a>
+
+            <a href="#proyectos" className="btn-secondary">
+              Ver proyectos
+            </a>
+          </div>
+
+          <span className="cta-note">
+            Respuesta en menos de 24 horas
+          </span>
+
         </div>
-
-        <span className="cta-note">
-          Respuesta en menos de 24 horas
-        </span>
 
       </div>
 

@@ -77,16 +77,19 @@ export default function Projects() {
                 <div className="projects-grid">
 
                     <a href="https://www.tufarmaciadigital.cl/" target="_blank" className="project-card">
+                        <img src="/img/logos/logo4.png" alt="E-commerce Farmacia" />
                         <h4>E-commerce Farmacia</h4>
-                        <p>Landing para ofrecer servicios farmaceuticos.</p>
+                        <p>Landing para ofrecer servicios farmacéuticos.</p>
                     </a>
 
                     <a href="https://mydconstruccionesspa.onrender.com/" target="_blank" className="project-card">
+                        <img src="/img/logos/logo3.png" alt="Constructora MYD" />
                         <h4>Constructora MYD</h4>
                         <p>Sitio corporativo enfocado en captación de clientes.</p>
                     </a>
 
                     <a href="https://angelyeva.es/" target="_blank" className="project-card">
+                        <img src="/img/logos/logo5.png" alt="Angel & Eva" />
                         <h4>Angel & Eva</h4>
                         <p>Landing de servicios y agenda de visitas. Colaboración con Teranube España</p>
                     </a>

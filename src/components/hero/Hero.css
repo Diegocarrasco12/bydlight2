@@ -116,11 +116,12 @@
   justify-content:center;
 }
 
-.btn-primary{
-  background:#ff6a00;
+.hero .btn-primary{
+  background: linear-gradient(135deg, #ff6a00, #ff8c42);
   border:none;
+
   padding:14px 30px;
-  border-radius:8px;
+  border-radius:10px;
 
   font-size:16px;
   font-weight:600;
@@ -128,25 +129,36 @@
 
   cursor:pointer;
 
-  transition:transform .2s ease;
+  transition:all .25s ease;
+}
+
+.hero .btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 30px rgba(255,106,0,0.35);
 }
 
 .btn-primary:hover{
   transform:translateY(-2px);
 }
 
-.btn-secondary{
-  background:transparent;
-  border:1px solid rgba(255,255,255,.35);
+.hero .btn-secondary{
+  background: rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.2);
+
   padding:14px 30px;
-  border-radius:8px;
+  border-radius:10px;
 
   font-size:16px;
   color:white;
 
   cursor:pointer;
 
-  transition:all .2s ease;
+  transition:all .25s ease;
+}
+
+.hero .btn-secondary:hover{
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.4);
 }
 
 .btn-secondary:hover{

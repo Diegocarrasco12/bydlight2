@@ -11,7 +11,7 @@ export default function Trust(){
         <h2>Empresas que han confiado</h2>
 
         <p className="trust-sub">
-          Proyectos desarrollados para clientes reales en distintos rubros.
+          Proyectos desarrollados para clientes en distintos rubros.
         </p>
 
         <div className="trust-grid">
@@ -24,19 +24,19 @@ export default function Trust(){
 
           {/* MYD */}
           <div className="trust-card">
-            <img src="/img/clients/myd.png" alt="MYD Construcciones" />
+            <img src="/img/logos/logo3.png" alt="MYD Construcciones" />
             <span>MYD Construcciones</span>
           </div>
 
           {/* GINFET */}
           <div className="trust-card">
-            <img src="/img/clients/ginfet.png" alt="GINFET" />
+            <img src="/img/logos/logo6.png" alt="GINFET" />
             <span>GINFET</span>
           </div>
 
           {/* FARMACIA */}
           <div className="trust-card">
-            <img src="/img/clients/farmacia.png" alt="Tu Farmacia Digital" />
+            <img src="/img/logos/logo4.png" alt="Tu Farmacia Digital" />
             <span>Tu Farmacia Digital</span>
           </div>
 

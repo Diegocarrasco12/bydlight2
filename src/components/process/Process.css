@@ -88,18 +88,61 @@
 /* RESPONSIVE */
 /* ========================= */
 
-@media (max-width:1024px){
-    .process-grid{
-        grid-template-columns:1fr 1fr;
-    }
-}
-
 @media (max-width:768px){
+
     .process-grid{
-        grid-template-columns:1fr;
+        display:flex;              /* 🔥 cambiamos grid a fila */
+        overflow-x:auto;           /* 🔥 scroll horizontal */
+        gap:20px;
+
+        padding-bottom:10px;
+
+        scroll-snap-type:x mandatory;
+        scroll-behavior:smooth;
+    }
+
+    .process-grid::-webkit-scrollbar{
+        display:none; /* 🔥 ocultar scroll */
     }
 
     .process h2{
         font-size:32px;
     }
+
+}
+@media (max-width:768px){
+
+    .process-grid{
+        display:flex;              /* 🔥 cambiamos grid a fila */
+        overflow-x:auto;           /* 🔥 scroll horizontal */
+        gap:20px;
+
+        padding-bottom:10px;
+
+        scroll-snap-type:x mandatory;
+        scroll-behavior:smooth;
+    }
+
+    .process-grid::-webkit-scrollbar{
+        display:none; /* 🔥 ocultar scroll */
+    }
+
+    .process h2{
+        font-size:32px;
+    }
+
+}
+@media (max-width:768px){
+
+    .process-card{
+        min-width:260px;
+        max-width:260px;
+
+        flex:0 0 auto;
+
+        scroll-snap-align:start;
+
+        padding:30px 20px;
+    }
+
 }

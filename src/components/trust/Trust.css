@@ -45,14 +45,16 @@
 }
 
 /* 🔥 LOGOS */
-
 .trust-card img{
     width:100%;
     max-width:120px;
     height:60px;
     object-fit:contain;
-    filter:grayscale(100%) brightness(1.2);
-    transition:.3s;
+
+    filter:none; /* 🔥 clave */
+    opacity:0.95;
+
+    transition:.3s ease;
 }
 
 /* texto */
@@ -72,20 +74,40 @@
 }
 
 .trust-card:hover img{
-    filter:none;
     transform:scale(1.05);
+    opacity:1;
 }
 
 /* responsive */
-
 @media(max-width:768px){
-    .trust-grid{
-        grid-template-columns:1fr 1fr;
-    }
-}
 
-@media(max-width:480px){
     .trust-grid{
-        grid-template-columns:1fr;
+        display:flex;
+        overflow-x:auto;
+        gap:15px;
+
+        padding-bottom:10px;
+
+        scroll-snap-type:x mandatory;
+        scroll-behavior:smooth;
     }
+
+    .trust-grid::-webkit-scrollbar{
+        display:none;
+    }
+
+}
+@media(max-width:768px){
+
+    .trust-card{
+        min-width:140px;
+        max-width:140px;
+
+        flex:0 0 auto;
+
+        scroll-snap-align:start;
+
+        padding:20px 15px;
+    }
+
 }

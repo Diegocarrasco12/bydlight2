@@ -1,0 +1,248 @@
+.servicios-page{
+    background:#020617;
+    color:white;
+}
+
+/* ================= HERO ================= */
+
+.servicios-hero{
+    min-height:80vh;
+    padding:200px 20px 120px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+}
+
+.servicios-hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at 20% 30%, rgba(255,106,0,0.15), transparent 60%);
+    pointer-events:none;
+}
+
+.servicios-hero .container{
+    max-width:900px;
+    margin:0 auto;
+    text-align:center;
+}
+
+.servicios-hero h1{
+    font-size:42px;
+    line-height:1.2;
+    margin-bottom:20px;
+}
+
+.servicios-hero p{
+    color:#94a3b8;
+    font-size:18px;
+    margin-bottom:40px;
+}
+
+/* ================= LISTA SERVICIOS ================= */
+
+.servicios-list{
+    max-width:1000px;
+    margin:0 auto;
+    padding:80px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:40px;
+}
+
+.servicio-item{
+    padding:40px;
+    border-radius:16px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    transition:0.3s ease;
+}
+
+.servicio-item:hover{
+    transform:translateY(-5px);
+    border-color:rgba(255,106,0,0.5);
+    box-shadow:0 10px 40px rgba(255,106,0,0.15);
+}
+
+.servicio-item h2{
+    font-size:26px;
+    margin-bottom:10px;
+}
+
+.servicio-item p{
+    color:#94a3b8;
+    margin-bottom:20px;
+    line-height:1.6;
+}
+
+/* BENEFICIOS DENTRO DE SERVICIO */
+
+.servicio-item span{
+    display:block;
+    font-size:14px;
+    color:#cbd5f5;
+    margin-bottom:5px;
+}
+
+/* ================= BENEFICIOS ================= */
+
+.servicios-benefits{
+    padding:100px 20px;
+    text-align:center;
+}
+
+.servicios-benefits h2{
+    font-size:32px;
+    margin-bottom:40px;
+}
+
+.benefits-grid{
+    max-width:800px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+.benefits-grid div{
+    padding:20px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    font-size:15px;
+}
+
+/* ================= CTA FINAL ================= */
+
+.servicios-cta{
+    padding:120px 20px;
+    text-align:center;
+    position:relative;
+}
+
+.servicios-cta::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at center, rgba(255,106,0,0.15), transparent 70%);
+    pointer-events:none;
+}
+
+.servicios-cta h2{
+    font-size:32px;
+    margin-bottom:30px;
+}
+
+/* ================= BOTONES ================= */
+
+.btn-primary{
+    display:inline-block;
+    padding:14px 28px;
+    border-radius:10px;
+    background:linear-gradient(135deg, #ff6a00, #ff8c42);
+    color:white;
+    font-weight:600;
+    text-decoration:none;
+    transition:0.3s ease;
+}
+
+.btn-primary:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 30px rgba(255,106,0,0.3);
+}
+
+.btn-secondary{
+    display:inline-block;
+    padding:14px 28px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.2);
+    color:white;
+    text-decoration:none;
+    transition:0.3s ease;
+}
+
+.btn-secondary:hover{
+    background:rgba(255,255,255,0.05);
+}
+/* VIDEO HERO */
+
+.servicios-video{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:0;
+}
+
+/* OVERLAY OSCURO */
+
+.servicios-overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(2,6,23,0.75);
+    z-index:1;
+}
+
+/* CONTENIDO ENCIMA */
+
+.servicios-hero .container{
+    position:relative;
+    z-index:2;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:768px){
+
+    /* HERO */
+    .servicios-hero{
+        padding:160px 20px 80px;
+    }
+
+    .servicios-hero h1{
+        font-size:32px;
+    }
+
+    /* LISTA SERVICIOS (SCROLL HORIZONTAL PRO) */
+    .servicios-list{
+        display:flex;
+        flex-direction:row;
+        overflow-x:auto;
+        gap:16px;
+
+        padding:40px 20px 40px 20px;
+
+        scroll-snap-type:x mandatory;
+    }
+
+    /* OCULTAR SCROLLBAR */
+    .servicios-list::-webkit-scrollbar{
+        display:none;
+    }
+
+    /* CARDS (TAMAÑO PROPORCIONAL) */
+    .servicio-item{
+        min-width:75%;
+        max-width:75%;
+        flex:0 0 auto;
+
+        padding:25px;
+
+        scroll-snap-align:start;
+    }
+
+    /* BENEFICIOS */
+    .benefits-grid{
+        grid-template-columns:1fr;
+    }
+
+    /* CTA */
+    .servicios-cta{
+        padding:80px 20px;
+    }
+
+}

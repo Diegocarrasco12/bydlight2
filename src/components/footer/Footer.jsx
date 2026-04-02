@@ -1,8 +1,9 @@
 "use client"
 
 import "./Footer.css"
+import Link from "next/link"
 
-export default function Footer(){
+export default function Footer() {
   return (
     <footer className="footer">
 
@@ -10,25 +11,27 @@ export default function Footer(){
 
         {/* 🔥 COLUMNA 1 - LOGO / MARCA */}
         <div className="footer-brand">
+
           <div className="footer-logo">
-            {/* aquí luego puedes poner imagen */}
-            <span>BYD Light Solutions</span>
+            <img src="/img/logos/logo1.png" alt="BYD Light Solutions" />
           </div>
 
           <p>
             Desarrollo de sistemas, plataformas y soluciones digitales a medida
             para empresas que buscan crecer y optimizar sus procesos.
           </p>
+
         </div>
 
         {/* 🔧 COLUMNA 2 - SERVICIOS */}
         <div className="footer-links">
           <h4>Servicios</h4>
           <ul>
-            <li>Desarrollo de sistemas</li>
-            <li>E-commerce</li>
-            <li>Landing pages</li>
-            <li>Automatización</li>
+            <li>Arquitectura de Software</li>
+            <li>Desarrollo de Sistemas a Medida</li>
+            <li>Automatización de Procesos</li>
+            <li>Integración de Plataformas</li>
+            <li>Desarrollo Web</li>
           </ul>
         </div>
 
@@ -36,9 +39,11 @@ export default function Footer(){
         <div className="footer-links">
           <h4>Navegación</h4>
           <ul>
-            <li><a href="#proyectos">Proyectos</a></li>
-            <li><a href="#contacto">Contacto</a></li>
-            <li><a href="#">Inicio</a></li>
+            <li><Link href="/">Inicio</Link></li>
+            <li><Link href="/servicios">Servicios</Link></li>
+            <li><Link href="/proyectos">Proyectos</Link></li>
+            <li><Link href="/nosotros">Nosotros</Link></li>
+            <li><Link href="/contacto">Contacto</Link></li>
           </ul>
         </div>
 
@@ -46,8 +51,8 @@ export default function Footer(){
         <div className="footer-links">
           <h4>Contacto</h4>
           <ul>
-            <li>Email: contacto@tudominio.com</li>
-            <li>WhatsApp: +56 9 XXXX XXXX</li>
+            <li>Email: contacto@bydlightsolutions.com</li>
+            <li>WhatsApp: +56 9 8324 9135</li>
             <li>Chile</li>
           </ul>
         </div>

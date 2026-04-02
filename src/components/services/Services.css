@@ -95,18 +95,53 @@
 }
 
 
-/* ========================= */
-/* RESPONSIVE */
-/* ========================= */
-
 @media (max-width:768px) {
+
     .services-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        /* 🔥 cambia grid a fila */
+        overflow-x: auto;
+        /* 🔥 scroll horizontal */
+        gap: 20px;
+
+        padding-bottom: 10px;
+        /* espacio para scroll */
+
+        scroll-snap-type: x mandatory;
+        /* 🔥 efecto pro */
+    }
+
+    .services-grid::-webkit-scrollbar {
+        display: none;
+        /* 🔥 oculta scrollbar */
     }
 
     .services h2 {
         font-size: 32px;
     }
+}
+
+@media (max-width:768px) {
+
+    .service-card {
+        min-width: 280px;
+        /* 🔥 tamaño de cada card */
+        max-width: 280px;
+
+        flex: 0 0 auto;
+        /* 🔥 no se achican */
+
+        scroll-snap-align: start;
+        /* 🔥 efecto snap */
+
+        padding: 35px 25px;
+        /* más compacto mobile */
+    }
+
+}
+
+.services-grid {
+    scroll-behavior: smooth;
 }
 
 /* ========================= */

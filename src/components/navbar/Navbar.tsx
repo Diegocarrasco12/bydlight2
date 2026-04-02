@@ -1,24 +1,57 @@
+"use client"
+
+import { useState } from "react"
 import "./Navbar.css"
+import Link from "next/link"
+
 
 export default function Navbar() {
+
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
 
-        <div className="navbar-logo">
-          Byd Light Solutions
-        </div>
+        <Link href="/" className="navbar-logo">
+          <img src="/img/logos/logo1.png" alt="BYD Light Solutions" />
+        </Link>
 
-        <ul className="navbar-menu">
-          <li>Servicios</li>
-          <li>Proyectos</li>
-          <li>Nosotros</li>
-          <li>Contacto</li>
+        {/* MENU */}
+        <ul className={`navbar-menu ${menuOpen ? "active" : ""}`}>
+
+          <li onClick={() => setMenuOpen(false)}>
+            <Link href="/servicios">Servicios</Link>
+          </li>
+
+          <li onClick={() => setMenuOpen(false)}>
+            <Link href="/proyectos">Proyectos</Link>
+          </li>
+
+          <li onClick={() => setMenuOpen(false)}>
+            <Link href="/nosotros">Nosotros</Link>
+          </li>
+
+          <li onClick={() => setMenuOpen(false)}>
+            <Link href="/contacto">Contacto</Link>
+          </li>
+
         </ul>
 
-        <button className="navbar-cta">
+        {/* CTA */}
+        <Link href="/contacto" className="navbar-cta">
           Solicitar asesoría
-        </button>
+        </Link>
+
+        {/* HAMBURGUESA */}
+        <div
+          className={`navbar-toggle ${menuOpen ? "open" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
 
       </div>
     </nav>

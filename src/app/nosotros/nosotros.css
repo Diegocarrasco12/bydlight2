@@ -1,0 +1,408 @@
+/* ================= HERO ================= */
+
+.about-hero {
+    position: relative;
+    height: 80vh;
+    overflow: hidden;
+}
+
+.about-video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.about-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.about-overlay {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    color: white;
+    padding: 0 20px;
+}
+
+.about-overlay h1 {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.about-overlay p {
+    color: #cbd5e1;
+}
+
+/* ================= BASE ================= */
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 100px 20px;
+    text-align: center;
+    color: white;
+}
+
+body {
+    background: #070b14;
+}
+
+/* ================= TEXTO ================= */
+
+.about-text {
+    margin-top: 20px;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+
+/* ================= PROCESO ================= */
+
+.about-process {
+    background: #05070d;
+}
+
+.process-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.process-grid div {
+    padding: 25px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.process-grid h3 {
+    color: #ff6a00;
+}
+
+/* ================= VALUE ================= */
+
+.value-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.value-grid div {
+    padding: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ================= EXPERIENCE ================= */
+
+.about-experience {
+    background: #05070d;
+}
+
+/* ================= MESSAGE ================= */
+
+.about-message {
+    padding: 80px 20px;
+    text-align: center;
+    font-size: 20px;
+}
+
+/* ================= CTA ================= */
+
+.about-cta {
+    padding: 120px 20px;
+    text-align: center;
+}
+
+.btn-primary {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 14px 28px;
+    background: #ff6a00;
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+/* ================= PROCESS ================= */
+
+.process-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 20px;
+}
+
+.process-video video {
+    width: 500px;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.process-content {
+    flex: 1;
+    color: white;
+}
+
+.process-content h2 {
+    margin-bottom: 30px;
+}
+
+.process-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.process-grid div {
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.process-grid h3 {
+    color: #ff6a00;
+}
+
+/* ================= VALUE ================= */
+
+.value-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 20px;
+}
+
+.value-video video {
+    width: 500px;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.value-content {
+    flex: 1;
+    color: white;
+}
+
+.value-content h2 {
+    margin-bottom: 30px;
+}
+
+.value-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.value-grid div {
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ================= EXPERIENCE ================= */
+
+.about-experience {
+    background: #05070d;
+}
+
+.experience-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 20px;
+}
+
+.experience-content {
+    flex: 1;
+    color: white;
+}
+
+.experience-content h2 {
+    margin-bottom: 20px;
+}
+
+.experience-content p {
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+/* highlights */
+
+.experience-highlights span {
+    display: block;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+/* video */
+
+.experience-video video {
+    width: 500px;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+/* ================= CTA VIDEO ================= */
+
+.about-cta{
+    position:relative;
+    height:60vh;
+    overflow:hidden;
+}
+
+/* video fondo */
+.about-cta-video{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* overlay oscuro */
+.about-cta::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.65);
+}
+
+/* contenido */
+.about-cta-overlay{
+    position:relative;
+    z-index:2;
+
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+    color:white;
+    padding:0 20px;
+}
+
+.about-cta-overlay h2{
+    font-size:36px;
+    margin-bottom:10px;
+}
+
+.about-cta-overlay p{
+    color:#cbd5e1;
+    margin-bottom:20px;
+}
+
+/* botón */
+.about-cta .btn-primary{
+    padding:14px 28px;
+    border-radius:10px;
+    background:linear-gradient(135deg, #ff6a00, #ff8c42);
+    color:white;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.about-cta .btn-primary:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 30px rgba(255,106,0,0.4);
+}
+
+/* mobile */
+@media(max-width:768px){
+
+    .about-cta{
+        height:50vh;
+    }
+
+    .about-cta-overlay h2{
+        font-size:26px;
+    }
+
+    .about-cta-overlay p{
+        font-size:14px;
+    }
+
+}
+
+/* responsive */
+
+@media(max-width:900px) {
+
+    .experience-wrapper {
+        flex-direction: column;
+    }
+
+    .experience-video video {
+        width: 100%;
+        height: auto;
+    }
+
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px) {
+
+    .process-wrapper,
+    .value-wrapper {
+        flex-direction: column;
+    }
+
+    .process-video video,
+    .value-video video {
+        width: 100%;
+        height: auto;
+    }
+
+    .process-grid,
+    .value-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:768px) {
+
+    .about-overlay h1 {
+        font-size: 32px;
+    }
+
+    .process-grid,
+    .value-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
