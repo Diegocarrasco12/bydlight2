@@ -1,0 +1,29 @@
+/* RESET GLOBAL */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* BASE */
+  
+  body {
+    background-color: #070b14;
+    color: white;
+    font-family: var(--font-geist-sans);
+  }
+  
+  /* LINKS */
+  
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  /* IMAGES */
+  
+  img {
+    max-width: 100%;
+    display: block;
+  }
