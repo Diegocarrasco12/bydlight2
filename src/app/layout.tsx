@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   title: "Byd Light Solutions | Arquitectura de Software y Desarrollo Web",
   description:
     "Desarrollo web, ecommerce, sistemas empresariales y automatización. Construimos plataformas digitales para empresas.",
+
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

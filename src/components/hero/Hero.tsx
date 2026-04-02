@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import "./Hero.css"
+import Link from "next/link"
 
 export default function Hero() {
 
@@ -42,13 +43,17 @@ export default function Hero() {
           transition={{ delay: .9 }}
         >
 
-          <button className="btn-primary">
-            Ver Proyectos
-          </button>
+          <Link href="/proyectos">
+            <button className="btn-primary">
+              Ver Proyectos
+            </button>
+          </Link>
 
-          <button className="btn-secondary">
-            Contáctanos
-          </button>
+          <Link href="/contacto">
+            <button className="btn-secondary">
+              Contáctanos
+            </button>
+          </Link>
 
         </motion.div>
 

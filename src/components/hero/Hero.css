@@ -115,6 +115,26 @@
   gap:20px;
   justify-content:center;
 }
+.hero .btn-primary,
+.hero .btn-secondary{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  height:50px;           /* 👈 MISMA ALTURA */
+  min-width:180px;       /* 👈 MISMO ANCHO BASE */
+
+  padding:0 30px;        /* 👈 elimina desbalance vertical */
+
+  border-radius:10px;
+
+  font-size:16px;
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:all .25s ease;
+}
 
 .hero .btn-primary{
   background: linear-gradient(135deg, #ff6a00, #ff8c42);

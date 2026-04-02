@@ -1,8 +1,10 @@
 "use client"
 
 import "./CTA.css"
+import Link from "next/link"
 
-export default function CTA(){
+
+export default function CTA() {
   return (
     <section className="cta">
 
@@ -30,13 +32,13 @@ export default function CTA(){
           </p>
 
           <div className="cta-buttons">
-            <a href="#contacto" className="btn-primary">
+            <Link href="/contacto" className="btn-primary">
               Solicitar propuesta
-            </a>
+            </Link>
 
-            <a href="#proyectos" className="btn-secondary">
+            <Link href="/proyectos" className="btn-secondary">
               Ver proyectos
-            </a>
+            </Link>
           </div>
 
           <span className="cta-note">
