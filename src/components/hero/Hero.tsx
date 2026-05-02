@@ -43,16 +43,14 @@ export default function Hero() {
           transition={{ delay: .9 }}
         >
 
-          <Link href="/proyectos">
-            <button className="btn-primary">
-              Ver Proyectos
-            </button>
+          <Link href="/proyectos" prefetch={false}>            <button className="btn-primary">
+            Ver Proyectos
+          </button>
           </Link>
 
-          <Link href="/contacto">
-            <button className="btn-secondary">
-              Contáctanos
-            </button>
+          <Link href="/contacto" prefetch={false}>            <button className="btn-secondary">
+            Contáctanos
+          </button>
           </Link>
 
         </motion.div>

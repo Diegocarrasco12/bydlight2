@@ -32,12 +32,10 @@ export default function CTA() {
           </p>
 
           <div className="cta-buttons">
-            <Link href="/contacto" className="btn-primary">
-              Solicitar propuesta
+            <Link href="/contacto" className="btn-primary" prefetch={false}>              Solicitar propuesta
             </Link>
 
-            <Link href="/proyectos" className="btn-secondary">
-              Ver proyectos
+            <Link href="/proyectos" className="btn-secondary" prefetch={false}>              Ver proyectos
             </Link>
           </div>
 
