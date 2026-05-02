@@ -39,11 +39,11 @@ export default function Footer() {
         <div className="footer-links">
           <h4>Navegación</h4>
           <ul>
-            <li><Link href="/">Inicio</Link></li>
-            <li><Link href="/servicios">Servicios</Link></li>
-            <li><Link href="/proyectos">Proyectos</Link></li>
-            <li><Link href="/nosotros">Nosotros</Link></li>
-            <li><Link href="/contacto">Contacto</Link></li>
+            <li><Link href="/" prefetch={false}>Inicio</Link></li>
+            <li><Link href="/servicios" prefetch={false}>Servicios</Link></li>
+            <li><Link href="/proyectos" prefetch={false}>Proyectos</Link></li>
+            <li><Link href="/nosotros" prefetch={false}>Nosotros</Link></li>
+            <li><Link href="/contacto" prefetch={false}>Contacto</Link></li>
           </ul>
         </div>
 

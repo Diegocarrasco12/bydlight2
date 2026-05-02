@@ -23,7 +23,7 @@ export default function Navbar() {
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="navbar-container">
 
-        <Link href="/" className="navbar-logo">
+        <Link href="/" className="navbar-logo" prefetch={false}>
           <img src="/img/logos/logo2.png" alt="BYD Light Solutions" />
         </Link>
 
@@ -31,25 +31,25 @@ export default function Navbar() {
         <ul className={`navbar-menu ${menuOpen ? "active" : ""}`}>
 
           <li onClick={() => setMenuOpen(false)}>
-            <Link href="/servicios">Servicios</Link>
+            <Link href="/servicios" prefetch={false}>Servicios</Link>
           </li>
 
           <li onClick={() => setMenuOpen(false)}>
-            <Link href="/proyectos">Proyectos</Link>
+            <Link href="/proyectos" prefetch={false}>Proyectos</Link>
           </li>
 
           <li onClick={() => setMenuOpen(false)}>
-            <Link href="/nosotros">Nosotros</Link>
+            <Link href="/nosotros" prefetch={false}>Nosotros</Link>
           </li>
 
           <li onClick={() => setMenuOpen(false)}>
-            <Link href="/contacto">Contacto</Link>
+            <Link href="/contacto" prefetch={false}>Contacto</Link>
           </li>
 
         </ul>
 
         {/* CTA */}
-        <Link href="/contacto" className="navbar-cta">
+        <Link href="/contacto" className="navbar-cta" prefetch={false}>
           Solicitar asesoría
         </Link>
 
