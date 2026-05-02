@@ -32,7 +32,7 @@ export default function ServiciosPage() {
                         automatizar y optimizar sus procesos.
                     </p>
 
-                    <Link href="/contacto" className="btn-primary">
+                    <Link href="/contacto" className="btn-primary" prefetch={false}>
                         Solicitar asesoría
                     </Link>
                 </div>
@@ -95,7 +95,7 @@ export default function ServiciosPage() {
             {/* CTA FINAL */}
             <section className="servicios-cta">
                 <h2>¿Listo para mejorar tu negocio?</h2>
-                <Link href="/contacto" className="btn-primary">
+                <Link href="/contacto" className="btn-primary" prefetch={false}>
                     Hablemos de tu proyecto
                 </Link>
             </section>
