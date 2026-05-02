@@ -1,32 +1,38 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import emailjs from "@emailjs/browser"
 import "./contacto.css"
 
 export default function ContactoPage() {
 
     const formRef = useRef<HTMLFormElement | null>(null)
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const [sending, setSending] = useState(false)
+    const [status, setStatus] = useState("")
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (!formRef.current) return
+        if (!formRef.current || sending) return
 
-        emailjs.sendForm(
-            "service_z3s5mho",
-            "template_jnsxd4o",
-            formRef.current,
-            "_sCMwpxerur2jJ7SP"
-        )
-        .then(() => {
-            alert("Mensaje enviado correctamente 🚀")
-            formRef.current?.reset()
-        })
-        .catch((error) => {
-            console.log(error)
-            alert("Error al enviar ❌")
-        })
+        setSending(true)
+        setStatus("")
+
+        try {
+            await emailjs.sendForm(
+                "service_z3s5mho",
+                "template_jnsxd4o",
+                formRef.current,
+                "_sCMwpxerur2jJ7SP"
+            )
+
+            setStatus("Mensaje enviado correctamente.")
+            formRef.current.reset()
+        } catch (error) {
+            console.error("Error EmailJS:", error)
+            setStatus("No se pudo enviar el mensaje. Intenta nuevamente.")
+        } finally {
+            setSending(false)
+        }
     }
 
     return (
@@ -34,7 +40,7 @@ export default function ContactoPage() {
             {/* 🔥 HERO */}
             <section className="contact-hero">
 
-                <video 
+                <video
                     className="contact-video"
                     src="/videos/hero4.mp4"
                     autoPlay
@@ -74,34 +80,38 @@ export default function ContactoPage() {
                     </div>
 
                     {/* FORMULARIO */}
-                    <form 
+                    <form
                         ref={formRef}
                         onSubmit={handleSubmit}
                         className="contact-form"
                     >
 
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             name="nombre"
-                            placeholder="Nombre" 
-                            required 
+                            placeholder="Nombre"
+                            required
                         />
 
-                        <input 
-                            type="email" 
+                        <input
+                            type="email"
                             name="email"
-                            placeholder="Correo electrónico" 
-                            required 
+                            placeholder="Correo electrónico"
+                            required
                         />
 
-                        <textarea 
+                        <textarea
                             name="mensaje"
-                            placeholder="Cuéntanos tu proyecto..." 
-                            rows={5} 
-                            required 
+                            placeholder="Cuéntanos tu proyecto..."
+                            rows={5}
+                            required
                         />
 
-                        <button type="submit">Enviar mensaje</button>
+                        <button type="submit" disabled={sending}>
+                            {sending ? "Enviando..." : "Enviar mensaje"}
+                        </button>
+
+                        {status && <p className="form-status">{status}</p>}
 
                     </form>
 
