@@ -24,7 +24,7 @@ export default function Navbar() {
       <div className="navbar-container">
 
         <Link href="/" className="navbar-logo">
-          <img src="/img/logos/logo1.png" alt="BYD Light Solutions" />
+          <img src="/img/logos/logo2.png" alt="BYD Light Solutions" />
         </Link>
 
         {/* MENU */}

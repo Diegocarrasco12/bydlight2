@@ -23,7 +23,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: .3 }}
         >
-          Arquitectura de Software
+          Arquitectura de <span>Software</span>
           <br />
           y Desarrollo Web
         </motion.h1>
@@ -37,7 +37,7 @@ export default function Hero() {
         </motion.p>
 
         <motion.div
-          className="hero-buttons"
+          className="hero-buttons hero-buttons-mobile"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: .9 }}
@@ -58,6 +58,7 @@ export default function Hero() {
         </motion.div>
 
       </motion.div>
+      <div className="hero-mobile-orb"></div>
       <video
         className="hero-video"
         autoPlay

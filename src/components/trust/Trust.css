@@ -1,113 +1,177 @@
-.trust{
-    padding:100px 20px;
-    background:#070b14;
-    color:white;
+.trust {
+    padding: 100px 20px;
+    background: #070b14;
+    color: white;
 }
 
-.trust-container{
-    max-width:1000px;
-    margin:0 auto;
-    text-align:center;
+.trust-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center;
 }
 
-.trust h2{
-    font-size:36px;
-    margin-bottom:10px;
+.trust h2 {
+    font-size: 36px;
+    margin-bottom: 10px;
 }
 
-.trust-sub{
-    color:#94a3b8;
-    margin-bottom:50px;
+.trust-sub {
+    color: #94a3b8;
+    margin-bottom: 50px;
 }
 
 /* grid */
+.trust-slider {
+    width: 100%;
+}
 
-.trust-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:20px;
+.trust-track {
+    width: 100%;
+}
+
+.trust-grid.trust-grid-copy {
+    display: none;
+}
+
+.trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
 }
 
 /* cards */
 
-.trust-card{
-    padding:25px 20px;
-    border-radius:12px;
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.08);
-    transition:.3s;
+.trust-card {
+    padding: 25px 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: .3s;
 
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
 }
 
 /* 🔥 LOGOS */
-.trust-card img{
-    width:100%;
-    max-width:120px;
-    height:60px;
-    object-fit:contain;
+.trust-card img {
+    width: 100%;
+    max-width: 120px;
+    height: 60px;
+    object-fit: contain;
 
-    filter:none; /* 🔥 clave */
-    opacity:0.95;
+    filter: none;
+    /* 🔥 clave */
+    opacity: 0.95;
 
-    transition:.3s ease;
+    transition: .3s ease;
 }
 
 /* texto */
 
-.trust-card span{
-    font-weight:600;
-    font-size:13px;
-    letter-spacing:1px;
-    color:#cbd5e1;
+.trust-card span {
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #cbd5e1;
 }
 
 /* hover */
 
-.trust-card:hover{
-    border-color:#ff6a00;
-    transform:translateY(-3px);
+.trust-card:hover {
+    border-color: #ff6a00;
+    transform: translateY(-3px);
 }
 
-.trust-card:hover img{
-    transform:scale(1.05);
-    opacity:1;
+.trust-card:hover img {
+    transform: scale(1.05);
+    opacity: 1;
 }
 
-/* responsive */
-@media(max-width:768px){
+@media(max-width:768px) {
 
-    .trust-grid{
-        display:flex;
-        overflow-x:auto;
-        gap:15px;
-
-        padding-bottom:10px;
-
-        scroll-snap-type:x mandatory;
-        scroll-behavior:smooth;
+    .trust {
+        overflow: hidden;
+        padding: 90px 0;
     }
 
-    .trust-grid::-webkit-scrollbar{
-        display:none;
+    .trust-container {
+        max-width: 100%;
+        padding: 0;
     }
 
-}
-@media(max-width:768px){
+    .trust h2 {
+        max-width: 340px;
+        margin: 0 auto 12px;
+        padding: 0 22px;
 
-    .trust-card{
-        min-width:140px;
-        max-width:140px;
-
-        flex:0 0 auto;
-
-        scroll-snap-align:start;
-
-        padding:20px 15px;
+        font-size: 32px;
+        line-height: 1.12;
+        font-weight: 900;
+        letter-spacing: -0.8px;
     }
 
+    .trust-sub {
+        max-width: 320px;
+        margin: 0 auto 45px;
+        padding: 0 22px;
+
+        font-size: 15px;
+        line-height: 1.45;
+        color: rgba(203, 213, 225, .86);
+    }
+
+    .trust-slider {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .trust-track {
+        display: flex;
+        width: max-content;
+        gap: 16px;
+        animation: trustAutoSlide 22s linear infinite;
+    }
+
+    .trust-grid {
+        display: flex;
+        gap: 16px;
+    }
+
+    .trust-grid.trust-grid-copy {
+        display: flex;
+    }
+
+    .trust-card {
+        flex: 0 0 150px;
+        width: 150px;
+        min-width: 150px;
+        max-width: 150px;
+
+        min-height: 145px;
+        padding: 22px 16px;
+        border-radius: 18px;
+    }
+
+    .trust-card img {
+        max-width: 105px;
+        height: 55px;
+    }
+
+    .trust-card span {
+        font-size: 12px;
+        line-height: 1.25;
+    }
+
+    @keyframes trustAutoSlide {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-50%);
+        }
+    }
 }

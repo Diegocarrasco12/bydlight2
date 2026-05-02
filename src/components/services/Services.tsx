@@ -14,38 +14,74 @@ export default function Services() {
                     Diseñamos arquitectura, sistemas y soluciones tecnológicas para empresas que quieren escalar.
                 </p>
 
-                <div className="services-grid">
+                <div className="services-slider">
 
-                    {/* 1. ARQUITECTURA (TU FUERTE) */}
-                    <div className="service-card">
-                        <h3>Arquitectura de Software</h3>
-                        <p>
-                            Diseñamos la estructura tecnológica de tu empresa para asegurar escalabilidad, rendimiento y estabilidad.
-                        </p>
-                    </div>
+                    <div className="services-track">
 
-                    {/* 2. SISTEMAS */}
-                    <div className="service-card">
-                        <h3>Sistemas a Medida</h3>
-                        <p>
-                            Creamos soluciones adaptadas a tus procesos reales, mejorando eficiencia y control operativo.
-                        </p>
-                    </div>
+                        <div className="services-grid">
 
-                    {/* 3. AUTOMATIZACIÓN */}
-                    <div className="service-card">
-                        <h3>Automatización de Procesos</h3>
-                        <p>
-                            Eliminamos tareas manuales, reducimos errores y optimizamos tu operación con tecnología inteligente.
-                        </p>
-                    </div>
+                            <div className="service-card">
+                                <h3>Arquitectura de Software</h3>
+                                <p>
+                                    Diseñamos la estructura tecnológica de tu empresa para asegurar escalabilidad, rendimiento y estabilidad.
+                                </p>
+                            </div>
 
-                    {/* 4. DESARROLLO WEB */}
-                    <div className="service-card">
-                        <h3>Desarrollo Web</h3>
-                        <p>
-                            Sitios modernos y optimizados para presencia digital y captación de clientes.
-                        </p>
+                            <div className="service-card">
+                                <h3>Sistemas a Medida</h3>
+                                <p>
+                                    Creamos soluciones adaptadas a tus procesos reales, mejorando eficiencia y control operativo.
+                                </p>
+                            </div>
+
+                            <div className="service-card">
+                                <h3>Automatización de Procesos</h3>
+                                <p>
+                                    Eliminamos tareas manuales, reducimos errores y optimizamos tu operación con tecnología inteligente.
+                                </p>
+                            </div>
+
+                            <div className="service-card">
+                                <h3>Desarrollo Web</h3>
+                                <p>
+                                    Sitios modernos y optimizados para presencia digital y captación de clientes.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div className="services-grid services-grid-copy">
+
+                            <div className="service-card">
+                                <h3>Arquitectura de Software</h3>
+                                <p>
+                                    Diseñamos la estructura tecnológica de tu empresa para asegurar escalabilidad, rendimiento y estabilidad.
+                                </p>
+                            </div>
+
+                            <div className="service-card">
+                                <h3>Sistemas a Medida</h3>
+                                <p>
+                                    Creamos soluciones adaptadas a tus procesos reales, mejorando eficiencia y control operativo.
+                                </p>
+                            </div>
+
+                            <div className="service-card">
+                                <h3>Automatización de Procesos</h3>
+                                <p>
+                                    Eliminamos tareas manuales, reducimos errores y optimizamos tu operación con tecnología inteligente.
+                                </p>
+                            </div>
+
+                            <div className="service-card">
+                                <h3>Desarrollo Web</h3>
+                                <p>
+                                    Sitios modernos y optimizados para presencia digital y captación de clientes.
+                                </p>
+                            </div>
+
+                        </div>
+
                     </div>
 
                 </div>
