@@ -1,0 +1,22 @@
+# Archivo: %USERPROFILE%\.ssh\bd-deploy.config   (SEPARADO de ~/.ssh/config y de oe-deploy.config; lo usa solo bd-deploy.ps1)
+#
+# Clave EXCLUSIVA para la cuenta restringida `bddeploy` (ya generada: id_ed25519_bddeploy; NO reutilizar la de otros proyectos).
+# La clave publica se instala en el servidor con install.sh --pubkey-file (lo ejecuta el administrador).
+# Esta clave solo permite invocar el ejecutor bd-gate: aunque Claude la leyera, no abre shell ni accede a Docker.
+#
+# Canal: el SSH del servidor escucha solo en 127.0.0.1:22; se llega por el Cloudflare Tunnel con `cloudflared access ssh`.
+# <SSH_HOSTNAME> es el hostname del tunel que enruta a ssh://localhost:22 (lo define el administrador; NO se versiona).
+# Si la sesion de Cloudflare Access caduca, use un service token propio de bydlight: defina en su PC las variables de
+# entorno TUNNEL_SERVICE_TOKEN_ID y TUNNEL_SERVICE_TOKEN_SECRET (nunca en este archivo ni en el repositorio).
+
+Host bd-deploy
+    HostName <SSH_HOSTNAME>
+    User bddeploy
+    IdentityFile <RUTA_USUARIO>\.ssh\id_ed25519_bddeploy
+    IdentitiesOnly yes
+    PasswordAuthentication no
+    PreferredAuthentications publickey
+    ForwardAgent no
+    ForwardX11 no
+    RequestTTY no
+    ProxyCommand <RUTA_CLOUDFLARED>\cloudflared.exe access ssh --hostname %h

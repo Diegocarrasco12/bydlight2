@@ -1,0 +1,6 @@
+# Los archivos de despliegue corren en Linux: finales de linea LF siempre (git en Windows convertiria a CRLF).
+deploy/** text eol=lf
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+.dockerignore text eol=lf
+*.sh text eol=lf

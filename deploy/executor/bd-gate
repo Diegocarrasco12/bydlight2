@@ -1,0 +1,50 @@
+#!/usr/bin/python3 -I
+"""bd-gate: comando FORZADO de la cuenta `bddeploy` (sshd ForceCommand + authorized_keys command=).
+
+Corre sin privilegios. Valida SSH_ORIGINAL_COMMAND contra la gramatica cerrada y solo entonces invoca
+`sudo -n bd-run <operacion> [arg]` con argv (nunca por shell). Cualquier otra cosa se rechaza.
+"""
+import os
+import sys
+import syslog
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, "/usr/local/lib/bd-deploy")
+
+import bd_lib as L  # noqa: E402
+
+POLICY = "/etc/bd-deploy/policy.json"
+BD_RUN = "/usr/local/sbin/bd-run"
+SUDO = "/usr/bin/sudo"
+
+
+def reject(msg, raw):
+    syslog.openlog("bd-gate", 0, syslog.LOG_AUTH)
+    syslog.syslog(syslog.LOG_WARNING, "rechazado: %s | conn=%s | cmd=%r" % (
+        msg, os.environ.get("SSH_CONNECTION", "?"), (raw or "")[:80]))
+    sys.stderr.write("bd-gate: rechazado (%s)\n" % msg)
+    sys.exit(126)
+
+
+def build_argv(raw, policy_loader=lambda: L.load_policy(POLICY)):
+    """argv de sudo para una peticion valida; lanza RequestError (o ValueError) si no lo es."""
+    policy = policy_loader()
+    req = L.parse_request(raw, policy)
+    return [SUDO, "-n", "--", BD_RUN, req.op, *req.args]
+
+
+def main():
+    raw = os.environ.get("SSH_ORIGINAL_COMMAND")
+    if raw is None:
+        reject("sin comando (sesion interactiva no permitida)", raw)
+    try:
+        argv = build_argv(raw)
+    except L.RequestError as e:
+        reject(str(e), raw)
+    except Exception:  # noqa: BLE001
+        reject("politica ilegible", raw)
+    os.execv(SUDO, argv)
+
+
+if __name__ == "__main__":
+    main()

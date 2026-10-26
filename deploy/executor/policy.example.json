@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "common": {
+    "service_user": "bddeploy",
+    "state_dir": "/var/lib/bd-deploy",
+    "log_dir": "/var/log/bd-deploy",
+    "docker": "/usr/bin/docker",
+    "git": "/usr/bin/git",
+    "known_hosts": "/etc/bd-deploy/known_hosts",
+    "git_remote_url": "git@github.com:<GITHUB_USER>/bydlight2.git",
+    "git_branch": "main",
+    "min_mem_available_mb": 1536,
+    "min_disk_free_gb": 10,
+    "build_timeout_s": 1800
+  },
+  "project": {
+    "project": "bydlight-prod",
+    "app_dir": "/srv/bydlight-prod/app",
+    "compose_files": ["docker-compose.prod.yml"],
+    "deploy_key": "/etc/bd-deploy/keys/prod_deploy",
+    "image_repo": "bydlight-web",
+    "service": "web",
+    "port": 8200,
+    "container_port": 3000,
+    "networks": ["app"],
+    "http_checks": ["/", "/servicios", "/proyectos", "/nosotros", "/contacto"],
+    "keep_releases": 5
+  }
+}

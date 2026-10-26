@@ -1,0 +1,36 @@
+#!/usr/bin/python3 -I
+"""bd-approve: aprobacion humana de un solo uso (solo root, solo el administrador). La cuenta bddeploy no puede ejecutarla.
+
+  sudo bd-approve accept-compose <sha40> [minutos]     # vigencia 1-120 min (por defecto 30), ligada al commit
+"""
+import os
+import sys
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, "/usr/local/lib/bd-deploy")
+
+import bd_lib as L  # noqa: E402
+
+POLICY = "/etc/bd-deploy/policy.json"
+
+
+def main(argv):
+    if os.geteuid() != 0:
+        sys.stderr.write("bd-approve: ejecute con sudo\n")
+        return 126
+    policy = L.load_policy(POLICY)
+    who = os.environ.get("SUDO_USER", "root")
+    if who == policy["common"]["service_user"]:
+        sys.stderr.write("bd-approve: la cuenta de servicio no puede aprobar\n")
+        return 126
+    if len(argv) not in (3, 4) or argv[1] != "accept-compose" or not L.SHA_RE.fullmatch(argv[2]):
+        sys.stderr.write(__doc__)
+        return 2
+    minutes = int(argv[3]) if len(argv) == 4 and argv[3].isdigit() else 30
+    path = L.write_approval(policy, argv[1], argv[2], minutes, who)
+    print(f"aprobado {argv[1]} {argv[2][:12]} por {minutes} min (un solo uso): {path}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

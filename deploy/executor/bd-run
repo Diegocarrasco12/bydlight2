@@ -1,0 +1,91 @@
+#!/usr/bin/python3 -I
+"""bd-run: ejecutor PRIVILEGIADO (root) del despliegue de bydlight2. Se invoca solo via `sudo` desde bd-gate (o por el
+administrador). Re-valida todo; no confia en el llamador. Ver docs/despliegue-automatizado.md."""
+import json
+import os
+import sys
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, "/usr/local/lib/bd-deploy")
+
+import bd_lib as L  # noqa: E402
+import bd_ops as O  # noqa: E402
+
+POLICY = "/etc/bd-deploy/policy.json"
+
+
+def audit_sink_factory(policy):
+    path = os.path.join(policy["common"]["log_dir"], "audit.log")
+
+    def sink(rec):
+        os.makedirs(policy["common"]["log_dir"], mode=0o750, exist_ok=True)
+        fd = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o640)
+        try:
+            os.write(fd, (json.dumps(rec, ensure_ascii=False) + "\n").encode())
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+    return sink
+
+
+def main(argv):
+    if os.geteuid() != 0:
+        sys.stderr.write("bd-run: debe ejecutarse como root (via sudo)\n")
+        return 126
+    os.umask(0o077)
+    keep = {k: os.environ[k] for k in ("SUDO_USER", "SSH_CONNECTION", "BD_JOB_TOKEN") if k in os.environ}
+    os.environ.clear()
+    os.environ.update(keep)
+    try:
+        policy = L.load_policy(POLICY)
+    except Exception:  # noqa: BLE001
+        sys.stderr.write("bd-run: politica invalida o ilegible\n")
+        return 78
+    args = argv[1:]
+    if any(not a or any(c.isspace() for c in a) for a in args):
+        sys.stderr.write("bd-run: argumentos invalidos\n")
+        return 2
+    caller = os.environ.get("SUDO_USER", "?")
+    mk = lambda: O.Ctx(policy=policy, audit_sink=audit_sink_factory(policy), caller=caller,  # noqa: E731
+                       conn=os.environ.get("SSH_CONNECTION", "?"))
+
+    # Trabajo en segundo plano (lo lanza el propio bd-run con un token que bddeploy no puede conocer)
+    if args and args[0] == "--run-job":
+        if len(args) != 2 or not L.JOB_RE.fullmatch(args[1]):
+            return 2
+        ctx = mk()
+        try:
+            with open(os.path.join(ctx.state.dir, "jobs", args[1] + ".json"), encoding="utf-8") as fh:
+                job = json.load(fh)
+        except (OSError, ValueError):
+            return 2
+        if not job.get("token") or job["token"] != os.environ.get("BD_JOB_TOKEN"):
+            sys.stderr.write("bd-run: token de trabajo invalido\n")
+            return 2
+        res = O.Executor(ctx).run_build_job(args[1])
+        return 0 if res.rc == 0 else 1
+
+    # Operaciones SOLO de administrador: jamas desde la cuenta de servicio.
+    if args and args[0] in L.ADMIN_OPS:
+        if caller in ("?", policy["common"]["service_user"]) or len(args) != 1:
+            sys.stderr.write("bd-run: operacion reservada al administrador\n")
+            return 126
+        res = O.Executor(mk()).admin_init_clone()
+    else:
+        try:
+            req = L.parse_request(" ".join(args), policy)
+        except L.RequestError as e:
+            audit_sink_factory(policy)({"ts": "", "op": "?", "args": [" ".join(args)[:80]], "rc": 2, "caller": caller,
+                                        "msg": f"rechazado: {e}"})
+            sys.stderr.write(f"bd-run: peticion rechazada ({e})\n")
+            return 2
+        res = O.Executor(mk()).execute(req)
+    if res.out:
+        sys.stdout.write(res.out.rstrip("\n") + "\n")
+    if res.err:
+        sys.stderr.write(res.err.rstrip("\n") + "\n")
+    return min(max(res.rc, 0), 255)
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

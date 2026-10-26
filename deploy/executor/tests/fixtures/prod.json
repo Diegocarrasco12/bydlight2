@@ -1,0 +1,70 @@
+{
+  "name": "bydlight-prod",
+  "networks": {
+    "app": {
+      "ipam": {},
+      "name": "bydlight-prod_app"
+    }
+  },
+  "services": {
+    "web": {
+      "build": {
+        "context": "/srv/bydlight-prod/app",
+        "dockerfile": "Dockerfile"
+      },
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": null,
+      "cpus": 1,
+      "entrypoint": null,
+      "healthcheck": {
+        "interval": "15s",
+        "retries": 5,
+        "start_period": "20s",
+        "test": [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "/dev/null",
+          "http://127.0.0.1:3000/"
+        ],
+        "timeout": "5s"
+      },
+      "image": "bydlight-web:baseline",
+      "init": true,
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-file": "3",
+          "max-size": "10m"
+        }
+      },
+      "mem_limit": "536870912",
+      "networks": {
+        "app": null
+      },
+      "pids_limit": 256,
+      "ports": [
+        {
+          "host_ip": "127.0.0.1",
+          "mode": "ingress",
+          "protocol": "tcp",
+          "published": "8200",
+          "target": 3000
+        }
+      ],
+      "read_only": true,
+      "restart": "unless-stopped",
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp",
+        "/app/.next/cache:uid=1000,gid=1000,mode=0700"
+      ],
+      "user": "1000:1000"
+    }
+  }
+}
