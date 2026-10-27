@@ -76,7 +76,24 @@ export default function HeroStage() {
     // La escena se inicia con el navegador ocioso, despues del primer pintado: el titular nunca espera a three.js.
     const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
     const idle = (fn: () => void) => (ric ? ric(fn, { timeout: 1200 }) : setTimeout(fn, 400))
-    if (live && canvas.current) idle(() => {
+    // En movil la escena arranca con la primera interaccion (o a los 3,5 s): el primer pintado y la interactividad no compiten con WebGL.
+    const start = (fn: () => void) => {
+      if (!mobile) return idle(fn)
+      let done = false
+      const go = () => {
+        if (done) return
+        done = true
+        window.removeEventListener("scroll", go)
+        window.removeEventListener("touchstart", go)
+        window.removeEventListener("pointerdown", go)
+        idle(fn)
+      }
+      window.addEventListener("scroll", go, { passive: true, once: true })
+      window.addEventListener("touchstart", go, { passive: true, once: true })
+      window.addEventListener("pointerdown", go, { passive: true, once: true })
+      setTimeout(go, 3500)
+    }
+    if (live && canvas.current) start(() => {
       if (cancelled || !canvas.current) return
       import("./scene")
         .then(({ createScene }) => {

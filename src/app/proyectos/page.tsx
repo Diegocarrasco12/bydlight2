@@ -20,8 +20,9 @@ export default function ProyectosPage() {
         title={<>Proyectos que <span>ya están en producción</span></>}
         lead="Tiendas, plataformas y sitios que puedes visitar, más nuestras capacidades en software de escritorio."
       />
-      <section className="bd-section showcase" aria-label="Proyecto destacado">
+      <section className="bd-section showcase bd-light" aria-labelledby="feat-title">
         <div className="bd-container">
+          <h2 id="feat-title" className="sr-only">Proyecto destacado</h2>
           <ProjectFeature />
         </div>
       </section>

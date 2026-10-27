@@ -151,6 +151,36 @@ export const SERVICES: Service[] = [
     planIds: ["software"],
   },
   {
+    slug: "aplicaciones-moviles",
+    line: "ingenieria",
+    name: "Aplicaciones móviles",
+    short: "Apps para Android e iOS con Flutter, conectadas a tus sistemas y APIs.",
+    metaTitle: "Desarrollo de aplicaciones móviles con Flutter en Chile",
+    metaDescription:
+      "Desarrollamos aplicaciones móviles para Android e iOS con Flutter, conectadas a APIs y sistemas existentes. Cotización según alcance.",
+    intro:
+      "Una sola base de código en Flutter para Android e iOS, conectada a tu backend o a tus sistemas mediante APIs. Definimos el alcance antes de cotizar.",
+    problems: [
+      "Tu equipo en terreno aún registra datos en papel o planillas.",
+      "Necesitas una app que consulte o actualice información de tus sistemas.",
+      "Quieres ofrecer a tus clientes un canal móvil propio.",
+    ],
+    deliverables: [
+      "Aplicación Flutter para Android e iOS",
+      "Conexión con tu backend o ERP mediante APIs REST",
+      "Autenticación y control de acceso por usuario",
+      "Publicación en las tiendas y documentación técnica",
+    ],
+    fitsFor: ["Operaciones en terreno", "Empresas con sistemas internos", "Productos digitales propios"],
+    faq: [
+      {
+        q: "¿Se puede conectar la app a mi sistema actual?",
+        a: "Sí, si tu sistema expone una API o podemos construirla. Evaluamos la factibilidad antes de cotizar.",
+      },
+    ],
+    planIds: ["software"],
+  },
+  {
     slug: "integraciones-y-apis",
     line: "ingenieria",
     name: "Integración de sistemas y APIs",

@@ -126,7 +126,7 @@ export function createScene({ canvas, getDock, mobile }: Opts): SceneHandle {
   }
 
   // ---- Particulas -----------------------------------------------------------------------------
-  const COUNT = mobile ? 600 : 1100
+  const COUNT = mobile ? 380 : 1100
   const pos = new Float32Array(COUNT * 3)
   const col = new Float32Array(COUNT * 3)
   const sizes = new Float32Array(COUNT)

@@ -11,6 +11,7 @@ import { TECH_LOGOS } from "@/lib/techLogos"
 
 const ICONS: Record<string, React.ReactNode> = {
   "software-a-medida": <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" />,
+  "aplicaciones-moviles": <><rect x="7" y="2.5" width="10" height="19" rx="2.2" /><path d="M11 18.5h2" /></>,
   "desarrollo-web": <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18M7 6.5h.01M10 6.5h.01" /></>,
   ecommerce: <><path d="M3 4h2l2.4 11h10.2L20 8H6.2" /><circle cx="9" cy="19" r="1.4" /><circle cx="17" cy="19" r="1.4" /></>,
   "integraciones-y-apis": <><circle cx="6" cy="6" r="2.5" /><circle cx="18" cy="18" r="2.5" /><path d="M8.5 6H14a3 3 0 013 3v6.5M15.5 18H10a3 3 0 01-3-3V8.5" /></>,
@@ -21,7 +22,7 @@ const ICONS: Record<string, React.ReactNode> = {
 const HOME_SERVICES = [
   "software-a-medida",
   "desarrollo-web",
-  "ecommerce",
+  "aplicaciones-moviles",
   "integraciones-y-apis",
   "automatizacion-de-procesos",
   "arquitectura-de-software",
@@ -138,7 +139,7 @@ export function InfraBand() {
       <img
         className="infra-img"
         src="/img/stock/centro-de-datos-1280.webp"
-        srcSet="/img/stock/centro-de-datos-640.webp 640w, /img/stock/centro-de-datos-1280.webp 1280w"
+        srcSet="/img/stock/centro-de-datos-640.webp 640w, /img/stock/centro-de-datos-1280.webp 1280w, /img/stock/centro-de-datos-1920.webp 1920w"
         sizes="100vw"
         width={1280} height={853} loading="lazy" decoding="async" alt=""
       />
@@ -206,11 +207,32 @@ POST /b1s/v2/$batch
   )
 }
 
-const TECH_GROUPS: { title: string; items: string[]; extra?: string[] }[] = [
-  { title: "Web y plataformas", items: ["TypeScript", "React", "Next.js", "Node.js"] },
-  { title: "Escritorio", items: [".NET"], extra: ["C#", "Windows Forms"] },
-  { title: "Infraestructura", items: ["Docker", "Linux", "Git"] },
+// Experiencia tecnica del equipo (no son, por si solas, proyectos publicados: esos estan en /proyectos).
+// Sin logo en Simple Icons: insignia de texto propia (BADGES).
+const BADGES: Record<string, string> = { "C#": "C#", Java: "Jv", "SQL Server": "SQL", "Windows Forms": "WF", "Windows Server · IIS": "IIS" }
+
+const TECH_GROUPS: { title: string; items: string[] }[] = [
+  { title: "Backend y APIs", items: [".NET", "C#", "Node.js", "Python", "Java", "Spring Boot", "PHP"] },
+  { title: "Frontend y aplicaciones", items: ["TypeScript", "JavaScript", "React", "Next.js", "Flutter", "Dart", "Windows Forms"] },
+  { title: "Bases de datos", items: ["SQL Server", "PostgreSQL", "MySQL", "SQLite"] },
+  { title: "Infraestructura", items: ["Docker", "Linux", "Windows Server · IIS", "Git", "Cloudflare"] },
 ]
+
+function TechItem({ name }: { name: string }) {
+  const l = TECH_LOGOS[name]
+  return (
+    <li>
+      {l ? (
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style={{ fill: l.color }}>
+          <path d={l.d} />
+        </svg>
+      ) : (
+        <i aria-hidden="true">{BADGES[name]}</i>
+      )}
+      <span>{name === ".NET" ? ".NET / ASP.NET Core" : name}</span>
+    </li>
+  )
+}
 
 export function TechSection() {
   return (
@@ -220,30 +242,32 @@ export function TechSection() {
           <span className="bd-eyebrow">Tecnologías</span>
           <h2 id="tech-title" className="bd-h2">Con qué construimos</h2>
         </div>
+
+        <div className="tech-feature rv">
+          <div className="tf-copy">
+            <svg className="tf-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style={{ fill: TECH_LOGOS.SAP.color }}>
+              <path d={TECH_LOGOS.SAP.d} />
+            </svg>
+            <h3>Integración empresarial</h3>
+            <p>SAP Business One y su Service Layer, conectados con tus sistemas y tus aplicaciones.</p>
+          </div>
+          <ul className="tf-list">
+            <li>SAP Business One · Service Layer</li>
+            <li>APIs REST propias y de terceros</li>
+            <li>Autenticación, autorización y seguridad de APIs</li>
+            <li>Automatización de procesos entre sistemas</li>
+          </ul>
+        </div>
+
         <div className="tech-groups">
           {TECH_GROUPS.map((g) => (
             <div key={g.title} className="tech-group rv">
               <h3>{g.title}</h3>
-              <ul>
-                {g.items.map((n) => {
-                  const l = TECH_LOGOS[n]
-                  return (
-                    <li key={n}>
-                      <svg viewBox="0 0 24 24" width="36" height="36" aria-hidden="true" focusable="false" style={{ fill: l.color }}>
-                        <path d={l.d} />
-                      </svg>
-                      <span>{n}</span>
-                    </li>
-                  )
-                })}
-                {g.extra?.map((n) => (
-                  <li key={n} className="txt"><i aria-hidden="true">{n === "C#" ? "C#" : "WF"}</i><span>{n}</span></li>
-                ))}
-              </ul>
+              <ul>{g.items.map((n) => <TechItem key={n} name={n} />)}</ul>
             </div>
           ))}
         </div>
-        <p className="tech-note">Solo listamos tecnologías presentes en este sitio y en nuestros proyectos publicados.</p>
+        <p className="tech-note">Experiencia técnica del equipo. Los proyectos publicados, con sus tecnologías verificadas, están en <Link href="/proyectos" prefetch={false}>Proyectos</Link>.</p>
       </div>
     </section>
   )
