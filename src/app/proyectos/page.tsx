@@ -1,133 +1,48 @@
-"use client"
+import type { Metadata } from "next"
+import Link from "next/link"
+import { FinalCta } from "@/components/home/sections"
+import { DesktopShowcase, PortfolioFeatured, PortfolioGrid } from "@/components/portfolio/Portfolio"
 
-import "./projects.css"
+export const metadata: Metadata = {
+  title: "Portafolio de proyectos web y software",
+  description:
+    "Proyectos reales de Byd Light Solutions: ecommerce Only Energy, plataforma de empleabilidad del CFT de Magallanes, sitios corporativos y software de escritorio para Windows.",
+  alternates: { canonical: "/proyectos" },
+  openGraph: { url: "/proyectos" },
+}
 
-export default function ProjectsPage() {
-    return (
-        <>
-            {/* 🔥 HERO */}
-            <section className="projects-hero">
+export default function ProyectosPage() {
+  return (
+    <>
+      <section className="bd-page-hero">
+        <div className="bd-container">
+          <nav className="bd-crumbs" aria-label="Migas de pan">
+            <Link href="/" prefetch={false}>Inicio</Link> / Proyectos
+          </nav>
+          <h1>Portafolio de proyectos</h1>
+          <p className="bd-lead">
+            Tiendas online, plataformas y sitios en producción, además de nuestras capacidades en software de escritorio.
+          </p>
+        </div>
+      </section>
 
-                <video
-                    className="projects-hero-video"
-                    src="/videos/hero6.mp4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                />
+      <section className="bd-section" aria-label="Proyecto destacado">
+        <div className="bd-container">
+          <PortfolioFeatured />
+        </div>
+      </section>
 
-                <div className="projects-hero-overlay">
+      <section className="bd-section bd-section-alt" aria-labelledby="more-title">
+        <div className="bd-container">
+          <div className="bd-head">
+            <h2 id="more-title" className="bd-h2">Más proyectos</h2>
+          </div>
+          <PortfolioGrid />
+        </div>
+      </section>
 
-                    <h1>Resultados reales</h1>
-
-                    <p>Software. Plataformas. Impacto.</p>
-
-                </div>
-
-            </section>
-
-            {/* 🔥 PROYECTOS */}
-            <section className="projects">
-
-                <div className="projects-container">
-
-                    <h2>Proyectos desarrollados</h2>
-
-                    <p className="projects-sub">
-                        Soluciones reales implementadas para empresas y clientes.
-                    </p>
-
-                    <p className="projects-message">
-                        Cada proyecto está diseñado para resolver problemas reales, mejorar procesos
-                        y aumentar la eficiencia de las empresas.
-                    </p>
-
-                    {/* 🔥 PROYECTO 1 */}
-                    <div className="project-feature">
-
-                        <div className="project-video">
-                            <video src="/videos/demo1.mp4" autoPlay loop muted playsInline />
-                        </div>
-
-                        <div className="project-info">
-                            <h3>LogisticControlCenter (LCC)</h3>
-                            <p>
-                                Software de control logístico en tiempo real para gestión de procesos industriales,
-                                trazabilidad y optimización operativa.
-                            </p>
-                        </div>
-
-                    </div>
-
-                    {/* 🔥 PROYECTO 2 */}
-                    <div className="project-feature reverse">
-
-                        <div className="project-video">
-                            <video src="/videos/demo2.mp4" autoPlay loop muted playsInline />
-                        </div>
-
-                        <div className="project-info">
-                            <h3>Bolsa de Trabajo CFT Magallanes</h3>
-                            <p>
-                                Plataforma completa de empleo con gestión de usuarios, empresas,
-                                postulaciones y administración avanzada.
-                            </p>
-
-                            <a href="https://bolsadetrabajo.cftdemagallanes.cl/" target="_blank">
-                                Ver proyecto
-                            </a>
-                        </div>
-
-                    </div>
-
-                    {/* 🔥 PROYECTO 3 */}
-                    <div className="project-feature">
-
-                        <div className="project-video">
-                            <video src="/videos/demo3.mp4" autoPlay loop muted playsInline />
-                        </div>
-
-                        <div className="project-info">
-                            <h3>Plataforma GINFET</h3>
-                            <p>
-                                Sitio web corporativo desarrollado con enfoque en presentación profesional,
-                                rendimiento y experiencia de usuario.
-                            </p>
-
-                            <a href="https://ginfet.cl/" target="_blank">
-                                Ver proyecto
-                            </a>
-                        </div>
-
-                    </div>
-
-                    {/* 🧱 PROYECTOS SECUNDARIOS */}
-                    <div className="projects-grid">
-
-                        <a href="https://www.tufarmaciadigital.cl/" target="_blank" className="project-card">
-                            <img src="/img/logos/logo4.png" alt="E-commerce Farmacia" />
-                            <h4>E-commerce Farmacia</h4>
-                            <p>Landing para ofrecer servicios farmacéuticos.</p>
-                        </a>
-
-                        <a href="https://mydconstruccionesspa.onrender.com/" target="_blank" className="project-card">
-                            <img src="/img/logos/logo3.png" alt="Constructora MYD" />
-                            <h4>Constructora MYD</h4>
-                            <p>Sitio corporativo enfocado en captación de clientes.</p>
-                        </a>
-
-                        <a href="https://angelyeva.es/" target="_blank" className="project-card">
-                            <img src="/img/logos/logo5.png" alt="Angel & Eva" />
-                            <h4>Angel & Eva</h4>
-                            <p>Landing de servicios y agenda de visitas. Colaboración con Teranube España</p>
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </section>
-        </>
-    )
+      <DesktopShowcase />
+      <FinalCta title="¿Quieres un proyecto como estos?" />
+    </>
+  )
 }
