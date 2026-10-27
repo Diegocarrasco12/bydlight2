@@ -25,3 +25,7 @@ dist
 # Archivos temporales de Python
 __pycache__/
 *.pyc
+# Configuracion local de Claude Code (reglas del ejecutor, rutas locales)
+.claude/
+.codex/
+*.tsbuildinfo

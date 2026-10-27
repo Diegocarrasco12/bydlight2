@@ -1,41 +1,81 @@
-# CLAUDE.md
+﻿# Protocolo Claude Code — Bydlight2
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Leer primero
+1. `docs/ESTADO_ACTUAL.md` (dónde quedó el proyecto; SHA desplegado y de rollback).
+2. `docs/PENDIENTES.md`. Detalle: `docs/ARQUITECTURA.md`, `docs/DESPLIEGUE.md`, `docs/DECISIONES_TECNICAS.md`, `docs/CALIDAD_Y_PRUEBAS.md`, `docs/CREDITOS-RECURSOS.md`.
+3. Producción (2026-10-27): **desplegado `56fdcf1cb6e05632a5425272dc3603364d0ec0cd`**, rollback `af710546c42ef4edb91eb2a5494a5b4e8033de69`.
+   Commits posteriores de documentación no implican despliegue. Verificar siempre con `status` antes de afirmar el estado real.
 
-## Commands
+## Alcance
+Trabajar exclusivamente en el repositorio Bydlight2.
+No modificar otros proyectos, contenedores, servicios ni configuraciones globales.
 
-- `npm run dev` — start dev server
-- `npm run build` / `npm start` — production build / serve
-- `npm run lint` — ESLint (flat config in `eslint.config.mjs`, `eslint-config-next`)
+## Flujo de desarrollo
+1. Revisar el estado de Git y comprender el cambio solicitado.
+2. Modificar solamente los archivos necesarios.
+3. Ejecutar pruebas, lint y build disponibles.
+4. Revisar diferencias y detectar secretos antes de publicar.
+5. Confirmar que GitHub utiliza Diegocarrasco12/bydlight2.
+6. Solicitar autorización antes de push y despliegue.
 
-There is no test suite.
+## Despliegue
+Utilizar exclusivamente el cliente restringido:
 
-## Architecture
+powershell -NoProfile -File C:/Users/dcarrasco/.claude/tools/bd-deploy/bd-deploy.ps1 -Op status
 
-Byd Light Solutions corporate site (Spanish-language, `lang="es"`): Next.js 16 App Router + React 19 + TypeScript, plain CSS (no Tailwind/CSS-in-JS), `framer-motion` for animation. No backend or API routes.
+Operaciones permitidas: status, preflight, verify, compose-diff,
+list-releases, job-status, logs, fetch, build, up, rollback.
 
-- `src/app/layout.tsx` wraps every page with `Navbar` and `Footer` and loads Geist fonts; global styles come from `src/app/globals.css`. Note `src/styles/globals.css` is **not imported anywhere** (dead file) — edit the one in `src/app/`.
-- Routes (`src/app/{contacto,servicios,proyectos,nosotros}/page.tsx`) are thin; the home page composes section components from `src/components/<name>/` (hero, services, projects, process, trust, cta, contact...).
-- Each component folder pairs the component with a same-named `.css` file imported directly by the component. Route-level pages have their own css (e.g. `contacto/contacto.css`). CSS is global (not modules, except `page.module.css`), so class names must stay unique across files.
-- Components are a mix of `.tsx` and `.jsx`.
-- Contact form (`src/app/contacto/page.tsx`) sends mail client-side via `@emailjs/browser` `sendForm`; EmailJS service/template/public key are configured in that file, not via env vars.
-- Media assets live in `public/videos` (hero/demo background videos) and `public/img`.
+Nunca usar SSH directo, Docker remoto, sudo remoto ni modificar
+Cloudflare, el dominio público o servicios de otros proyectos.
 
-## Infraestructura de servidor y despliegue
+## Publicación
+1. Obtener el SHA completo del commit autorizado.
+2. Confirmar push exitoso a GitHub personal.
+3. Ejecutar fetch con el SHA.
+4. Ejecutar preflight y revisar compose-diff.
+5. Ejecutar build y esperar su finalización.
+6. Solicitar autorización para up.
+7. Ejecutar verify y status.
+8. Informar SHA, resultado y cualquier incidencia.
 
-Este proyecto se despliega en el **servidor Ubuntu personal del usuario**, con el mismo modelo que `C:\Users\dcarrasco\Desktop\Proyectos\projectmanager` (leer su `DEPLOY.md`, `CLAUDE.md` y `deploy/` como referencia antes de crear nada de infraestructura aquí). Es un **proyecto independiente**: no se rige por la arquitectura de deploy de faret (`workspacefaret`) ni debe compartir con él ni con otros proyectos del servidor contenedores, redes, volúmenes, secretos, túnel ni puertos.
+Si cambia Docker Compose o la política de infraestructura,
+detenerse y solicitar aprobación administrativa.
+No ejecutar accept-compose automáticamente.
 
-Patrón heredado de projectmanager (adaptar, no copiar a ciegas; este sitio no tiene backend, base de datos ni Redis):
+## Fallos
+Detenerse ante errores.
+No realizar rollback sin autorización.
+No modificar ni reiniciar otros contenedores.
+No asumir que el despliegue local en puerto 8200 actualiza
+automáticamente el sitio público.
 
-- Proyecto Docker propio (`docker compose -p <proyecto>`), con directorio propio en `/srv/<proyecto>/` (`app/` = clon sin secretos, `secrets/` 700 con `.env` 600, `backups/`), redes y volúmenes con ese prefijo.
-- Sin proxy propio ni puertos 80/443 públicos: el contenedor publica un único puerto solo en `127.0.0.1` y un Cloudflare Tunnel (`cloudflared` en el host, TLS en Cloudflare) lo expone. Subdominios de un solo nivel.
-- Despliegue vía ejecutor restringido (`oe-deploy`/`oe-gate`, usuario sin sudo ni docker, deploy key de solo lectura en GitHub), no con SSH admin desde Claude. Reglas `ask` para operaciones en producción.
-- Nunca `prune`, `down -v` ni tocar otros proyectos del servidor. Desplegar solo con orden expresa del usuario en el chat.
-- Seguridad del repo: no versionar `.env`, dominios/IPs/IDs de túnel reales ni datos de infraestructura; usar placeholders (`<SERVER_HOST>`, `<CLOUDFLARE_TUNNEL_NAME>`...). Revisar `git status`/`git diff` antes de commitear y usar `git add <archivo>`.
+## Proyecto (una línea)
+Sitio corporativo de Byd Light Solutions SpA (ingeniería y desarrollo de software, Chile). Next.js 16 + React 19 + TypeScript, CSS propio (`src/styles/design.css`), hero three.js diferido,
+contacto por EmailJS. Docker standalone en servidor Ubuntu propio (`bydlight-prod`, 127.0.0.1:8200, Cloudflare Tunnel). Español.
 
-Implementado (2026-10-26, preparado localmente; **nada instalado ni desplegado aún**): `Dockerfile` + `docker-compose.prod.yml` (Next.js `output: "standalone"`, proyecto Docker `bydlight-prod`, solo `127.0.0.1:8200`), ejecutor independiente `bd-deploy` en `deploy/executor/` (`bd-gate` → `sudo bd-run`, política, línea base de compose con `accept-compose` aprobado por humano, rollback de imágenes, instalador transaccional `--plan/--apply/--verify` con reversión verificada y sudoers explícito por forma de petición; auditado, 129 pruebas) y cliente `deploy/executor/claude-code/bd-deploy.ps1`. Guía completa y pasos de instalación en `DEPLOY.md`.
+## Comandos
+`npm ci` · `npm test` (18 pruebas; requiere Node >= 22.13 por `node:sqlite`) · `npx tsc --noEmit` · `npm run lint` · `npm run build` · `npm run dev`.
+Tras el build: `git checkout next-env.d.ts`. No versionar `tsconfig.tsbuildinfo`. Commits con `git add <archivos>` explícitos.
 
-- Pruebas del ejecutor (sin servidor): `cd deploy/executor && python -B -m unittest discover -s tests`. Si cambia `docker-compose.prod.yml`, regenerar `tests/fixtures/prod.json` (la prueba `test_fixture_coincide...` lo exige) y revisar `compose-diff`.
-- Operaciones: `status preflight verify compose-diff list-releases job-status logs` (lectura); `fetch build up rollback accept-compose` (modifican; reglas `ask`). Nunca desplegar sin orden expresa del usuario.
-- Los scripts de `deploy/` y los Dockerfile deben mantener finales LF (`.gitattributes`).
-- Los valores reales (host SSH, dominio, túnel, usuario de GitHub) los define el usuario; no inventarlos ni versionarlos.
+## Restricciones permanentes
+- **Webpay/Transbank: apagados e invisibles** (`ONLINE_CHECKOUT_UI=false`). No activar pagos, `/contratar`, `/orden` ni endpoints de cobro sin autorización expresa (`docs/ACTIVACION-WEBPAY.md`).
+- **La palabra «WordPress» (ni «Divi») no debe aparecer** en la experiencia pública (textos, metadatos, JSON-LD, tarjetas, tecnologías).
+- No inventar clientes, cifras, testimonios, certificaciones, resultados ni licencias. Tecnologías = capacidades técnicas declaradas por el titular; proyectos demostrables solo con evidencia
+  (`src/lib/portfolio.ts`). Fotos de stock = ilustrativas y rotuladas, nunca presentadas como oficinas o equipo de Bydlight.
+- No exponer ni versionar secretos, claves SSH, hosts reales ni IDs de túnel. Revisar `git diff` antes de publicar.
+- No modificar Cloudflare, túneles, DNS, otros contenedores ni proyectos. No `docker system prune`, no `down -v`, no `accept-compose` automático, no cambiar Compose sin revisar política y línea base.
+- No eludir el sandbox, las reglas `deny` ni el hook `bd-deploy-guard`. No `git reset --hard`, `git clean -fd` ni force push.
+- Mantener rollback; no hacer `rollback` sin autorización.
+
+## Despliegue: precisiones
+- `fetch`, `build` y `up` (y `accept-compose`) llevan el SHA completo de 40 hex (`-OpArgs <sha40>`); `job-status` lleva el id del trabajo; `logs` lleva un número de líneas.
+- Orden comprobado: `status → fetch → preflight → compose-diff → build → job-status → up → verify → status`. Detalle en `docs/DESPLIEGUE.md`.
+- Si falta el cliente, el administrador lo restaura desde `deploy/executor/claude-code/bd-deploy.ps1` hacia `C:\Users\dcarrasco\.claude\tools\bd-deploy\bd-deploy.ps1` (Claude no puede escribir allí).
+- **Problema conocido:** a veces el ejecutor devuelve código 21 dentro de Claude Code y funciona en PowerShell normal. Causa raíz no demostrada; no culpar a Kaspersky ni a SSH sin evidencia.
+  Alternativa validada: el administrador despliega desde PowerShell normal. Ver `docs/DESPLIEGUE.md` §9.
+- Mediciones Lighthouse locales: Kaspersky inyecta un script en el navegador de prueba; se bloquea solo ahí (`--blocked-url-patterns`). No presentar mediciones de laboratorio como datos de usuarios.
+
+## Preferencias del titular
+Sitio premium, realista y profesional; alto contraste entre secciones; menos texto y más demostración visual; español natural y comercial, sin frases grandilocuentes; móvil de primera clase;
+rendimiento sin sacrificar la calidad. Trabajo autónomo hasta el final, deteniéndose solo ante operaciones sensibles (producción, Cloudflare, secretos, Webpay).

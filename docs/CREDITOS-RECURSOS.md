@@ -12,8 +12,22 @@ Optimizadas a WebP (640 y 1280 px; la banda a pantalla completa también 1920 px
 | `codigo-react-*.webp` | https://www.pexels.com/photo/4164418/ | Sección «Método» |
 | `fibra-optica-*.webp` | https://www.pexels.com/photo/2881229/ | Fondo tenue del contacto (home) |
 
+Detalles: originales descargados de `images.pexels.com` (1920 px) el 2026-10-27; convertidos con Pillow a WebP (calidad 55–66, `method=6`). Variantes: `centro-de-datos` 640/1280/1920 px
+(28/131/348 KB), `codigo-react` 640/1280 px (13/39 KB), `fibra-optica` 640/1280 px (17/38 KB). Los nombres de los fotógrafos no se registraron (la atribución no es obligatoria; si se desea acreditar, consultarlos en la página
+de cada foto). Restricciones de Pexels (comprobadas en su página de licencia): no revender copias sin modificar, no sugerir que las personas o marcas retratadas respaldan el producto, no usarlas como marca,
+no redistribuirlas en otras plataformas de stock. Se evaluó y **descartó** una foto con portada de libro de una marca editorial reconocible.
+
 ## Logos de tecnologías (Simple Icons, CC0 1.0)
 https://simpleicons.org — trazados incrustados en `src/lib/techLogos.ts`. Las marcas pertenecen a sus titulares y se muestran solo para nombrar tecnologías usadas. «C#» y «Windows Forms» usan una insignia de texto propia (no el logo oficial).
+
+## Capturas de proyectos (`public/img/portfolio/*.webp`)
+Capturas de pantalla de sitios **publicados** (Only Energy, CFT Magallanes, GINFET, Angel & Eva), tomadas con Playwright durante la jornada anterior, y de la **demo propia** de escritorio (`software-escritorio-demo.webp`, datos ficticios,
+código en `demos/windows-inventory/`). **El permiso de los titulares para mostrar las capturas no está documentado en el repositorio: pendiente de confirmar.** No se presentan interfaces ficticias como productos entregados.
+
+## Marca propia y otros archivos (procedencia/licencia **no documentadas**)
+`public/img/logos/*` (logo2 es el usado por `SITE.logo`; `logo2-sm.png` el pequeño; `logo1,3,4,5,6.png` y `favicon.png` sin uso verificado), `public/favicon.png`, `public/icon-192.png`, `public/og-image.png`,
+`public/img/clients/cft.png`, `src/assets/images/hero-bg.jpeg`. Se asume material de marca propia aportado por el titular; **confirmar**. `og-image.png` no se regeneró con la identidad nueva. Los PNG de logo pesan hasta 1,4 MB
+(optimización pendiente si se usan en rutas críticas).
 
 ## Videos
 No se incorporó video: la licencia de los videos de Mixkit («Restricted») no pudo verificarse y no se localizaron videos de Pexels adecuados. Pendiente si se aporta material propio.

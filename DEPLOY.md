@@ -178,8 +178,9 @@ python deploy\executor\claude-code\apply_claude_config.py --rollback # restaura 
 - Auditoría: `/var/log/bd-deploy/audit.log` (JSON por operación y por rechazo); rechazos del gate en `syslog` (`bd-gate`).
 - Estado: `/var/lib/bd-deploy/state.json` (release actual/anterior, línea base de compose).
 
-## 8. Pendiente que requiere tu autorización (no se hace por defecto)
+## 8. Estado (actualizado 2026-10-27)
 
-- Entrada de ingress del túnel `bydlight-tunnel` hacia `http://localhost:8200` y el DNS de `<WEB_DOMAIN>`. Mientras no exista,
-  el sitio corre solo en `127.0.0.1:8200` y no es público.
-- Primer despliegue a producción (`fetch/build/up`).
+- El ejecutor está instalado y operativo; el administrador desplegó `af71054` y luego `56fdcf1` (rollback disponible: `af71054`). Ver `docs/DESPLIEGUE.md` (procedimiento comprobado,
+  problemas conocidos) y `docs/ESTADO_ACTUAL.md`.
+- El ingress del túnel `bydlight-tunnel` hacia `http://localhost:8200` para `<WEB_DOMAIN>` y `www` lo configuró el administrador; el sitio público sirve el contenedor.
+- Sigue requiriendo autorización expresa: cualquier cambio de túnel/Cloudflare/DNS, cambios de Compose (`accept-compose`), activación de pagos y cualquier `up`/`rollback`.

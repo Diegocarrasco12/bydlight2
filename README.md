@@ -1,3 +1,5 @@
+> **Estado actual del proyecto, arquitectura y despliegue:** ver [`docs/ESTADO_ACTUAL.md`](docs/ESTADO_ACTUAL.md) y [`CLAUDE.md`](CLAUDE.md). Este README es una descripción general y puede estar desactualizado en detalles.
+
 # Byd Light Solutions – Plataforma Web Corporativa
 
 Sitio web profesional desarrollado para la presentación de servicios tecnológicos enfocados en **arquitectura de software, desarrollo de sistemas y soluciones digitales para empresas**.
