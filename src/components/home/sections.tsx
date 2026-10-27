@@ -6,6 +6,7 @@ import {
   PLAN_RULES,
   IVA_LABEL,
   PRICE_NOTE,
+  planHref,
   planWhatsappMessage,
 } from "@/lib/plans"
 import { SERVICES } from "@/lib/services"
@@ -162,7 +163,7 @@ export function PlansGrid({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
               </div>
               <div className="actions">
                 <Link
-                  href={`/contratar?plan=${p.id}`}
+                  href={planHref(p.id)}
                   prefetch={false}
                   className={`bd-btn bd-btn-block ${p.recommended ? "bd-btn-primary" : "bd-btn-ghost"}`}
                 >
@@ -189,7 +190,7 @@ export function PlansGrid({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
             </div>
             <div className="bd-custom-side">
               <strong>{custom.priceLabel}</strong>
-              <Link href="/contratar?plan=software" prefetch={false} className="bd-btn bd-btn-ghost">
+              <Link href={planHref("software")} prefetch={false} className="bd-btn bd-btn-ghost">
                 Cotizar proyecto
               </Link>
             </div>

@@ -2,6 +2,11 @@
 
 Estado a 2026-10-27. **Nada de esto está aplicado en el servidor.** Los pagos siguen apagados en producción.
 
+## 0. Estado de publicación: Webpay invisible y apagado
+- **Servidor**: sin `payments.json` ni `PAYMENTS_ENABLED`, `paymentsEnabled()` es `false` en producción. `/api/solicitudes` responde 503; `/api/pagos/*` no ejecutan operaciones; `/api/admin` responde 404; **no se abre ni se crea ninguna base ni archivo**.
+- **Interfaz**: `ONLINE_CHECKOUT_UI = false` (`src/lib/plans.ts`): «Solicitar este plan» lleva a `/contacto?plan=<id>` (mensaje prellenado) y WhatsApp. `/contratar` redirige a `/contacto`; `/orden` y `/orden/<id>` responden 404 sin consultar datos. Ningún texto público menciona Webpay/Transbank.
+- **Orden para activar después** (cada paso con tu autorización): (1) afiliación y validación con Transbank (sección 2); (2) aplicar volumen `/data` + `accept-compose` (sección 5); (3) crear `/data/config/payments.json` con `enabled:false`, código de comercio, llave y `adminSecret`; (4) ejecutar las validaciones de Transbank y la compra real de $50 (poniendo `enabled:true` solo durante la prueba); (5) cambiar `ONLINE_CHECKOUT_UI` a `true`, publicar con `fetch → build → up → verify` para mostrar los botones; (6) `enabled:true` definitivo. El interruptor `enabled:false` apaga los pagos en ≤ 5 s sin redeploy.
+
 ## 1. Qué hace cada parte
 
 | Quién | Qué |

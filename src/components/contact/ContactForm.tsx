@@ -1,13 +1,24 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import emailjs from "@emailjs/browser"
+import { PLANS } from "@/lib/plans"
 
 // Formulario de contacto original (EmailJS). Los identificadores de EmailJS son publicos por diseno.
 export default function ContactForm() {
   const formRef = useRef<HTMLFormElement | null>(null)
   const [sending, setSending] = useState(false)
   const [status, setStatus] = useState<{ ok: boolean; text: string } | null>(null)
+
+  // Llegar desde «Solicitar este plan» (/contacto?plan=...) deja el mensaje preparado; el usuario lo puede editar.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("plan")
+    const plan = PLANS.find((p) => p.id === id)
+    const field = formRef.current?.elements.namedItem("mensaje")
+    if (plan && field instanceof HTMLTextAreaElement && !field.value) {
+      field.value = `Hola, me interesa el plan ${plan.name}. Quisiera una cotización.`
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

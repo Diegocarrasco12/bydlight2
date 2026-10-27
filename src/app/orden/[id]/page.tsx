@@ -81,7 +81,8 @@ export default async function OrdenPage({
 }) {
   const { id } = await params
   const { aviso } = await searchParams
-  if (!isValidOrderId(id)) notFound()
+  // Con los pagos apagados no se consulta ni se expone ninguna orden (ni se abre la base).
+  if (!paymentsEnabled() || !isValidOrderId(id)) notFound()
   // Frena la busqueda de codigos al azar: cada IP puede consultar 40 ordenes por 10 min.
   if (rateLimited(`ord:${clientIp({ headers: await headers() })}`, 40, 10 * 60_000)) notFound()
   let order = await readOrder(id)

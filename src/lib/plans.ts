@@ -247,6 +247,18 @@ export const COMPARISON_ROWS: { label: string; key: keyof Plan["limits"] }[] = [
   { label: "Soporte posterior", key: "support" },
 ]
 
+/**
+ * Interfaz de contratacion en linea (solicitud + anticipo con Webpay). Mientras sea false, los botones de plan
+ * llevan a solicitar cotizacion por contacto/WhatsApp. Es solo la capa visual: los pagos se apagan ademas desde
+ * el servidor (paymentsEnabled) y /contratar y /orden se cierran aunque alguien conozca la URL.
+ */
+export const ONLINE_CHECKOUT_UI = false
+
+/** Destino del boton «Solicitar este plan». */
+export function planHref(planId: string) {
+  return ONLINE_CHECKOUT_UI ? `/contratar?plan=${planId}` : `/contacto?plan=${planId}`
+}
+
 export function planWhatsappMessage(plan: Plan) {
   return `Hola, me interesa el plan ${plan.name} de Byd Light Solutions. Quisiera una cotización.`
 }

@@ -1,6 +1,10 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import OrderLookup from "@/components/checkout/OrderLookup"
+import { paymentsEnabled } from "@/lib/payments/config"
+
+export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "Consultar estado de una orden",
@@ -9,6 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default function OrdenLookupPage() {
+  if (!paymentsEnabled()) notFound()
   return (
     <section className="bd-section" style={{ paddingTop: 140 }}>
       <div className="bd-container bd-checkout">

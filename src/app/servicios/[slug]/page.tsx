@@ -3,7 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import JsonLd from "@/components/seo/JsonLd"
 import { Faq, FinalCta } from "@/components/home/sections"
-import { PLANS } from "@/lib/plans"
+import { PLANS, planHref } from "@/lib/plans"
 import { SERVICES, getService } from "@/lib/services"
 import { absoluteUrl } from "@/lib/site"
 
@@ -111,7 +111,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             {priced.map((p) => (
               <Link
                 key={p.id}
-                href={`/contratar?plan=${p.id}`}
+                href={planHref(p.id)}
                 prefetch={false}
                 className={`bd-btn ${p.recommended ? "bd-btn-primary" : "bd-btn-ghost"}`}
               >

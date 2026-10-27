@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import ContractForm from "@/components/checkout/ContractForm"
 import { paymentsEnabled } from "@/lib/payments/config"
 import { storageWritable } from "@/lib/payments/store"
@@ -17,6 +18,8 @@ export const metadata: Metadata = {
 
 export default async function ContratarPage({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
   const { plan } = await searchParams
+  // Sin pagos habilitados el checkout no existe: se redirige a contacto (nada de solicitudes ni ordenes).
+  if (!paymentsEnabled()) redirect(`/contacto${plan && PLANS.some((p) => p.id === plan) ? `?plan=${plan}` : ""}`)
   const initial = PLANS.some((p) => p.id === plan) ? (plan as string) : "profesional"
   const available = paymentsEnabled() && (await storageWritable())
   const options = PLANS.map((p) => ({ id: p.id, name: p.name, priceLabel: p.priceLabel, fixed: p.priceFrom !== null }))
