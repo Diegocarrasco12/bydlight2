@@ -102,7 +102,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           </div>
 
           <aside className="bd-aside" aria-label="Cotizar este servicio">
-            <h2>{priced.length ? `Desde ${priced[0].priceLabel}` : "Cotización personalizada"}</h2>
+            <h2>{priced.length ? `Desde ${priced[0].priceLabel} + IVA` : "Cotización personalizada"}</h2>
             <p>
               {priced.length
                 ? "Valores referenciales en CLP. El alcance exacto se confirma en la cotización."
@@ -115,7 +115,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                 prefetch={false}
                 className={`bd-btn ${p.recommended ? "bd-btn-primary" : "bd-btn-ghost"}`}
               >
-                {p.name} · desde {p.priceLabel}
+                {p.name} · desde {p.priceLabel} + IVA
               </Link>
             ))}
             <Link href="/contacto" prefetch={false} className="bd-btn bd-btn-ghost">Solicitar cotización</Link>

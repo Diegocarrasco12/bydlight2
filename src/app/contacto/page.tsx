@@ -1,133 +1,60 @@
-"use client"
+import type { Metadata } from "next"
+import Link from "next/link"
+import BgVideo from "@/components/media/BgVideo"
+import ContactForm from "@/components/contact/ContactForm"
+import JsonLd from "@/components/seo/JsonLd"
+import { SITE, absoluteUrl, whatsappLink } from "@/lib/site"
 
-import { useRef, useState } from "react"
-import emailjs from "@emailjs/browser"
-import "./contacto.css"
+export const metadata: Metadata = {
+  title: "Contacto",
+  description:
+    "Cuéntanos tu proyecto web o de software a medida. Respondemos por correo o WhatsApp con una propuesta clara y sin compromiso.",
+  alternates: { canonical: "/contacto" },
+}
 
 export default function ContactoPage() {
+  const ld = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    url: absoluteUrl("/contacto"),
+    name: "Contacto Byd Light Solutions",
+    about: { "@id": absoluteUrl("/#organization") },
+  }
+  return (
+    <>
+      <JsonLd data={ld} />
+      <section className="bd-pagehero">
+        <BgVideo className="bd-pagehero-video" src="/videos/hero4.mp4" poster="/img/posters/hero4.webp" />
+        <div className="bd-pagehero-shade" />
+        <div className="bd-container bd-pagehero-body">
+          <span className="bd-eyebrow">Contacto</span>
+          <h1>Hablemos de tu <span>proyecto</span></h1>
+          <p>Cuéntanos qué necesitas. Analizamos tu caso y te proponemos una solución clara, sin compromiso.</p>
+        </div>
+      </section>
 
-    const formRef = useRef<HTMLFormElement | null>(null)
-    const [sending, setSending] = useState(false)
-    const [status, setStatus] = useState("")
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-
-        if (!formRef.current || sending) return
-
-        setSending(true)
-        setStatus("")
-
-        try {
-            await emailjs.sendForm(
-                "service_z3s5mho",
-                "template_jnsxd4o",
-                formRef.current,
-                "_sCMwpxerur2jJ7SP"
-            )
-
-            setStatus("Mensaje enviado correctamente.")
-            formRef.current.reset()
-        } catch (error) {
-            console.error("Error EmailJS:", error)
-            setStatus("No se pudo enviar el mensaje. Intenta nuevamente.")
-        } finally {
-            setSending(false)
-        }
-    }
-
-    return (
-        <>
-            {/* 🔥 HERO */}
-            <section className="contact-hero">
-
-                <video
-                    className="contact-video"
-                    src="/videos/hero4.mp4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                />
-
-                <div className="contact-overlay">
-                    <h1>Hablemos de tu proyecto</h1>
-                    <p>Soluciones reales para empresas reales</p>
-                </div>
-
-            </section>
-
-            {/* 📩 CONTACTO */}
-            <section className="contact-section">
-
-                <div className="contact-wrapper">
-
-                    {/* TEXTO */}
-                    <div className="contact-info">
-
-                        <h2>Cuéntanos lo que necesitas</h2>
-
-                        <p>
-                            Analizamos tu caso y te proponemos una solución clara,
-                            sin compromisos y enfocada en resultados.
-                        </p>
-
-                        <div className="contact-points">
-                            <span>✔ Respuesta rápida</span>
-                            <span>✔ Sin compromiso</span>
-                            <span>✔ Enfoque profesional</span>
-                        </div>
-
-                    </div>
-
-                    {/* FORMULARIO */}
-                    <form
-                        ref={formRef}
-                        onSubmit={handleSubmit}
-                        className="contact-form"
-                    >
-
-                        <input
-                            type="text"
-                            name="nombre"
-                            placeholder="Nombre"
-                            required
-                        />
-
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Correo electrónico"
-                            required
-                        />
-
-                        <textarea
-                            name="mensaje"
-                            placeholder="Cuéntanos tu proyecto..."
-                            rows={5}
-                            required
-                        />
-
-                        <button type="submit" disabled={sending}>
-                            {sending ? "Enviando..." : "Enviar mensaje"}
-                        </button>
-
-                        {status && <p className="form-status">{status}</p>}
-
-                    </form>
-
-                </div>
-
-            </section>
-
-            {/* 📧 EXTRA */}
-            <section className="contact-extra">
-
-                <p>
-                    También puedes escribir directamente a: <strong>contacto@bydlightsolutions.com</strong>
-                </p>
-
-            </section>
-
-        </>
-    )
+      <section className="bd-section">
+        <div className="bd-container bd-contact-grid">
+          <div className="bd-contact-info">
+            <h2 className="bd-h2">Cuéntanos lo que necesitas</h2>
+            <ul className="bd-checks">
+              <li>Respuesta por correo o WhatsApp</li>
+              <li>Cotización sin compromiso</li>
+              <li>Planes con alcance y plazos definidos</li>
+            </ul>
+            <div className="bd-contact-ways">
+              <a className="bd-btn bd-btn-primary" href={whatsappLink("Hola, quiero cotizar un proyecto con Byd Light Solutions.")} target="_blank" rel="noopener noreferrer">
+                Escribir por WhatsApp
+              </a>
+              <a className="bd-btn bd-btn-ghost" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+            </div>
+            <p className="bd-note" style={{ textAlign: "left" }}>
+              ¿Ya sabes qué plan necesitas? <Link href="/planes" prefetch={false}>Mira los planes y precios</Link>.
+            </p>
+          </div>
+          <ContactForm />
+        </div>
+      </section>
+    </>
+  )
 }

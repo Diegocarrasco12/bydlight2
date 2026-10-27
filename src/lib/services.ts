@@ -21,7 +21,7 @@ export const SERVICES: Service[] = [
     short: "Sitios profesionales, rápidos y listos para ser encontrados en Google.",
     metaTitle: "Desarrollo de páginas web en Chile",
     metaDescription:
-      "Creamos páginas web profesionales y rápidas para emprendedores y pymes en Chile: diseño responsive, SEO base, formulario y WhatsApp. Planes desde $149.990.",
+      "Creamos páginas web profesionales y rápidas para emprendedores y pymes en Chile: diseño responsive, SEO base, formulario y WhatsApp. Planes desde $149.990 + IVA.",
     intro:
       "Diseñamos y desarrollamos sitios web con alcance y precio definidos. Cada plan indica cuántas páginas incluye, cuántas revisiones tiene y qué debes entregar, para que sepas qué recibirás antes de empezar.",
     problems: [
@@ -55,7 +55,7 @@ export const SERVICES: Service[] = [
     short: "Tienda online con catálogo, carrito y medio de pago para vender desde tu sitio.",
     metaTitle: "Desarrollo de ecommerce y tiendas online en Chile",
     metaDescription:
-      "Desarrollamos tiendas online en Chile con catálogo, carrito, panel de administración y pasarela de pago. Plan Ecommerce desde $699.990.",
+      "Desarrollamos tiendas online en Chile con catálogo, carrito, panel de administración y pasarela de pago. Plan Ecommerce desde $699.990 + IVA.",
     intro:
       "Una tienda online debe ser simple de comprar y simple de administrar. Construimos el catálogo, el proceso de compra y el panel para que gestiones productos y pedidos sin depender de nadie.",
     problems: [
@@ -217,7 +217,7 @@ export const SERVICES: Service[] = [
     short: "Actualizaciones, respaldos y soporte para que tu sitio siga funcionando bien.",
     metaTitle: "Mantenimiento de sitios web en Chile",
     metaDescription:
-      "Planes de mantenimiento web mensual: actualizaciones de seguridad, respaldos, monitoreo y soporte. Desde $19.990 al mes.",
+      "Planes de mantenimiento web mensual: actualizaciones de seguridad, respaldos, monitoreo y soporte. Desde $19.990 + IVA al mes.",
     intro:
       "Un sitio necesita cuidado continuo. Nuestros planes mensuales cubren actualizaciones, respaldos, monitoreo y pequeños cambios, con alcance y tiempos de respuesta definidos.",
     problems: [

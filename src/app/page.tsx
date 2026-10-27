@@ -17,7 +17,7 @@ import { SITE, absoluteUrl } from "@/lib/site"
 export const metadata: Metadata = {
   title: { absolute: "Desarrollo web y software a medida en Chile | Byd Light Solutions" },
   description:
-    "Páginas web desde $149.990, ecommerce y software a medida para emprendedores, pymes y empresas en Chile. Planes con alcance, revisiones y plazos definidos.",
+    "Páginas web desde $149.990 + IVA, ecommerce y software a medida para emprendedores, pymes y empresas en Chile. Planes con alcance, revisiones y plazos definidos.",
   alternates: { canonical: "/" },
 }
 

@@ -4,6 +4,7 @@ import {
   MAINTENANCE,
   PLANS,
   PLAN_RULES,
+  IVA_LABEL,
   PRICE_NOTE,
   planWhatsappMessage,
 } from "@/lib/plans"
@@ -48,9 +49,9 @@ export function HomeHero() {
         <aside className="bd-quote bd-rise d3" aria-label="Precios de referencia">
           <h2>Cuánto puede costar</h2>
           <ul>
-            <li><span>Landing page</span><strong>Desde $149.990</strong></li>
-            <li><span>Web profesional</span><strong>Desde $299.990</strong></li>
-            <li><span>Ecommerce</span><strong>Desde $699.990</strong></li>
+            <li><span>Landing page</span><strong>Desde $149.990 + IVA</strong></li>
+            <li><span>Web profesional</span><strong>Desde $299.990 + IVA</strong></li>
+            <li><span>Ecommerce</span><strong>Desde $699.990 + IVA</strong></li>
             <li><span>Software a medida</span><strong>Cotización</strong></li>
           </ul>
           <small>{PRICE_NOTE}</small>
@@ -147,6 +148,7 @@ export function PlansGrid({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" 
               <div className="bd-price">
                 {p.priceFrom !== null && <small>Desde</small>}
                 <strong className={p.priceFrom === null ? "small" : undefined}>{p.priceLabel}</strong>
+                {p.priceFrom !== null && <span className="iva">{IVA_LABEL}</span>}
               </div>
               <ul className="feat">
                 {p.includes.slice(0, 5).map((i) => (
@@ -218,7 +220,7 @@ export function PlanComparison() {
                     {p.name}
                     {p.recommended ? " (recomendado)" : ""}
                     <br />
-                    <small>Desde {p.priceLabel}</small>
+                    <small>Desde {p.priceLabel} {IVA_LABEL}</small>
                   </th>
                 ))}
               </tr>
@@ -268,7 +270,7 @@ export function MaintenanceBlock() {
           {MAINTENANCE.map((m) => (
             <article key={m.id} className="bd-maint">
               <h3>{m.name}</h3>
-              <div className="bd-price"><small>Desde</small><strong>{m.priceLabel}</strong></div>
+              <div className="bd-price"><small>Desde</small><strong>{m.priceLabel}</strong><span className="iva">{IVA_LABEL}</span></div>
               <ul className="inc">{m.includes.map((i) => <li key={i}>{i}</li>)}</ul>
               <h4>No incluye</h4>
               <ul className="exc">{m.excluded.map((i) => <li key={i}>{i}</li>)}</ul>

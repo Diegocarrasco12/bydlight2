@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="bd-container">
         <div className="bd-footer-grid">
           <div>
-            <img src="/img/logos/logo2.png" alt={SITE.name} width={120} height={43} />
+            <img src={SITE.logoSmall} alt={SITE.name} width={120} height={43} />
             <p>
               Desarrollo web y software a medida para emprendedores, pymes y empresas en Chile.
             </p>

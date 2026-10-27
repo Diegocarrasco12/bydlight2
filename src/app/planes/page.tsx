@@ -7,7 +7,7 @@ import { absoluteUrl } from "@/lib/site"
 export const metadata: Metadata = {
   title: "Planes y precios de páginas web, ecommerce y software",
   description:
-    "Planes de desarrollo web en Chile: Emprendedor desde $149.990, Web Profesional desde $299.990, Web Empresa desde $499.990 y Ecommerce desde $699.990. Software a medida con cotización.",
+    "Planes de desarrollo web en Chile: Emprendedor desde $149.990, Web Profesional desde $299.990, Web Empresa desde $499.990 y Ecommerce desde $699.990, más IVA. Software a medida con cotización.",
   alternates: { canonical: "/planes" },
   openGraph: { url: "/planes", title: "Planes y precios | Byd Light Solutions" },
 }
@@ -28,6 +28,7 @@ export default function PlanesPage() {
             "@type": "PriceSpecification",
             minPrice: p.priceFrom,
             priceCurrency: "CLP",
+            valueAddedTaxIncluded: false,
           },
           seller: { "@id": absoluteUrl("/#organization") },
         })),

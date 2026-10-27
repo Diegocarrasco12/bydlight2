@@ -54,7 +54,7 @@ export default function ContractForm({ plans, initialPlan }: { plans: PlanOption
         <select id="plan" value={planId} onChange={(e) => setPlanId(e.target.value)}>
           {plans.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.name} — {p.fixed ? `desde ${p.priceLabel}` : p.priceLabel}
+              {p.name} — {p.fixed ? `desde ${p.priceLabel} + IVA` : p.priceLabel}
             </option>
           ))}
         </select>

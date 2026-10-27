@@ -29,7 +29,7 @@ export default function Navbar() {
     <header className={`bd-header${scrolled ? " scrolled" : ""}${open ? " open" : ""}`}>
       <div className="bd-container bd-header-inner">
         <Link href="/" className="bd-logo" prefetch={false} aria-label={`${SITE.name}, inicio`}>
-          <img src={SITE.logo} alt={SITE.name} width={112} height={40} />
+          <img src={SITE.logoSmall} alt={SITE.name} width={112} height={40} />
         </Link>
 
         <nav className="bd-nav" id="menu-principal" aria-label="Principal">

@@ -1,10 +1,13 @@
 // Planes y precios de referencia (CLP). Fuente unica: la pagina de planes, el home,
 // los datos estructurados y el sitemap leen de aqui.
 //
-// PENDIENTE DE APROBACION ANTES DE PUBLICAR: situacion del IVA (ver PRICE_NOTE).
+// IVA: los precios se muestran "Desde $X + IVA" (decision del titular). Confirmar que corresponde segun el
+// regimen tributario vigente antes de publicar; si cambia, ajustar solo IVA_LABEL y PRICE_NOTE.
+
+export const IVA_LABEL = "+ IVA"
 
 export const PRICE_NOTE =
-  "Valores referenciales en pesos chilenos (CLP). La situación del IVA se confirma en la cotización."
+  "Valores referenciales en pesos chilenos (CLP), más IVA. El valor final se confirma en la cotización."
 
 export type Plan = {
   id: string
