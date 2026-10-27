@@ -1,8 +1,10 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { headers } from "next/headers"
 import { notFound } from "next/navigation"
 import { paymentsEnabled } from "@/lib/payments/config"
-import { amountDue } from "@/lib/payments/service"
+import { clientIp, rateLimited } from "@/lib/payments/http"
+import { amountDue, verifyOrder } from "@/lib/payments/service"
 import { isValidOrderId, readOrder } from "@/lib/payments/store"
 import type { Attempt, Order } from "@/lib/payments/types"
 import { SITE, whatsappLink } from "@/lib/site"
@@ -15,6 +17,13 @@ export const metadata: Metadata = {
 }
 
 const clp = (n: number) => new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(n)
+function hasStalePending(o: Order) {
+  return o.attempts.some((a) => a.status === "INICIADO" && Date.now() - new Date(a.createdAt).getTime() > 2 * 60_000)
+}
+function maskEmail(e: string) {
+  const [u, d] = e.split("@")
+  return `${u.slice(0, 2)}${"•".repeat(Math.max(1, Math.min(6, u.length - 2)))}@${d}`
+}
 const when = (iso: string) => new Date(iso).toLocaleString("es-CL", { dateStyle: "medium", timeStyle: "short" })
 
 const AVISOS: Record<string, string> = {
@@ -73,8 +82,16 @@ export default async function OrdenPage({
   const { id } = await params
   const { aviso } = await searchParams
   if (!isValidOrderId(id)) notFound()
-  const order = await readOrder(id)
+  // Frena la busqueda de codigos al azar: cada IP puede consultar 40 ordenes por 10 min.
+  if (rateLimited(`ord:${clientIp({ headers: await headers() })}`, 40, 10 * 60_000)) notFound()
+  let order = await readOrder(id)
   if (!order) notFound()
+
+  // Recuperacion: si quedo un pago "en curso" (cliente cerro la ventana, retorno perdido), se consulta a Transbank.
+  if (hasStalePending(order) && paymentsEnabled()) {
+    await verifyOrder(id)
+    order = (await readOrder(id)) ?? order
+  }
 
   const last = order.attempts[order.attempts.length - 1]
   const pending = order.attempts.some((a) => a.status === "INICIADO")
@@ -105,7 +122,7 @@ export default async function OrdenPage({
         {order.stage === "SOLICITADA" && (
           <div className="bd-panel">
             <h2>Solicitud recibida</h2>
-            <p>Revisaremos tus requisitos y nuestra disponibilidad, y te enviaremos la cotización a <strong>{order.customer.email}</strong>. Cuando esté aprobada podrás pagar el anticipo desde esta página.</p>
+            <p>Revisaremos tus requisitos y nuestra disponibilidad, y te enviaremos la cotización a <strong>{maskEmail(order.customer.email)}</strong>. Cuando esté aprobada podrás pagar el anticipo desde esta página.</p>
             <p className="bd-note">Guarda este código: <strong>{order.id}</strong></p>
           </div>
         )}

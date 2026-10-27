@@ -68,4 +68,16 @@ CREATE TABLE events (
 CREATE INDEX events_by_order ON events(order_id, seq);
 `,
   },
+  {
+    version: 2,
+    name: "admin-nonces",
+    sql: `
+-- Nonces de la API administrativa firmada: cada peticion solo se acepta una vez (anti-repeticion).
+CREATE TABLE admin_nonces (
+  nonce   TEXT PRIMARY KEY CHECK (length(nonce) BETWEEN 16 AND 64),
+  used_at INTEGER NOT NULL
+) STRICT;
+CREATE INDEX admin_nonces_by_time ON admin_nonces(used_at);
+`,
+  },
 ]

@@ -20,3 +20,5 @@ docker-compose*.yml
 .data
 scripts
 demos
+tests
+docs

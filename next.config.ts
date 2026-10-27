@@ -12,7 +12,17 @@ const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    // Paginas de ordenes y API: nunca en cache, sin indexar y sin enviar el codigo de la orden como Referer a otros sitios (same-origin: el navegador si envia Origin en sus propios formularios).
+    const private_ = [
+      { key: "Cache-Control", value: "no-store" },
+      { key: "Referrer-Policy", value: "same-origin" },
+      { key: "X-Robots-Tag", value: "noindex, nofollow" },
+    ];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/orden/:path*", headers: private_ },
+      { source: "/api/:path*", headers: private_ },
+    ];
   },
 };
 

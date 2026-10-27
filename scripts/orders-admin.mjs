@@ -80,7 +80,7 @@ if (cmd === "list") {
   const db = open()
   const o = mustOrder(db, arg)
   if (o.stage !== "SOLICITADA" && o.stage !== "COTIZADA") die(`No se puede cotizar una orden en estado ${o.stage}.`)
-  if (db.prepare("SELECT 1 FROM attempts WHERE order_id = ? AND status = 'AUTORIZADO'").get(arg)) die("La orden ya tiene un pago autorizado.")
+  if (db.prepare("SELECT 1 FROM attempts WHERE order_id = ? AND status IN ('AUTORIZADO','INICIADO')").get(arg)) die("La orden tiene un pago autorizado o en curso.")
   const amount = Number(opt("amount"))
   const pct = Number(opt("deposit-percent", "50"))
   const days = Number(opt("valid-days", "7"))

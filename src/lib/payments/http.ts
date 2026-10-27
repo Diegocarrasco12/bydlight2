@@ -1,7 +1,8 @@
 import "server-only"
 import { SITE } from "@/lib/site"
+import { fileConfig } from "./config"
 
-export function clientIp(req: Request): string {
+export function clientIp(req: { headers: Headers }): string {
   return (
     req.headers.get("cf-connecting-ip") ??
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
@@ -27,7 +28,8 @@ export function rateLimited(key: string, max: number, windowMs: number): boolean
 /** Acepta solo peticiones originadas en nuestro propio sitio (defensa contra CSRF). */
 export function sameOrigin(req: Request): boolean {
   const allowed = new Set([SITE.url, new URL(req.url).origin])
-  if (process.env.PUBLIC_BASE_URL) allowed.add(process.env.PUBLIC_BASE_URL.replace(/\/$/, ""))
+  const configured = process.env.PUBLIC_BASE_URL ?? fileConfig().publicBaseUrl
+  if (configured) allowed.add(configured.replace(/\/$/, ""))
   const origin = req.headers.get("origin")
   if (origin) return allowed.has(origin)
   const site = req.headers.get("sec-fetch-site")

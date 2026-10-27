@@ -1,6 +1,6 @@
 import "server-only"
 import { PLANS } from "@/lib/plans"
-import { createTransaction } from "./config"
+import { createTransaction, tbkMode } from "./config"
 import { isValidOrderId, newOrderId, readOrder, withOrderLock, writeOrder } from "./store"
 import type { Attempt, Order, PaymentKind } from "./types"
 
@@ -106,6 +106,12 @@ export async function startPayment(orderId: string, kind: PaymentKind, baseUrl: 
       (a) => a.status === "INICIADO" && Date.now() - new Date(a.createdAt).getTime() < PENDING_MAX_MIN * 60_000,
     )
     if (pending) return { ok: false, reason: "Ya hay un pago en curso. Verifica su estado antes de reintentar.", code: "en-curso" }
+
+    // En produccion el retorno de Webpay debe ser siempre https.
+    if (tbkMode() === "production" && !baseUrl.startsWith("https://")) {
+      log("payment_start_blocked", { orderId: order.id, reason: "base-url-no-https" })
+      return { ok: false, reason: "No pudimos iniciar el pago. Intenta nuevamente en unos minutos.", code: "error" }
+    }
 
     const n = order.attempts.length + 1
     const buyOrder = `BL${order.id}-${String(n).padStart(2, "0")}` // 17 caracteres (maximo 26)
