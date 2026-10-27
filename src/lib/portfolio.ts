@@ -75,7 +75,7 @@ export const PROJECTS: Project[] = [
     kind: "Sitio de servicios",
     summary: "Sitio de peluquería con servicios, reservas y contacto. Desarrollado en colaboración con Teranube España.",
     verified: ["Páginas de servicios", "Acceso a reservas", "Sección de contacto"],
-    tech: ["WordPress", "Divi"],
+    tech: [],
     url: "https://angelyeva.es/",
     images: [img("/img/portfolio/angel-y-eva.webp", "Sitio web de la peluquería Angel & Eva")],
   },

@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import JsonLd from "@/components/seo/JsonLd"
 import HeroStage from "@/components/hero/HeroStage"
-import { Capabilities, HomeContact, Method, PlansTeaser, ProjectsShowcase, StackStrip } from "@/components/home/blocks"
+import { ApiSection, Capabilities, HomeContact, InfraBand, Method, PlansTeaser, ProjectsShowcase, TechSection } from "@/components/home/blocks"
 import { SITE, absoluteUrl } from "@/lib/site"
 
 export const metadata: Metadata = {
@@ -29,9 +29,11 @@ export default function Home() {
       <JsonLd data={serviceLd} />
       <HeroStage />
       <Capabilities />
+      <InfraBand />
       <ProjectsShowcase />
+      <ApiSection />
       <Method />
-      <StackStrip />
+      <TechSection />
       <PlansTeaser />
       <HomeContact />
     </>

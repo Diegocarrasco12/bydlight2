@@ -157,18 +157,22 @@ export const SERVICES: Service[] = [
     short: "Conectamos tus sistemas, plataformas y servicios para que los datos fluyan solos.",
     metaTitle: "Integración de sistemas y desarrollo de APIs en Chile",
     metaDescription:
-      "Integramos sistemas, plataformas y servicios mediante APIs: facturación, pagos, ERP, CRM y aplicaciones propias. Cotización según alcance.",
+      "Desarrollo de APIs REST e integración con ERP (SAP Business One Service Layer), CRM, facturación, pagos y aplicaciones propias. Autenticación segura, reintentos, registro y documentación. Cotización según alcance.",
     intro:
-      "Muchas empresas usan varias herramientas que no se hablan entre sí. Diseñamos integraciones y APIs que conectan tus sistemas, reducen el doble ingreso de datos y dejan registro de lo que ocurre.",
+      "Muchas empresas usan varias herramientas que no se hablan entre sí. Diseñamos APIs e integraciones que conectan tus sistemas, incluido SAP Business One mediante Service Layer, reducen el doble ingreso de datos y dejan registro de lo que ocurre.",
     problems: [
       "Ingresas la misma información en varios sistemas.",
       "Necesitas conectar tu sitio o aplicación con pagos, facturación u otros servicios.",
       "Quieres exponer datos de forma segura a otras aplicaciones.",
     ],
     deliverables: [
-      "Análisis de los sistemas a conectar",
-      "Desarrollo de APIs e integraciones",
-      "Manejo de errores y registro de eventos",
+      "Análisis de los sistemas a conectar y del flujo de datos",
+      "APIs REST con contrato documentado (OpenAPI), versionado y validación de datos",
+      "Integración con ERP, entre ellos SAP Business One vía Service Layer (OData, sesiones, lotes)",
+      "Autenticación segura y secretos fuera del código",
+      "Reintentos con espera progresiva, idempotencia y manejo de errores",
+      "Registro de eventos y trazabilidad de cada operación",
+      "Pruebas contra un ambiente de pruebas antes de pasar a producción",
       "Documentación técnica",
     ],
     fitsFor: ["Empresas con varios sistemas", "Tiendas online", "Plataformas internas"],

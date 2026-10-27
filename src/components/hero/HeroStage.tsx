@@ -143,6 +143,7 @@ export default function HeroStage() {
               Ver proyectos
             </Link>
           </div>
+          <p className="hx-proof">En producción: <b>Only Energy</b> · CFT Magallanes · GINFET</p>
         </div>
 
         <div ref={mock} className="hx-mock">

@@ -5,6 +5,7 @@ import { SERVICES } from "@/lib/services"
 import { IVA_LABEL, PLANS } from "@/lib/plans"
 import { OTHERS } from "@/lib/portfolio"
 import { SITE, whatsappLink } from "@/lib/site"
+import { TECH_LOGOS } from "@/lib/techLogos"
 
 // Bloques de la home. Poco texto: cada bloque tiene un objeto visual o un dato verificable.
 
@@ -71,7 +72,7 @@ export function Capabilities() {
 
 export function ProjectsShowcase() {
   return (
-    <section className="bd-section showcase" aria-labelledby="proj-title">
+    <section className="bd-section showcase bd-light" aria-labelledby="proj-title">
       <div className="bd-container">
         <div className="bd-head rv">
           <span className="bd-eyebrow">Proyectos</span>
@@ -88,44 +89,161 @@ export function ProjectsShowcase() {
 }
 
 const STEPS = [
-  ["Analizamos", "Entendemos tu negocio y definimos el alcance antes de proponer nada."],
-  ["Diseñamos", "Estructura, interfaz y tecnología adecuadas para tu caso."],
-  ["Construimos", "Desarrollo por etapas, con revisiones y pruebas durante el proceso."],
-  ["Lanzamos y evolucionamos", "Publicamos, te acompañamos y, si quieres, seguimos mejorando."],
+  ["Analizamos", "Alcance y prioridades, antes de escribir código."],
+  ["Diseñamos", "Interfaz y arquitectura para tu caso."],
+  ["Construimos", "Entregas por etapas, con revisión y pruebas."],
+  ["Lanzamos", "Publicación, soporte y mejora continua."],
 ]
 
 export function Method() {
   return (
     <section className="bd-section method" aria-labelledby="method-title">
-      <div className="bd-container">
-        <div className="bd-head rv">
-          <span className="bd-eyebrow">Método</span>
-          <h2 id="method-title" className="bd-h2">Del plano al producto</h2>
+      <div className="bd-container msplit">
+        <figure className="mphoto rv">
+          <img
+            src="/img/stock/codigo-react-1280.webp"
+            srcSet="/img/stock/codigo-react-640.webp 640w, /img/stock/codigo-react-1280.webp 1280w"
+            sizes="(max-width: 900px) 100vw, 46vw"
+            width={1280} height={853} loading="lazy" decoding="async"
+            alt="Código React en un monitor"
+          />
+          <figcaption>Imagen ilustrativa · Pexels</figcaption>
+        </figure>
+        <div>
+          <div className="bd-head rv">
+            <span className="bd-eyebrow">Método</span>
+            <h2 id="method-title" className="bd-h2">Del plano al producto</h2>
+          </div>
+          <ol className="msteps">
+            {STEPS.map(([t, d], i) => (
+              <li key={t} className="rv">
+                <span className="n" aria-hidden="true">0{i + 1}</span>
+                <div>
+                  <h3>{t}</h3>
+                  <p>{d}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
-        <ol className="method-list">
-          {STEPS.map(([t, d], i) => (
-            <li key={t} className="rv">
-              <span className="n" aria-hidden="true">0{i + 1}</span>
-              <h3>{t}</h3>
-              <p>{d}</p>
-            </li>
-          ))}
-        </ol>
       </div>
     </section>
   )
 }
 
-const STACK = ["Next.js", "React", "C#", ".NET 8", "Windows Forms", "WordPress"]
-
-export function StackStrip() {
+// Banda fotografica: la imagen es ilustrativa (no es una instalacion de Bydlight); los datos de la lista si son de nuestra operacion.
+export function InfraBand() {
   return (
-    <section className="stack" aria-label="Tecnologías de proyectos reales">
+    <section className="infra" aria-labelledby="infra-title">
+      <img
+        className="infra-img"
+        src="/img/stock/centro-de-datos-1280.webp"
+        srcSet="/img/stock/centro-de-datos-640.webp 640w, /img/stock/centro-de-datos-1280.webp 1280w"
+        sizes="100vw"
+        width={1280} height={853} loading="lazy" decoding="async" alt=""
+      />
+      <div className="bd-container infra-in">
+        <div className="infra-copy rv">
+          <span className="bd-eyebrow">Producción</span>
+          <h2 id="infra-title" className="bd-h2">Software que se queda en producción</h2>
+          <ul className="infra-list">
+            <li><b>Docker</b><span>Contenedores sobre servidor Linux</span></li>
+            <li><b>Git</b><span>Código versionado; la versión anterior siempre disponible</span></li>
+            <li><b>Verificación</b><span>Chequeo de salud tras cada publicación</span></li>
+          </ul>
+        </div>
+      </div>
+      <p className="infra-credit">Imagen ilustrativa · Pexels</p>
+    </section>
+  )
+}
+
+const API_PRACTICES = [
+  "Contrato OpenAPI y versionado",
+  "Autenticación y secretos fuera del código",
+  "Reintentos con espera progresiva e idempotencia",
+  "Paginación y límites de tasa",
+  "Registro y trazabilidad por operación",
+  "Pruebas en ambiente de pruebas antes de producción",
+]
+
+// Ejemplo ilustrativo de un flujo contra SAP Business One Service Layer. No es codigo ni datos de un cliente.
+export function ApiSection() {
+  return (
+    <section className="bd-section apis" aria-labelledby="api-title">
+      <div className="bd-container api-grid">
+        <div className="rv">
+          <span className="bd-eyebrow">APIs e integraciones</span>
+          <h2 id="api-title" className="bd-h2">Sistemas que se hablan entre sí</h2>
+          <p className="bd-lead">Desarrollamos APIs e integramos ERP, CRM, facturación y pagos, incluido SAP Business One mediante Service Layer.</p>
+          <ul className="api-chips">
+            {API_PRACTICES.map((t) => <li key={t}>{t}</li>)}
+          </ul>
+          <p className="center-cta left">
+            <Link href="/servicios/integraciones-y-apis" prefetch={false} className="bd-btn bd-btn-ghost">Ver el servicio</Link>
+          </p>
+        </div>
+        <figure className="api-term rv" aria-label="Ejemplo ilustrativo de integración con SAP Business One Service Layer">
+          <div className="api-bar"><i /><i /><i /><span>Service Layer · ejemplo ilustrativo</span></div>
+          <pre><code>{`# 1. Sesión
+POST /b1s/v2/Login
+{ "CompanyDB": "…", "UserName": "…", "Password": "<secreto>" }
+→ 200  Set-Cookie: B1SESSION=…
+
+# 2. Consulta paginada
+GET /b1s/v2/Orders?$filter=DocDate ge '2026-01-01'
+    &$select=DocEntry,CardCode,DocTotal&$top=50
+→ 200  { "value": [ … ], "odata.nextLink": "…" }
+
+# 3. Lote transaccional
+POST /b1s/v2/$batch
+→ changeset: todo se aplica o nada
+
+# Reintento con espera progresiva · idempotencia · log`}</code></pre>
+        </figure>
+      </div>
+    </section>
+  )
+}
+
+const TECH_GROUPS: { title: string; items: string[]; extra?: string[] }[] = [
+  { title: "Web y plataformas", items: ["TypeScript", "React", "Next.js", "Node.js"] },
+  { title: "Escritorio", items: [".NET"], extra: ["C#", "Windows Forms"] },
+  { title: "Infraestructura", items: ["Docker", "Linux", "Git"] },
+]
+
+export function TechSection() {
+  return (
+    <section className="bd-section tech bd-light" aria-labelledby="tech-title">
       <div className="bd-container">
-        <p>Tecnologías en nuestros proyectos publicados</p>
-        <ul>
-          {STACK.map((t) => <li key={t}>{t}</li>)}
-        </ul>
+        <div className="bd-head rv">
+          <span className="bd-eyebrow">Tecnologías</span>
+          <h2 id="tech-title" className="bd-h2">Con qué construimos</h2>
+        </div>
+        <div className="tech-groups">
+          {TECH_GROUPS.map((g) => (
+            <div key={g.title} className="tech-group rv">
+              <h3>{g.title}</h3>
+              <ul>
+                {g.items.map((n) => {
+                  const l = TECH_LOGOS[n]
+                  return (
+                    <li key={n}>
+                      <svg viewBox="0 0 24 24" width="36" height="36" aria-hidden="true" focusable="false" style={{ fill: l.color }}>
+                        <path d={l.d} />
+                      </svg>
+                      <span>{n}</span>
+                    </li>
+                  )
+                })}
+                {g.extra?.map((n) => (
+                  <li key={n} className="txt"><i aria-hidden="true">{n === "C#" ? "C#" : "WF"}</i><span>{n}</span></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p className="tech-note">Solo listamos tecnologías presentes en este sitio y en nuestros proyectos publicados.</p>
       </div>
     </section>
   )
@@ -141,7 +259,7 @@ export function PlansTeaser() {
           <div>
             <span className="bd-eyebrow">Sitios con alcance definido</span>
             <h2 className="bd-h2">Páginas web desde {price} {IVA_LABEL}</h2>
-            <p className="bd-lead">Planes con páginas, revisiones y plazos por escrito. Y para proyectos más complejos, cotización a medida.</p>
+            <p className="bd-lead">Alcance, revisiones y plazos por escrito. Proyectos más complejos: cotización a medida.</p>
           </div>
           <Link href="/planes" prefetch={false} className="bd-btn bd-btn-ghost">Ver planes y precios</Link>
         </div>
@@ -153,11 +271,12 @@ export function PlansTeaser() {
 export function HomeContact() {
   return (
     <section className="bd-section home-contact" aria-labelledby="hc-title">
+      <img className="hc-img" src="/img/stock/fibra-optica-1280.webp" srcSet="/img/stock/fibra-optica-640.webp 640w, /img/stock/fibra-optica-1280.webp 1280w" sizes="100vw" width={1280} height={851} loading="lazy" decoding="async" alt="" />
       <div className="bd-container hc-grid">
         <div className="rv">
           <span className="bd-eyebrow">Contacto</span>
           <h2 id="hc-title" className="bd-h2">¿Tienes una idea?<br />Hagámosla funcionar.</h2>
-          <p className="bd-lead">Cuéntanos qué necesitas y te respondemos con una propuesta clara.</p>
+          <p className="bd-lead">Cuéntanos qué necesitas. Respondemos con una propuesta clara.</p>
           <div className="hc-ways">
             <a className="bd-btn bd-btn-primary" href={whatsappLink("Hola, quiero cotizar un proyecto con Byd Light Solutions.")} target="_blank" rel="noopener noreferrer">
               Escribir por WhatsApp
