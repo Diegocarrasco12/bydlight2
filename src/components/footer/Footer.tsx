@@ -6,12 +6,19 @@ export default function Footer() {
   return (
     <footer className="bd-footer">
       <div className="bd-container">
+        <div className="bd-footer-top">
+          <p className="bd-footer-claim">
+            Del plano <span>al producto.</span>
+          </p>
+          <Link href="/contacto" prefetch={false} className="bd-btn bd-btn-primary">
+            Cuéntanos tu proyecto
+          </Link>
+        </div>
+
         <div className="bd-footer-grid">
           <div>
             <img src={SITE.logoSmall} alt={SITE.name} width={120} height={43} />
-            <p>
-              Desarrollo web y software a medida para emprendedores, pymes y empresas en Chile.
-            </p>
+            <p>Ingeniería de software y desarrollo web para emprendedores, pymes y empresas en Chile.</p>
           </div>
 
           <div>
@@ -29,8 +36,8 @@ export default function Footer() {
             <h2>Navegación</h2>
             <ul>
               <li><Link href="/" prefetch={false}>Inicio</Link></li>
-              <li><Link href="/planes" prefetch={false}>Planes y precios</Link></li>
               <li><Link href="/proyectos" prefetch={false}>Proyectos</Link></li>
+              <li><Link href="/planes" prefetch={false}>Planes y precios</Link></li>
               <li><Link href="/nosotros" prefetch={false}>Nosotros</Link></li>
               <li><Link href="/contacto" prefetch={false}>Contacto</Link></li>
             </ul>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import JsonLd from "@/components/seo/JsonLd"
+import PageHero from "@/components/layout/PageHero"
 import { Faq, FinalCta, MaintenanceBlock, PlanComparison, PlansGrid } from "@/components/home/sections"
 import { PLANS, PLANS_FAQ } from "@/lib/plans"
 import { absoluteUrl } from "@/lib/site"
@@ -54,8 +55,13 @@ export default function PlanesPage() {
   return (
     <>
       <JsonLd data={ld} />
-      <div style={{ height: 72 }} aria-hidden="true" />
-      <PlansGrid headingLevel="h1" />
+      <PageHero
+        crumbs={[{ label: "Planes y precios" }]}
+        eyebrow="Planes y precios"
+        title={<>Sitios con alcance <span>y precio definidos</span></>}
+        lead="Cada plan indica páginas, revisiones y plazos por escrito. Para proyectos más complejos, cotización a medida."
+      />
+      <PlansGrid showHead={false} />
       <PlanComparison />
       <MaintenanceBlock />
       <Faq items={PLANS_FAQ} />

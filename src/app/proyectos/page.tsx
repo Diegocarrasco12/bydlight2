@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
-import Link from "next/link"
+import PageHero from "@/components/layout/PageHero"
 import { FinalCta } from "@/components/home/sections"
-import { DesktopShowcase, PortfolioFeatured, PortfolioGrid } from "@/components/portfolio/Portfolio"
+import { DesktopShowcase, ProjectFeature, ProjectGrid } from "@/components/portfolio/Portfolio"
 
 export const metadata: Metadata = {
   title: "Portafolio de proyectos web y software",
@@ -14,33 +14,25 @@ export const metadata: Metadata = {
 export default function ProyectosPage() {
   return (
     <>
-      <section className="bd-page-hero">
+      <PageHero
+        crumbs={[{ label: "Proyectos" }]}
+        eyebrow="Portafolio"
+        title={<>Proyectos que <span>ya están en producción</span></>}
+        lead="Tiendas, plataformas y sitios que puedes visitar, más nuestras capacidades en software de escritorio."
+      />
+      <section className="bd-section showcase" aria-label="Proyecto destacado">
         <div className="bd-container">
-          <nav className="bd-crumbs" aria-label="Migas de pan">
-            <Link href="/" prefetch={false}>Inicio</Link> / Proyectos
-          </nav>
-          <h1>Portafolio de proyectos</h1>
-          <p className="bd-lead">
-            Tiendas online, plataformas y sitios en producción, además de nuestras capacidades en software de escritorio.
-          </p>
+          <ProjectFeature />
         </div>
       </section>
-
-      <section className="bd-section" aria-label="Proyecto destacado">
-        <div className="bd-container">
-          <PortfolioFeatured />
-        </div>
-      </section>
-
-      <section className="bd-section bd-section-alt" aria-labelledby="more-title">
+      <section className="bd-section" aria-labelledby="more-title">
         <div className="bd-container">
           <div className="bd-head">
             <h2 id="more-title" className="bd-h2">Más proyectos</h2>
           </div>
-          <PortfolioGrid />
+          <ProjectGrid />
         </div>
       </section>
-
       <DesktopShowcase />
       <FinalCta title="¿Quieres un proyecto como estos?" />
     </>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import "../styles/design.css"
 import Navbar from "../components/navbar/Navbar"
@@ -9,6 +9,12 @@ import { SITE, absoluteUrl } from "../lib/site"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: "swap",
+})
+
+const display = Bricolage_Grotesque({
+  variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
 })
@@ -42,7 +48,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#070b14",
+  themeColor: "#04060c",
 }
 
 const organization = {
@@ -84,7 +90,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es-CL">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${display.variable} ${geistSans.variable} ${geistMono.variable}`}>
         <a href="#contenido" className="bd-skip">Saltar al contenido</a>
         <JsonLd data={organization} />
         <Navbar />

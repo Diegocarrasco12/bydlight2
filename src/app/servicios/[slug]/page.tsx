@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import JsonLd from "@/components/seo/JsonLd"
+import PageHero from "@/components/layout/PageHero"
 import { Faq, FinalCta } from "@/components/home/sections"
 import { PLANS, planHref } from "@/lib/plans"
 import { SERVICES, getService } from "@/lib/services"
@@ -72,17 +73,12 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   return (
     <>
       <JsonLd data={ld} />
-      <section className="bd-page-hero">
-        <div className="bd-container">
-          <nav className="bd-crumbs" aria-label="Migas de pan">
-            <Link href="/" prefetch={false}>Inicio</Link> /{" "}
-            <Link href="/servicios" prefetch={false}>Servicios</Link> / {s.name}
-          </nav>
-          <span className="bd-eyebrow">{s.line === "web" ? "Desarrollo web" : "Ingeniería y software a medida"}</span>
-          <h1>{s.name}</h1>
-          <p className="bd-lead">{s.intro}</p>
-        </div>
-      </section>
+      <PageHero
+        crumbs={[{ href: "/servicios", label: "Servicios" }, { label: s.name }]}
+        eyebrow={s.line === "web" ? "Desarrollo web" : "Ingeniería y software a medida"}
+        title={s.name}
+        lead={s.intro}
+      />
 
       <section className="bd-section">
         <div className="bd-container bd-prose">

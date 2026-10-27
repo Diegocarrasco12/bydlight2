@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import emailjs from "@emailjs/browser"
 import { PLANS } from "@/lib/plans"
 
 // Formulario de contacto original (EmailJS). Los identificadores de EmailJS son publicos por diseno.
@@ -26,6 +25,8 @@ export default function ContactForm() {
     setSending(true)
     setStatus(null)
     try {
+      // EmailJS se descarga solo al enviar: no pesa en la carga inicial de la pagina.
+      const { default: emailjs } = await import("@emailjs/browser")
       await emailjs.sendForm("service_z3s5mho", "template_jnsxd4o", formRef.current, "_sCMwpxerur2jJ7SP")
       setStatus({ ok: true, text: "Mensaje enviado correctamente. Te responderemos pronto." })
       formRef.current.reset()

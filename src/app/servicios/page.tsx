@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import Link from "next/link"
+import PageHero from "@/components/layout/PageHero"
 import { FinalCta, ServicesGrid } from "@/components/home/sections"
 
 export const metadata: Metadata = {
@@ -13,17 +13,12 @@ export const metadata: Metadata = {
 export default function ServiciosPage() {
   return (
     <>
-      <section className="bd-page-hero">
-        <div className="bd-container">
-          <nav className="bd-crumbs" aria-label="Migas de pan">
-            <Link href="/" prefetch={false}>Inicio</Link> / Servicios
-          </nav>
-          <h1>Servicios de desarrollo de software y web</h1>
-          <p className="bd-lead">
-            Desde un sitio web con precio definido hasta sistemas empresariales con cotización personalizada.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        crumbs={[{ label: "Servicios" }]}
+        eyebrow="Servicios"
+        title={<>Software y web, <span>de la idea a producción</span></>}
+        lead="Desde un sitio con precio definido hasta sistemas empresariales con cotización a medida."
+      />
       <ServicesGrid />
       <FinalCta />
     </>

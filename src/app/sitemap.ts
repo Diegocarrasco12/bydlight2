@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next"
+import { PROJECTS } from "@/lib/portfolio"
 import { SERVICES } from "@/lib/services"
 import { absoluteUrl } from "@/lib/site"
 
@@ -9,5 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...pages.map((p) => ({ url: absoluteUrl(p), priority: p === "/" ? 1 : 0.8 })),
     ...SERVICES.map((s) => ({ url: absoluteUrl(`/servicios/${s.slug}`), priority: 0.7 })),
+    ...PROJECTS.map((p) => ({ url: absoluteUrl(`/proyectos/${p.slug}`), priority: 0.6 })),
   ]
 }

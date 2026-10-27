@@ -18,8 +18,15 @@ const nextConfig: NextConfig = {
       { key: "Referrer-Policy", value: "same-origin" },
       { key: "X-Robots-Tag", value: "noindex, nofollow" },
     ];
+    // Cache: el HTML SIEMPRE se revalida en el navegador (no-cache = guardar pero preguntar antes de usar).
+    // Asi, tras un despliegue nadie ve HTML viejo apuntando a archivos /_next/static que ya no existen (pagina sin
+    // estilos). Los archivos con hash de /_next/static los marca Next como immutable; las imagenes propias se
+    // cachean un dia.
+    const revalidate = [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }];
     return [
       { source: "/:path*", headers: securityHeaders },
+      { source: "/((?!_next/|img/|api/|orden).*)", headers: revalidate },
+      { source: "/img/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }] },
       { source: "/orden/:path*", headers: private_ },
       { source: "/api/:path*", headers: private_ },
     ];

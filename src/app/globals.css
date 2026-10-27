@@ -1,29 +1,8 @@
-/* RESET GLOBAL */
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* BASE */
-  
-  body {
-    background-color: #070b14;
-    color: white;
-    font-family: var(--font-geist-sans);
-  }
-  
-  /* LINKS */
-  
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  /* IMAGES */
-  
-  img {
-    max-width: 100%;
-    display: block;
-  }
+/* Reset y base. El sistema visual esta en src/styles/design.css. */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { background: #04060c; color: #eef3ff; font-family: var(--font-geist-sans), system-ui, sans-serif; }
+a { text-decoration: none; color: inherit; }
+img, video, canvas, svg { max-width: 100%; display: block; }
+button, input, textarea, select { font: inherit; color: inherit; }
+ul, ol { list-style: none; }
