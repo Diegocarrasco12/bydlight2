@@ -43,7 +43,7 @@ Arquitectura en `docs/ARQUITECTURA.md`; diseño y decisiones en `docs/DISENO_Y_U
 
 ## 5. Problemas conocidos
 
-0. **Hero antiguo (átomo):** reaparecía porque `/` importaba `HeroStage`. Corregido en `67287c0`: `/` usa `HeroNetwork`. `HeroStage.tsx`, `scene.ts` y `.hx*` quedan como código legado sin uso. Detalle en `docs/FASE2_PROTOTIPOS.md`.
+0. **Hero antiguo (átomo):** reaparecía porque `/` importaba `HeroStage`. Corregido en `67287c0`: `/` usa `HeroNetwork`. `HeroStage.tsx`, `scene.ts` y `.hx*` quedan como código legado sin uso. Detalle en `docs/FASE2_PROTOTIPOS.md` y documentación técnica en `docs/FASE3_DOCUMENTACION_TECNICA.md`.
 1. **Claude Code recibe a veces código de salida 21 del ejecutor** (desde PowerShell normal funciona). Causa raíz **no demostrada**.
    Alternativa validada: el administrador ejecuta el despliegue en PowerShell normal. Ver `docs/DESPLIEGUE.md` §9.
 2. `bd-deploy.ps1` desapareció tres veces antes y **una cuarta el 2026-10-28** (entre `job-status` y `up`; al ejecutar `status` más tarde ya estaba disponible) de `C:\Users\dcarrasco\.claude\tools\bd-deploy\` (causa no confirmada). Se restaura desde

@@ -52,10 +52,10 @@ docs/  scripts/  Dockerfile  docker-compose.prod.yml  DEPLOY.md
 
 ## 4. Rutas públicas **[V]** (build del 2026-10-27)
 
-`/`, `/servicios`, `/servicios/[slug]` (8 servicios: desarrollo-web, ecommerce, software-a-medida, arquitectura-de-software,
+`/`, `/servicios`, `/servicios/[slug]` (10 servicios: soluciones-erp, soluciones-saas, desarrollo-web, ecommerce, software-a-medida, arquitectura-de-software,
 aplicaciones-moviles, integraciones-y-apis, automatizacion-de-procesos, mantenimiento-web), `/proyectos`, `/proyectos/[slug]`
 (only-energy, cft-magallanes, ginfet, angel-y-eva, software-escritorio-windows), `/planes`, `/nosotros`, `/contacto`, `/sitemap.xml`
-(19 URL), `/robots.txt`. Rutas restringidas: ver §8.
+(21 URL desde la Fase 3), `/robots.txt`. Rutas restringidas: ver §8.
 
 ## 5. Hero 3D y animaciones **[V]**
 
