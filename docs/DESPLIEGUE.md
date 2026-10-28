@@ -65,7 +65,10 @@ status → fetch <sha40> → preflight → compose-diff → build <sha40> → jo
 8. Comprobar el dominio público (HTML nuevo, assets, rutas, ausencia de Webpay/WordPress). El puerto 8200 local **no** prueba el sitio público.
 9. Informar SHA, resultado e incidencias. **No** hacer `rollback` sin autorización.
 
-Resultados del último despliegue (administrador, `56fdcf1`): `fetch` ok; `preflight` OK; `compose-diff` CUMPLE/igual; `build` →
+**Despliegue 2026-10-28 (`67287c08d1f57c327aa22aa888a8a301df781b0d`, Fase 3):** Claude Code ejecutó `status`, `fetch` (clon 56fdcf1 → 67287c0, 42 archivos), `preflight` (OK, 18 ajenos), `compose-diff` (CUMPLE / línea base igual) y `build` (job `75578b96a9d33739`, imagen `bydlight-web:67287c08d1f5`). El cliente `bd-deploy.ps1` desapareció antes del `up`; el administrador ejecutó `up` y `verify` desde PowerShell normal. `status` posterior: desplegado `67287c0`, anterior `56fdcf1`, salud OK, línea base aceptada. Rollback no necesario (si hiciera falta: `rollback`, vuelve a `56fdcf1`).
+Comprobación pública (Playwright, 1440 y 390 px): `/` con `.hn` y sin `.hx` en entrada directa, F5 y clic en el logo; WebGL activo tras ~4 s; `/servicios/soluciones-erp` y `/soluciones-saas` responden 200 sin imágenes rotas; sin errores de consola ni desborde horizontal; `/contratar` 307 y `/orden` 404 (Webpay apagado); el sitemap incluye ambos servicios. Sin revisar: `logs` del contenedor.
+
+Resultados del despliegue anterior (administrador, `56fdcf1`): `fetch` ok; `preflight` OK; `compose-diff` CUMPLE/igual; `build` →
 `bydlight-web:56fdcf1cb6e0`; `up` ok (salud y HTTP); `verify` OK; `status` salud OK; 5 releases; 18 ajenos en la línea base.
 
 ## 4. Restaurar el cliente local

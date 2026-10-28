@@ -15,15 +15,18 @@ Reconstruido a partir del historial de Git y de las sesiones de trabajo. Las fec
 | 2026-10-27 | **Reconstrucción total** (`af71054`): hero 3D, páginas rediseñadas, móvil propio, detalle de proyectos, corrección de caché, Lighthouse inicial. Desplegada por el administrador |
 | 2026-10-27 | Diagnóstico del ejecutor en Claude Code (código 21): sin causa demostrada; el administrador despliega desde PowerShell normal |
 | 2026-10-27 | `26a4cea`: contraste, fotografía de Pexels, tecnologías reales, APIs/SAP, sin WordPress (publicado, no desplegado por separado) |
+| 2026-10-28 | `67287c0` (Fase 3): hero «red de nodos» (corrige el regreso del átomo), servicios ERP y SaaS, navegación por categorías, fotografía Pexels, banda en Nosotros, rendimiento móvil (Lighthouse 58→85). **Desplegado** (`up` por el administrador; rollback: `56fdcf1`) |
 | 2026-10-27 | `56fdcf1`: tecnologías por categoría, servicio de apps móviles, responsive 77/77, rendimiento y accesibilidad. **Desplegado por el administrador** (rollback: `af71054`) |
 | 2026-10-27 | Cierre técnico y documentación (este conjunto de documentos) |
 
 ## Commits relevantes (Git)
 
 ```
-56fdcf1  feat(web): tecnologias por categoria, servicio de apps moviles, rendimiento y responsive      ← DESPLEGADO
+67287c0  feat(web): hero de red de nodos metalicos, servicios ERP/SaaS y fotografia                     ← DESPLEGADO (2026-10-28)
+a52dc12  docs: cierre tecnico y memoria de Bydlight2 2026-10-27
+56fdcf1  feat(web): tecnologias por categoria, servicio de apps moviles, rendimiento y responsive      ← rollback
 26a4cea  feat(web): contraste, fotografia, tecnologias reales, APIs/SAP y sin WordPress
-af71054  feat(web): reconstruccion visual completa "Del plano al producto / Nucleo de luz"             ← rollback
+af71054  feat(web): reconstruccion visual completa "Del plano al producto / Nucleo de luz"
 6c2f640  feat(web): ocultar checkout y Webpay mientras los pagos estan apagados
 073bac6  feat(pagos): API administrativa firmada, configuracion por archivo, endurecimiento y pruebas
 b6f95b4  feat(pagos): persistencia en SQLite con migraciones, respaldo y restauracion

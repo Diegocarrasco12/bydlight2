@@ -1,8 +1,10 @@
 # Pendientes para futuras jornadas
 
-Registrados al cierre del 2026-10-27. **Ninguno debe ejecutarse sin que el titular lo pida**; los que tocan producción, Cloudflare o envían datos reales requieren autorización.
+Actualizados al cierre del 2026-10-28 (Fase 3 desplegada). **Ninguno debe ejecutarse sin que el titular lo pida**; los que tocan producción, Cloudflare o envían datos reales requieren autorización.
 
 ## Prioridad de la siguiente jornada
+
+0. **Fase 3 (hero «red de nodos», ERP/SaaS):** (a) medir fps/GPU/batería del 3D en un teléfono real (el navegador automatizado limita `requestAnimationFrame`); (b) en teléfonos de ~640 px de alto el CTA principal del hero queda tras la barra inferior fija al cargar (la barra ofrece la misma acción): decidir si se ajusta; (c) retirar el código legado del átomo (`HeroStage.tsx`, `scene.ts`, reglas `.hx*` de `design.css`) tras comprobar que nada lo importa; (d) varias metadescripciones existentes superan 160 caracteres; (e) confirmar con el titular el alcance comercial de ERP/SaaS y la redacción de SAP Business One como capacidad; (f) revisar `logs` del contenedor tras el despliegue (no se pudo ejecutar el ejecutor en esta sesión después de que desapareciera el cliente).
 
 1. **Lighthouse/PageSpeed sobre `https://bydlightsolutions.com/`** (móvil y escritorio) con HTTPS y caché reales, idealmente desde un equipo sin la inyección de Kaspersky. Comparar con
    `docs/CALIDAD_Y_PRUEBAS.md` (home móvil local 80–85, escritorio 98) y no presentar la medición local como dato de usuarios.
@@ -18,7 +20,7 @@ Registrados al cierre del 2026-10-27. **Ninguno debe ejecutarse sin que el titul
 
 ## Otros pendientes conocidos
 
-- `/planes` móvil: Lighthouse reportó `heading-order` (accesibilidad 98). Corregir el orden de encabezados.
+- `/planes` (pre-existente): Lighthouse reportó `heading-order` (accesibilidad 98). Corregir el orden de encabezados.
 - `public/og-image.png`: regenerar con la identidad nueva (no se verificó su contenido actual).
 - Régimen tributario/IVA de los precios «Desde $X + IVA» (`IVA_LABEL`, `PRICE_NOTE` en `src/lib/plans.ts`).
 - Videos: solo si se aporta material propio o con licencia verificable (la licencia «Restricted» de Mixkit no se pudo comprobar).

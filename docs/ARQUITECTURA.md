@@ -1,6 +1,6 @@
 # Arquitectura de Bydlight2
 
-Estado al **2026-10-27**, commit desplegado `56fdcf1`. Marcas: **[V]** = verificado en el código o en pruebas de esta jornada;
+Estado al **2026-10-28**, commit desplegado `67287c0`. Marcas: **[V]** = verificado en el código o en pruebas de esta jornada;
 **[C]** = requiere confirmación (no comprobado).
 
 ## 1. Visión general

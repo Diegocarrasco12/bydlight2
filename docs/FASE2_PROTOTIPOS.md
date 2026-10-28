@@ -1,6 +1,6 @@
 # Fase 2 y Fase 3: hero «red de nodos», ERP/SaaS y fotografía
 
-Estado: **integrado en la portada en la Fase 3 (2026-10-28)**. Lo que corre en producción (SHA) está en `ESTADO_ACTUAL.md`.
+Estado: **integrado en la portada y desplegado el 2026-10-28 (`67287c0`)**. Lo que corre en producción (SHA) está en `ESTADO_ACTUAL.md`.
 
 ## Qué contiene
 - **Hero «red de nodos»** (`src/components/hero/HeroNetwork.tsx`, `scene-network.ts`): es el hero de `/`. Ver `ARQUITECTURA.md` §5.
