@@ -1,30 +1,30 @@
 # Estado actual de Bydlight2
 
 > Documento de entrada para retomar el proyecto en una sesión nueva. Léelo junto con `CLAUDE.md`.
-> Última actualización: **2026-10-28** (Fase 3: hero «red de nodos», ERP/SaaS y fotografía, desplegado). Jornada anterior: `docs/CIERRE_JORNADA_2026-10-27.md`.
+> Última actualización: **2026-10-28** (hero cinematográfico `5f00015` y SEO Fases 1-2 `5fef157`, desplegados por el titular). Jornada anterior: `docs/CIERRE_JORNADA_2026-10-27.md`.
 
-## 1. Producción (confirmado con `status` y con pruebas en el dominio público el 2026-10-28)
+## 1. Producción (2026-10-28: desplegado por el titular desde PowerShell; verificado en el dominio público; `status` no ejecutable desde Claude Code por el código 21)
 
 | Dato | Valor |
 |---|---|
 | Sitio público | https://bydlightsolutions.com/ |
 | Proyecto Docker | `bydlight-prod` (contenedor en `127.0.0.1:8200`, expuesto por Cloudflare Tunnel) |
-| **Commit desplegado** | `67287c08d1f57c327aa22aa888a8a301df781b0d` (imagen `bydlight-web:67287c08d1f5`) |
-| **Commit de rollback** | `56fdcf1cb6e05632a5425272dc3603364d0ec0cd` |
+| **Commit desplegado** | `5fef157411e565c093f1be62ecc79ae22ae0b69e` (SEO Fases 1-2; incluye el hero cinematográfico `5f000150f40529abaa70c1dd7d39e4c486c129e2`). Confirmado por el titular y por el HTML público (títulos, `legalName`, favicon); el campo `desplegado` de `status` no se leyó desde Claude Code |
+| **Commit de rollback** | esperado `5f000150f40529abaa70c1dd7d39e4c486c129e2` (hero); anterior a ese `67287c08d1f57c327aa22aa888a8a301df781b0d` (Fase 3). **Verificar con `-Op status` / `list-releases` en PowerShell**: en un despliegue previo `anterior` quedó igual a `desplegado` por ejecutar `up` dos veces |
 | Releases construidos | 5 según `status` |
 | Salud / `verify` / `status` | OK |
 | `preflight` / `compose-diff` | OK / política CUMPLE, línea base igual |
 | Contenedores ajenos en la línea base | 18 (no se tocan) |
 
 `fetch`, `preflight`, `compose-diff` (CUMPLE / línea base igual) y `build` los ejecutó Claude Code; el `up` y el `verify` los ejecutó el administrador desde PowerShell normal porque el cliente del ejecutor desapareció de su carpeta antes del `up` (ver §5 y `docs/DESPLIEGUE.md`).
-**Los commits de documentación posteriores a `67287c0` no cambian lo que corre en producción** y no requieren despliegue.
+**Los commits de documentación posteriores a `5fef157` no cambian lo que corre en producción** y no requieren despliegue.
 Para saber qué corre hoy, la fuente de verdad es `bd-deploy.ps1 -Op status`, no este documento.
 
 ## 2. Repositorio
 
 - Remoto: `https://github.com/Diegocarrasco12/bydlight2.git`. Rama de publicación: `main`.
 - Rama de trabajo local: `feature/rediseno-2026` (se publica con `git push origin HEAD:main`; siempre fast-forward).
-- Cadena de commits desplegables: `6c2f640` → `af71054` → `26a4cea` (no desplegado por separado) → `56fdcf1` → `a52dc12` (solo documentación) → `67287c0` (Fase 3, **desplegado**).
+- Cadena de commits desplegables: `6c2f640` → `af71054` → `26a4cea` (no desplegado por separado) → `56fdcf1` → `a52dc12` (solo documentación) → `67287c0` (Fase 3) → `5f00015` (hero cinematográfico) → `5298696` (SEO 1) → `5fef157` (SEO 2, **desplegado**).
 - Archivos del usuario que no se deben alterar sin pedirlo: `AGENTS.md` (protocolo para Codex), `r-og.png` y `demos/windows-inventory/obj/` (sin versionar).
 
 ## 3. Qué es el sitio (resumen)
@@ -58,7 +58,7 @@ prueba real del formulario, diagnóstico del código 21, rendimiento móvil, Tra
 ## 7. Cómo retomar en una sesión nueva
 
 1. Leer `CLAUDE.md` y este archivo; luego `docs/PENDIENTES.md`.
-2. `git status`, `git log --oneline -5`, `git fetch` (comprobar que `origin/main` contiene `67287c0`).
+2. `git status`, `git log --oneline -5`, `git fetch` (comprobar que `origin/main` contiene `5fef157`).
 3. Para trabajar: Node **22.13 o superior** (el proyecto usa `node:sqlite`; producción corre Node 22.23.4). Comandos:
    `npm ci`, `npm test` (18 pruebas), `npx tsc --noEmit`, `npm run lint`, `npm run build`, `npm run dev`.
 4. Después de `npm run build`: `git checkout next-env.d.ts` (el build lo modifica) y no versionar `tsconfig.tsbuildinfo`.

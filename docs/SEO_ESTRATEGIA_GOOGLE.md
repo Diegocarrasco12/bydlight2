@@ -1,6 +1,6 @@
 # SEO Fase 2 — Estrategia para Google Chile
 
-Fecha: 2026-10-28. Estado: **preparado localmente, sin push ni despliegue.** Base: Fase 1 (`5298696`), no se pierde. Producción: hero `5f00015`.
+Fecha: 2026-10-28. Estado: **publicado en producción el 2026-10-28 (`5fef157411e565c093f1be62ecc79ae22ae0b69e`), desplegado por el titular.** Fase 1 `5298696`, Fase 2 `5fef157`. Verificación pública en §10.
 Regla de este documento: no hay volúmenes de búsqueda, posiciones ni datos de herramientas SEO porque **no se tuvo acceso a ninguna**. Lo investigado es cualitativo (qué aparece, qué intención hay, quién compite).
 
 ## 1. Diagnóstico del SEO actual (medido el 2026-10-28)
@@ -132,3 +132,10 @@ Tras el despliegue de estos cambios, solicitar nueva indexación de las 7 págin
 - **Días 30–60:** medir en Search Console qué consultas dan impresiones; reescribir títulos/descripciones de páginas con impresiones y poco CTR; publicar 2–3 artículos más.
 - **Días 60–90:** consolidar lo que posiciona, ampliar el nicho SAP/API, evaluar página de ecommerce+ERP; revisar enlaces entrantes conseguidos.
 - **Medir solicitudes de cotización** (formulario y WhatsApp) por página de origen; es la métrica que importa más que la posición.
+
+## 10. Verificación en producción tras el despliegue (2026-10-28)
+- 21 URL del sitemap en 200; sin títulos, descripciones ni H1 duplicados; títulos 47-63 caracteres; canonical y og:url propios por página; JSON-LD válido en todas (con legalName); /favicon.ico 200; sin noindex.
+- robots.txt: el grupo User-agent: * permite todo y no hay reglas para Googlebot; Cloudflare bloquea crawlers de entrenamiento de IA (GPTBot, ClaudeBot, Google-Extended, GoogleOther, etc.), lo que no afecta a Googlebot. Sitemap declarado.
+- Hero 3D activo tras ir al inicio por el logo y recargar; 0 errores de consola en escritorio (1440) y móvil (390); sin desborde; /contratar 307 y /orden 404 (Webpay apagado).
+- Las páginas son rastreables e indexables; no se sabe si Google ya las indexó (requiere Search Console).
+- Pendiente en PowerShell: status / list-releases (campo anterior válido para rollback).

@@ -137,3 +137,6 @@ ejecutar las pruebas del ejecutor (`cd deploy/executor && python -B -m unittest 
 
 **Diagnóstico propuesto (no ejecutado; requiere al administrador):** correr el cliente con `Start-Process … -RedirectStandardError` para capturar stderr
 en un proceso sin consola, y revisar eventos de Kaspersky sobre `ssh.exe`. Registrar el resultado aquí.
+
+## 10. Registro: despliegue 2026-10-28 (`5fef157411e565c093f1be62ecc79ae22ae0b69e`, hero cinematográfico + SEO 1-2)
+Claude Code hizo el `push` (`origin/main` avanzó `5f00015` → `5fef157`, fast-forward) y las validaciones previas; el ejecutor devolvió código 21 en `status` y luego el cliente no existía en `~/.claude/tools/bd-deploy/` (restaurable desde `deploy/executor/claude-code/bd-deploy.ps1`). El titular ejecutó la secuencia desde PowerShell normal. Verificación pública posterior por Claude Code: 21 URL en 200, títulos/canonical/OG nuevos, favicon 200, hero 3D activo tras logo y recarga, 0 errores de consola (escritorio y móvil), `/contratar` 307 y `/orden` 404. No se leyó `status` ni `list-releases` desde Claude Code.

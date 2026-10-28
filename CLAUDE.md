@@ -3,7 +3,7 @@
 ## Leer primero
 1. `docs/ESTADO_ACTUAL.md` (dónde quedó el proyecto; SHA desplegado y de rollback).
 2. `docs/PENDIENTES.md`. Detalle: `docs/ARQUITECTURA.md`, `docs/DESPLIEGUE.md`, `docs/DECISIONES_TECNICAS.md`, `docs/CALIDAD_Y_PRUEBAS.md`, `docs/CREDITOS-RECURSOS.md`.
-3. Producción (2026-10-28): **desplegado `67287c08d1f57c327aa22aa888a8a301df781b0d`**, rollback `56fdcf1cb6e05632a5425272dc3603364d0ec0cd`.
+3. Producción (2026-10-28): **desplegado `5fef157411e565c093f1be62ecc79ae22ae0b69e`** (hero cinematográfico + SEO 1-2, desplegado por el titular), rollback esperado `5f000150f40529abaa70c1dd7d39e4c486c129e2` (verificar con `status`).
    Commits posteriores de documentación no implican despliegue. Verificar siempre con `status` antes de afirmar el estado real.
 
 ## Alcance
