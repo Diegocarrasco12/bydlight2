@@ -2,11 +2,17 @@
 
 import Link from "next/link"
 import { useEffect, useRef } from "react"
+import "../../styles/hero-c.css"
 
-// Hero de la portada: red de nodos metalicos. Copia y escena conviven en una grilla normal, sin scroll pegajoso:
-// en escritorio el escenario 3D va a la derecha y en movil tiene su propio bloque bajo los botones.
+// Hero de la portada (Fase 5): red de nodos metalicos. Sin scroll pegajoso.
+// - Escritorio: fotografia de centro de datos de fondo (CSS, solo se descarga en escritorio) + red 3D a pantalla completa,
+//   con la misma fotografia como entorno de reflejos (scene-hero). En movil: composicion aprobada en la Fase 3 (scene-network).
 // Niveles: (1) escena three.js con movimiento autonomo; (2) prefers-reduced-motion: un solo cuadro 3D;
-// (3) sin WebGL, ahorro de datos o equipo modesto: red estatica en SVG. El titular y los CTA son HTML desde el primer byte.
+// (3) sin WebGL, ahorro de datos o equipo modesto: la fotografia + red estatica en SVG. El titular y los CTA son HTML desde el primer byte.
+// Version anterior conservada en HeroNetworkClassic.tsx.
+
+// Misma fotografia que el fondo CSS (1920 px desde 1500 px de ancho): el navegador ya la tiene en cache, no se descarga otra.
+const heroPhotoEnv = () => (window.innerWidth >= 1500 ? "/img/stock/centro-de-datos-1920.webp" : "/img/stock/centro-de-datos-1280.webp")
 
 type Nav = Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number }
 
@@ -86,23 +92,26 @@ export default function HeroNetwork() {
     events.forEach((e) => window.addEventListener(e, go, { passive: true, once: true }))
     timer = window.setTimeout(go, 3500)
 
+    // Movil: escena aprobada (scene-network, sin cambios). Escritorio: escena de la Fase 5 sobre la fotografia (scene-hero).
+    const onLost = () => el!.classList.remove("hn--gl")
+    const load = async () => {
+      if (mobile) {
+        const { createNetworkScene } = await import("./scene-network")
+        return createNetworkScene({ canvas: cv!, mobile, still: reduced, onLost, cancelled: () => cancelled })
+      }
+      const { createHeroScene } = await import("./scene-hero")
+      return createHeroScene({ canvas: cv!, envUrl: heroPhotoEnv(), still: reduced, onLost, cancelled: () => cancelled })
+    }
+
     function boot() {
       if (cancelled) return
-      import("./scene-network")
-        .then(async ({ createNetworkScene }) => {
-          if (cancelled) return
-          const h = await createNetworkScene({
-            canvas: cv!,
-            mobile,
-            still: reduced,
-            onLost: () => el!.classList.remove("hn--gl"),
-            cancelled: () => cancelled,
-          })
-          if (!h) return
+      load()
+        .then(async (h) => {
           if (cancelled) {
-            h.dispose()
+            h?.dispose()
             return
           }
+          if (!h) return
           handle = h
           el!.classList.add("hn--gl")
           ro = new ResizeObserver(() => handle?.resize())
@@ -126,6 +135,8 @@ export default function HeroNetwork() {
   return (
     <section ref={root} className="hn" aria-labelledby="hero-title">
       <div className="hn-bg" aria-hidden="true" />
+      <div className="hn-photo" aria-hidden="true" />
+      <div className="hn-haze" aria-hidden="true" />
       <div className="bd-container hn-grid">
         <div className="hn-head hn-copy">
           <p className="bd-eyebrow">Ingeniería de software · Chile</p>
@@ -158,8 +169,8 @@ export default function HeroNetwork() {
           </ul>
           <p className="hn-proof">En producción: <b>Only Energy</b> · CFT Magallanes · GINFET</p>
         </div>
-
       </div>
+      <p className="hn-credit">Imagen ilustrativa · Pexels</p>
     </section>
   )
 }
