@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { SITE, whatsappLink } from "@/lib/site"
+import { SERVICES, SERVICE_GROUPS } from "@/lib/services"
 
 const LINKS = [
   { href: "/servicios", label: "Servicios" },
@@ -47,11 +48,33 @@ export default function Navbar() {
           </Link>
 
           <nav className="bd-nav" aria-label="Principal">
-            {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} prefetch={false} aria-current={current(l.href) ? "page" : undefined}>
-                {l.label}
-              </Link>
-            ))}
+            {LINKS.map((l) =>
+              l.href === "/servicios" ? (
+                <div key={l.href} className="bd-has-mega">
+                  <Link href={l.href} prefetch={false} aria-current={current(l.href) ? "page" : undefined} aria-haspopup="true">
+                    {l.label}
+                  </Link>
+                  <div className="bd-mega">
+                    {SERVICE_GROUPS.map((g) => (
+                      <div key={g.line}>
+                        <p>{g.label}</p>
+                        <ul>
+                          {SERVICES.filter((s) => s.line === g.line).map((s) => (
+                            <li key={s.slug}>
+                              <Link href={`/servicios/${s.slug}`} prefetch={false}>{s.name}</Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <Link key={l.href} href={l.href} prefetch={false} aria-current={current(l.href) ? "page" : undefined}>
+                  {l.label}
+                </Link>
+              ),
+            )}
           </nav>
 
           <Link href="/contacto" prefetch={false} className="bd-btn bd-btn-primary bd-header-cta">
@@ -75,17 +98,21 @@ export default function Navbar() {
       <div id="menu-movil" className={`bd-sheet${open ? " open" : ""}`} aria-hidden={!open} inert={!open}>
         <nav aria-label="Menú móvil">
           {LINKS.map((l, i) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              prefetch={false}
-              onClick={() => setOpen(false)}
-              aria-current={current(l.href) ? "page" : undefined}
-              style={{ transitionDelay: open ? `${80 + i * 45}ms` : "0ms" }}
-            >
-              <small>0{i + 1}</small>
-              {l.label}
-            </Link>
+            <div key={l.href} className="bd-sheet-item" style={{ transitionDelay: open ? `${80 + i * 45}ms` : "0ms" }}>
+              <Link href={l.href} prefetch={false} onClick={() => setOpen(false)} aria-current={current(l.href) ? "page" : undefined}>
+                <small>0{i + 1}</small>
+                {l.label}
+              </Link>
+              {l.href === "/servicios" && (
+                <div className="bd-sheet-sub">
+                  {SERVICES.filter((s) => s.line === "empresa").map((s) => (
+                    <Link key={s.slug} href={`/servicios/${s.slug}`} prefetch={false} onClick={() => setOpen(false)}>
+                      {s.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </nav>
         <p className="bd-sheet-foot">{SITE.email}</p>

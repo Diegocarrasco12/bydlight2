@@ -11,6 +11,17 @@ Optimizadas a WebP (640 y 1280 px; la banda a pantalla completa también 1920 px
 | `centro-de-datos-*.webp` | https://www.pexels.com/photo/4508751/ | Banda «Producción» (home) |
 | `codigo-react-*.webp` | https://www.pexels.com/photo/4164418/ | Sección «Método» |
 | `fibra-optica-*.webp` | https://www.pexels.com/photo/2881229/ | Fondo tenue del contacto (home) |
+| `equipo-codigo-*.webp` | https://www.pexels.com/photo/7988745/ | `/servicios/software-a-medida`, `/servicios` (tarjeta), `/nosotros` (prototipo Fase 2) |
+| `desarrollador-pantallas-*.webp` | https://www.pexels.com/photo/36706460/ | `/servicios/soluciones-saas` y tarjeta SaaS (prototipo Fase 2) |
+| `sala-servidores-ti-*.webp` | https://www.pexels.com/photo/37605911/ | `/servicios/arquitectura-de-software` (prototipo Fase 2) |
+| `almacen-operacion-*.webp` | https://www.pexels.com/photo/4481260/ | `/servicios/automatizacion-de-procesos` (prototipo Fase 2) |
+| `almacen-tableta-*.webp` | https://www.pexels.com/photo/4484078/ | `/servicios/soluciones-erp` y tarjeta ERP (prototipo Fase 2) |
+| `modulo-red-*.webp` | https://www.pexels.com/photo/19226354/ | `/servicios/integraciones-y-apis` (prototipo Fase 2) |
+
+**Fase 2 (2026-10-28):** las seis fotos nuevas se descargaron de `images.pexels.com` (1600 px) y se convirtieron con Pillow a WebP 640 y 1280 px (calidad 62, `method=6`; 18–70 KB cada variante, 1,1 MB en total
+con las tres anteriores). Licencia Pexels (misma de arriba). Se rotulan en pantalla «Imagen ilustrativa · Pexels» y no se presentan como equipo, oficinas, clientes ni instalaciones de Byd Light Solutions. Las personas que aparecen
+no respaldan a Byd Light Solutions (restricción de la licencia). Se buscó también en Unsplash, pero no se incorporó ninguna imagen de esa fuente. Los nombres de los fotógrafos no se registraron (atribución no obligatoria).
+Descartadas tras revisión visual: Pexels 7988116 (sala casi vacía) y 1054397 (primer plano oscuro con poca información).
 
 Detalles: originales descargados de `images.pexels.com` (1920 px) el 2026-10-27; convertidos con Pillow a WebP (calidad 55–66, `method=6`). Variantes: `centro-de-datos` 640/1280/1920 px
 (28/131/348 KB), `codigo-react` 640/1280 px (13/39 KB), `fibra-optica` 640/1280 px (17/38 KB). Los nombres de los fotógrafos no se registraron (la atribución no es obligatoria; si se desea acreditar, consultarlos en la página

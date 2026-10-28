@@ -1,6 +1,36 @@
+// Fotografia ilustrativa (Pexels). Nunca representa instalaciones, equipo o clientes de Byd Light Solutions.
+// Procedencia y licencia: docs/CREDITOS-RECURSOS.md. Variantes: /img/stock/<file>-640.webp y -1280.webp.
+export type Photo = { file: string; alt: string; w: number; h: number }
+
+export const photoSrc = (p: Photo, w: 640 | 1280) => `/img/stock/${p.file}-${w}.webp`
+export const photoSrcSet = (p: Photo) => `${photoSrc(p, 640)} 640w, ${photoSrc(p, 1280)} 1280w`
+
+export const PHOTOS = {
+  equipo: { file: "equipo-codigo", alt: "Dos desarrolladores revisando código en un monitor", w: 1280, h: 854 },
+  desarrollador: { file: "desarrollador-pantallas", alt: "Desarrollador trabajando con dos monitores", w: 1280, h: 960 },
+  servidores: { file: "sala-servidores-ti", alt: "Profesional TI frente a racks de red en una sala técnica", w: 1280, h: 854 },
+  almacen: { file: "almacen-operacion", alt: "Operarios en un almacén con estanterías, vistos desde arriba", w: 1280, h: 854 },
+  tableta: { file: "almacen-tableta", alt: "Persona con una tableta controlando inventario en un almacén", w: 1280, h: 854 },
+  red: { file: "modulo-red", alt: "Manos instalando un módulo de red en un equipo", w: 1280, h: 852 },
+} satisfies Record<string, Photo>
+
+// Agrupacion para menu, /servicios y footer.
+export const SERVICE_GROUPS = [
+  { line: "empresa", label: "Soluciones empresariales", blurb: "ERP y plataformas SaaS: desarrollo, personalización e integración." },
+  { line: "ingenieria", label: "Software e ingeniería", blurb: "Sistemas a medida, arquitectura, apps, APIs y automatización." },
+  { line: "web", label: "Web y ecommerce", blurb: "Sitios y tiendas con alcance y precio definidos." },
+] as const
+
+export type ServiceLine = (typeof SERVICE_GROUPS)[number]["line"]
+
 export type Service = {
   slug: string
-  line: "web" | "ingenieria"
+  line: ServiceLine
+  photo?: Photo
+  /** Beneficios en lenguaje simple (opcional; se muestran como tarjetas). */
+  benefits?: { t: string; d: string }[]
+  /** Aclaracion comercial: que es y que no es el servicio (opcional). */
+  scopeNote?: string
   name: string
   short: string
   metaTitle: string
@@ -14,6 +44,106 @@ export type Service = {
 }
 
 export const SERVICES: Service[] = [
+  {
+    slug: "soluciones-erp",
+    line: "empresa",
+    photo: PHOTOS.tableta,
+    name: "Soluciones ERP",
+    short: "Integramos, adaptamos y desarrollamos sistemas de gestión: inventario, ventas y operaciones conectados.",
+    metaTitle: "Soluciones ERP: integración y desarrollo de sistemas de gestión en Chile",
+    metaDescription:
+      "Integración, personalización y desarrollo de sistemas de gestión (ERP) en Chile: inventario, ventas, operaciones y APIs. Experiencia en SAP Business One.",
+    intro:
+      "Ayudamos a que tu empresa trabaje con un solo flujo de información. Desarrollamos, implementamos, personalizamos e integramos soluciones de gestión empresarial: conectamos el ERP que ya usas con tu sitio, tus aplicaciones y tus procesos, o construimos los módulos que tu operación necesita.",
+    scopeNote:
+      "Es un servicio de desarrollo, implementación, personalización e integración. No comercializamos un ERP propio: trabajamos sobre la plataforma que tu empresa ya usa o diseñamos módulos a medida para tus procesos.",
+    benefits: [
+      { t: "Datos que fluyen solos", d: "Menos doble digitación entre tu ERP, tu tienda y tus aplicaciones." },
+      { t: "Inventario y ventas al día", d: "Stock, pedidos y documentos sincronizados donde los necesitas." },
+      { t: "Procesos a tu medida", d: "Módulos y automatizaciones para lo que un sistema genérico no cubre." },
+      { t: "Evolución sin detener la operación", d: "Mejoras por etapas, probadas antes de pasar a producción." },
+    ],
+    problems: [
+      "Tu ERP no se conecta con tu tienda online, tu app o tus otros sistemas.",
+      "El inventario y las ventas se actualizan a mano o con planillas.",
+      "Necesitas módulos o reportes que el sistema actual no ofrece.",
+      "Tu sistema empresarial es antiguo y modernizarlo parece un riesgo para la operación.",
+    ],
+    deliverables: [
+      "Levantamiento del proceso y de los sistemas involucrados",
+      "Integración con tu ERP mediante APIs, incluido SAP Business One vía Service Layer",
+      "Módulos a medida: inventario, ventas, operaciones y reportes",
+      "Automatización de flujos entre plataformas, con registro de cada operación",
+      "Pruebas en ambiente de pruebas antes de pasar a producción",
+      "Documentación técnica y transferencia al equipo",
+    ],
+    fitsFor: ["Empresas que ya usan un ERP", "Operaciones con inventario y despacho", "Tiendas online que necesitan sincronizar stock", "Áreas administrativas con procesos manuales"],
+    faq: [
+      {
+        q: "¿Venden un ERP propio?",
+        a: "No. Ofrecemos desarrollo, implementación, personalización e integración. Trabajamos sobre tu plataforma actual o construimos módulos a medida para tus procesos.",
+      },
+      {
+        q: "¿Pueden conectar mi ERP con mi tienda o mi aplicación?",
+        a: "Sí, si la plataforma expone una API o un mecanismo de integración. Tenemos experiencia técnica con SAP Business One y su Service Layer; evaluamos la factibilidad antes de cotizar.",
+      },
+      {
+        q: "¿Se puede hacer por etapas?",
+        a: "Sí. Recomendamos partir por el flujo de mayor impacto, validarlo en uso real y luego extender el alcance.",
+      },
+    ],
+    planIds: ["software"],
+  },
+  {
+    slug: "soluciones-saas",
+    line: "empresa",
+    photo: PHOTOS.desarrollador,
+    name: "Soluciones SaaS",
+    short: "Desarrollamos plataformas web multiusuario en la nube, con roles, integraciones y mantenimiento continuo.",
+    metaTitle: "Desarrollo de plataformas SaaS y aplicaciones web empresariales en Chile",
+    metaDescription:
+      "Desarrollo de plataformas SaaS y aplicaciones web empresariales en Chile: sistemas multiusuario, roles y permisos, suscripciones, integraciones y mantenimiento.",
+    intro:
+      "Si tu idea o tu negocio necesita una plataforma accesible desde cualquier lugar, la diseñamos y la construimos: aplicación web, cuentas de usuario, permisos por rol, integraciones con otros servicios y una base técnica que pueda crecer contigo.",
+    scopeNote:
+      "Es un servicio de desarrollo de software. Construimos tu plataforma; no ofrecemos un producto SaaS propio ya disponible ni precios por suscripción.",
+    benefits: [
+      { t: "Acceso desde cualquier lugar", d: "Aplicaciones web que tu equipo y tus clientes usan desde el navegador." },
+      { t: "Cada persona ve lo que le corresponde", d: "Múltiples usuarios con roles y permisos bien definidos." },
+      { t: "Hecha para crecer", d: "Arquitectura pensada para sumar clientes, módulos y volumen." },
+      { t: "Conectada con tus servicios", d: "Pagos, facturación, correo y otras plataformas mediante APIs." },
+    ],
+    problems: [
+      "Quieres lanzar una plataforma propia pero no sabes por dónde empezar.",
+      "Tu operación depende de planillas que varias personas editan a la vez.",
+      "Necesitas que clientes o socios accedan a información con sus propias cuentas.",
+      "Tu aplicación actual no escala o es difícil de mantener.",
+    ],
+    deliverables: [
+      "Definición del alcance y de una primera versión funcional",
+      "Aplicación web empresarial con autenticación y gestión de roles y permisos",
+      "Modelo multiusuario, y de suscripción si tu negocio lo requiere",
+      "Integraciones con servicios externos (pagos, facturación, correo y otros)",
+      "Publicación en la nube con respaldos y monitoreo básico",
+      "Mantenimiento y evolución posterior, por acuerdo",
+    ],
+    fitsFor: ["Startups y proyectos propios", "Empresas que digitalizan un proceso", "Instituciones con usuarios externos", "Equipos que reemplazan planillas por una plataforma"],
+    faq: [
+      {
+        q: "¿Tienen una plataforma SaaS lista para contratar?",
+        a: "No. Desarrollamos plataformas a medida. Si tienes una idea o un proceso que digitalizar, partimos por definir una primera versión.",
+      },
+      {
+        q: "¿Pueden mantener la plataforma después del lanzamiento?",
+        a: "Sí. El mantenimiento y la evolución se acuerdan por separado, con alcance y tiempos de respuesta definidos.",
+      },
+      {
+        q: "¿Cuánto cuesta y cuánto demora?",
+        a: "Depende del alcance. Entregamos una cotización con etapas, plazos y entregables después de un levantamiento.",
+      },
+    ],
+    planIds: ["software"],
+  },
   {
     slug: "desarrollo-web",
     line: "web",
@@ -85,6 +215,7 @@ export const SERVICES: Service[] = [
   {
     slug: "software-a-medida",
     line: "ingenieria",
+    photo: PHOTOS.equipo,
     name: "Software a medida y sistemas empresariales",
     short: "Sistemas y plataformas diseñados para los procesos reales de tu empresa.",
     metaTitle: "Desarrollo de software a medida y sistemas empresariales en Chile",
@@ -119,6 +250,7 @@ export const SERVICES: Service[] = [
   {
     slug: "arquitectura-de-software",
     line: "ingenieria",
+    photo: PHOTOS.servidores,
     name: "Arquitectura de software y consultoría tecnológica",
     short: "Diseño técnico para que tu plataforma sea escalable, segura y mantenible.",
     metaTitle: "Arquitectura de software y consultoría tecnológica en Chile",
@@ -183,6 +315,7 @@ export const SERVICES: Service[] = [
   {
     slug: "integraciones-y-apis",
     line: "ingenieria",
+    photo: PHOTOS.red,
     name: "Integración de sistemas y APIs",
     short: "Conectamos tus sistemas, plataformas y servicios para que los datos fluyan solos.",
     metaTitle: "Integración de sistemas y desarrollo de APIs en Chile",
@@ -217,6 +350,7 @@ export const SERVICES: Service[] = [
   {
     slug: "automatizacion-de-procesos",
     line: "ingenieria",
+    photo: PHOTOS.almacen,
     name: "Automatización y modernización de procesos",
     short: "Eliminamos tareas manuales y errores con flujos automatizados y sistemas simples.",
     metaTitle: "Automatización de procesos y modernización de sistemas en Chile",

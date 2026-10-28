@@ -1,6 +1,6 @@
 import * as THREE from "three"
 
-// Escena 3D del hero: "del plano al producto".
+// LEGADO (sin uso desde la Fase 3). Escena 3D del hero anterior: "del plano al producto".
 // Un nucleo de luz atrae paneles de interfaz (wireframe) que se ensamblan en la ventana de un producto real.
 // El DOM muestra el producto real encima; esta escena solo pone luz, profundidad y el ensamblado.
 // Se carga de forma diferida (import dinamico) y solo si el dispositivo lo soporta (ver HeroStage).

@@ -33,6 +33,9 @@ Registro de decisiones importantes, con motivo y dónde viven. Fechas 2026-10-26
 | 27 | `.claude/` en `.gitignore` | Reglas locales del ejecutor y rutas del PC no se versionan | `.gitignore` |
 | 28 | Dominio público apuntado al contenedor por el **administrador** (ingress del túnel) | Cambio de Cloudflare/túnel solo con autorización; Claude solo dio comandos | fuera del repo |
 
+> **Fase 3 (2026-10-28):** las decisiones 8–10 se mantienen para el hero nuevo (`HeroNetwork.tsx`): three.js diferido, arranque con la primera interacción o a los 3,5 s y respaldo estático (SVG).
+> Se midió que arrancar la escena nueva al quedar ocioso el navegador hundía el móvil de ~85 a ~59 (TBT 1,5 s); con el arranque diferido y la construcción en tareas cortas vuelve a ~85 (TBT 70–110 ms).
+
 ## No hacer (decisiones restrictivas)
 
 - No activar Webpay/Transbank ni crear volúmenes/variables para pagos sin autorización explícita.

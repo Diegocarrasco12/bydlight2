@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import JsonLd from "@/components/seo/JsonLd"
 import PageHero from "@/components/layout/PageHero"
 import { Faq, FinalCta } from "@/components/home/sections"
+import { Photo } from "@/components/home/enterprise"
 import { PLANS, planHref } from "@/lib/plans"
 import { SERVICES, getService } from "@/lib/services"
 import { absoluteUrl } from "@/lib/site"
@@ -75,10 +76,36 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       <JsonLd data={ld} />
       <PageHero
         crumbs={[{ href: "/servicios", label: "Servicios" }, { label: s.name }]}
-        eyebrow={s.line === "web" ? "Desarrollo web" : "Ingeniería y software a medida"}
+        eyebrow={s.line === "web" ? "Desarrollo web" : s.line === "empresa" ? "Soluciones empresariales" : "Ingeniería y software a medida"}
         title={s.name}
         lead={s.intro}
       />
+
+      {s.photo && (
+        <div className="bd-container sv-photo-wrap">
+          <figure className="sv-photo">
+            <Photo photo={s.photo} sizes="(max-width: 1240px) 100vw, 1192px" eager />
+            <figcaption>Imagen ilustrativa · Pexels</figcaption>
+          </figure>
+        </div>
+      )}
+
+      {s.benefits && (
+        <section className="bd-section sv-benefits" aria-label="Beneficios">
+          <div className="bd-container">
+            <ul className="sv-ben-grid">
+              {s.benefits.map((b, i) => (
+                <li key={b.t} className="sv-ben">
+                  <span aria-hidden="true">0{i + 1}</span>
+                  <h2>{b.t}</h2>
+                  <p>{b.d}</p>
+                </li>
+              ))}
+            </ul>
+            {s.scopeNote && <p className="sv-scope"><b>Alcance:</b> {s.scopeNote}</p>}
+          </div>
+        </section>
+      )}
 
       <section className="bd-section">
         <div className="bd-container bd-prose">
@@ -120,7 +147,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
-      <Faq items={s.faq} title={`Preguntas sobre ${s.name.toLowerCase()}`} />
+      <Faq items={s.faq} title={`Preguntas sobre ${s.name.toLowerCase().replace(/erp/, "ERP").replace(/saas/, "SaaS")}`} />
       <FinalCta />
     </>
   )

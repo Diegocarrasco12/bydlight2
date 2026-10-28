@@ -34,7 +34,9 @@ src/app/                 Rutas (App Router) + layout.tsx, globals.css, sitemap.t
   planes/ nosotros/ contacto/
   contratar/ orden/ api/ Flujo de pagos (INACTIVO, ver §8)
 src/components/
-  hero/HeroStage.tsx     Sección sticky del hero (cliente) + src/components/hero/scene.ts (three.js)
+  hero/HeroNetwork.tsx   Hero VIGENTE de la portada (desde la Fase 3): red de nodos metálicos, sin scroll pegajoso + hero/scene-network.ts (three.js)
+  hero/HeroStage.tsx     LEGADO sin uso (átomo/«núcleo de luz» anterior) + hero/scene.ts. Se conserva hasta confirmar que nada depende de ellos
+  home/enterprise.tsx    EnterpriseBand (portada), EnterpriseCards y ServicesByCategory (/servicios): soluciones ERP/SaaS y servicios por categoría
   home/blocks.tsx        Bloques de la home: Capabilities, InfraBand, ProjectsShowcase, ApiSection, Method, TechSection, PlansTeaser, HomeContact
   home/sections.tsx      ServicesGrid, PlansGrid, PlanComparison, MaintenanceBlock, Faq, FinalCta
   portfolio/             Portfolio.tsx (ProjectFeature/Card/Grid/DesktopShowcase) y Frames.tsx (marcos de navegador/app)
@@ -56,6 +58,15 @@ aplicaciones-moviles, integraciones-y-apis, automatizacion-de-procesos, mantenim
 (19 URL), `/robots.txt`. Rutas restringidas: ver §8.
 
 ## 5. Hero 3D y animaciones **[V]**
+
+> **Vigente desde la Fase 3 (2026-10-28):** la portada usa `HeroNetwork.tsx` + `scene-network.ts` (red de nodos metálicos). Lo descrito abajo para
+> `HeroStage.tsx`/`scene.ts` corresponde al hero anterior y queda como referencia histórica.
+> - Grilla normal (copia + escenario 3D), sin `position: sticky`; en móvil el 3D tiene su propio bloque entre el titular y los botones.
+> - `scene-network.ts`: `InstancedMesh` para nodos (metal oscuro, `MeshPhysicalMaterial` en escritorio y `MeshStandardMaterial` en móvil) y para conexiones; un único `Points`
+>   para los pulsos de luz; entorno de reflejos procedural (`RoomEnvironment` + PMREM), sin HDRI descargado ni sombras dinámicas. 46 nodos en escritorio, 30 en móvil.
+> - Arranque: con la primera interacción o a los 3,5 s (como el hero anterior), con el navegador ocioso; la escena se construye en tareas cortas y compila shaders con
+>   `compileAsync`. Mientras tanto se ve una red SVG estática, que también es el respaldo sin WebGL, con ahorro de datos o equipo modesto.
+> - `prefers-reduced-motion`: un solo cuadro 3D fijo y ningún cuadro de animación. Se pausa fuera de pantalla y con la pestaña oculta.
 
 - `HeroStage.tsx` (cliente): sección `.hx` de ~330vh (260vh en móvil) con contenido `sticky`. Un listener de scroll (rAF) escribe la
   variable CSS `--p` (0–1) y `data-stage` (1/2/3). El titular, los botones y el mockup del producto real (Only Energy) son HTML/CSS:

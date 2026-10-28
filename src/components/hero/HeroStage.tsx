@@ -6,6 +6,7 @@ import { whatsappLink } from "@/lib/site"
 import { BrowserFrame } from "@/components/portfolio/Frames"
 import { FEATURED } from "@/lib/portfolio"
 
+// LEGADO (sin uso desde la Fase 3: la portada usa HeroNetwork). Se conserva hasta confirmar que nada depende de el.
 // Hero cinematografico. Tres niveles, del mas rico al mas liviano:
 //  1. Escena 3D (three.js) guiada por el scroll: el nucleo de luz ensambla la interfaz de un producto real.
 //  2. Sin WebGL, con ahorro de datos o equipo modesto: composicion estatica con CSS (nucleo de luz + plano).

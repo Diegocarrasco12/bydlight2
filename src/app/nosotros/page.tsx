@@ -4,6 +4,8 @@ import PageHero from "@/components/layout/PageHero"
 import JsonLd from "@/components/seo/JsonLd"
 import { Method, ProjectsShowcase } from "@/components/home/blocks"
 import { FinalCta } from "@/components/home/sections"
+import { Photo } from "@/components/home/enterprise"
+import { PHOTOS } from "@/lib/services"
 import { SITE, absoluteUrl } from "@/lib/site"
 
 export const metadata: Metadata = {
@@ -52,6 +54,15 @@ export default function NosotrosPage() {
               <Link href="/proyectos" prefetch={false}>Mira los proyectos publicados</Link>
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="bd-section nos-photo" aria-label="Cómo trabajamos">
+        <div className="bd-container">
+          <figure className="sv-photo rv">
+            <Photo photo={PHOTOS.equipo} sizes="(max-width: 1240px) 100vw, 1192px" />
+            <figcaption>Imagen ilustrativa · Pexels. No corresponde a personas ni oficinas de Byd Light Solutions.</figcaption>
+          </figure>
         </div>
       </section>
 
