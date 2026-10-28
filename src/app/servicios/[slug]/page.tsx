@@ -8,6 +8,7 @@ import { Photo } from "@/components/home/enterprise"
 import { PLANS, planHref } from "@/lib/plans"
 import { SERVICES, getService } from "@/lib/services"
 import { absoluteUrl } from "@/lib/site"
+import { pageMetadata } from "@/lib/seo"
 
 export const dynamicParams = false
 
@@ -19,16 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const s = getService(slug)
   if (!s) return {}
-  return {
-    title: s.metaTitle,
-    description: s.metaDescription,
-    alternates: { canonical: `/servicios/${s.slug}` },
-    openGraph: {
-      url: `/servicios/${s.slug}`,
-      title: `${s.metaTitle} | Byd Light Solutions`,
-      description: s.metaDescription,
-    },
-  }
+  return pageMetadata({ title: s.metaTitle, description: s.metaDescription, path: `/servicios/${s.slug}` })
 }
 
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {

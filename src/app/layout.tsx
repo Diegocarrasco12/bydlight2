@@ -30,7 +30,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: "Desarrollo web y software a medida en Chile | Byd Light Solutions",
+    default: "Desarrollo web y software a medida en Chile | Byd Light",
     template: "%s | Byd Light Solutions",
   },
   description: SITE.description,
@@ -41,12 +41,12 @@ export const metadata: Metadata = {
     locale: "es_CL",
     siteName: SITE.name,
     url: SITE.url,
-    title: "Desarrollo web y software a medida en Chile | Byd Light Solutions",
+    title: "Desarrollo web y software a medida en Chile | Byd Light",
     description: SITE.description,
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Byd Light Solutions: desarrollo web y software a medida en Chile" }],
   },
   twitter: { card: "summary_large_image", images: ["/og-image.png"] },
-  icons: { icon: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }], apple: "/icon-192.png" },
+  icons: { icon: [{ url: "/favicon.ico", sizes: "48x48" }, { url: "/icon-192.png", sizes: "192x192", type: "image/png" }], apple: "/icon-192.png" },
 }
 
 export const viewport: Viewport = {

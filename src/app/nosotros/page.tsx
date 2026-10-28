@@ -7,21 +7,28 @@ import { FinalCta } from "@/components/home/sections"
 import { Photo } from "@/components/home/enterprise"
 import { PHOTOS } from "@/lib/services"
 import { SITE, absoluteUrl } from "@/lib/site"
+import { breadcrumbLd, pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  title: "Nosotros",
+export const metadata: Metadata = pageMetadata({
+  title: "Nosotros: ingeniería de software en Chile",
   description:
-    "Byd Light Solutions: ingeniería de software y desarrollo web con más de 13 años de experiencia en operaciones reales. Cómo trabajamos y qué podemos hacer por tu negocio.",
-  alternates: { canonical: "/nosotros" },
-}
+    "Ingeniería de software y desarrollo web con más de 13 años de experiencia en operaciones reales. Cómo trabajamos y qué podemos hacer por tu negocio.",
+  path: "/nosotros",
+})
 
 export default function NosotrosPage() {
   const ld = {
     "@context": "https://schema.org",
-    "@type": "AboutPage",
-    url: absoluteUrl("/nosotros"),
-    name: "Nosotros | Byd Light Solutions",
-    about: { "@id": absoluteUrl("/#organization") },
+    "@graph": [
+      {
+        "@type": "AboutPage",
+        url: absoluteUrl("/nosotros"),
+        name: "Nosotros | Byd Light Solutions",
+        inLanguage: "es-CL",
+        about: { "@id": absoluteUrl("/#organization") },
+      },
+      breadcrumbLd([{ name: "Nosotros", path: "/nosotros" }]),
+    ],
   }
   return (
     <>

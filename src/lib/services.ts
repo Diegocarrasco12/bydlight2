@@ -50,7 +50,7 @@ export const SERVICES: Service[] = [
     photo: PHOTOS.tableta,
     name: "Soluciones ERP",
     short: "Integramos, adaptamos y desarrollamos sistemas de gestión: inventario, ventas y operaciones conectados.",
-    metaTitle: "Soluciones ERP: integración y desarrollo de sistemas de gestión en Chile",
+    metaTitle: "Integración ERP y SAP Business One",
     metaDescription:
       "Integración, personalización y desarrollo de sistemas de gestión (ERP) en Chile: inventario, ventas, operaciones y APIs. Experiencia en SAP Business One.",
     intro:
@@ -100,7 +100,7 @@ export const SERVICES: Service[] = [
     photo: PHOTOS.desarrollador,
     name: "Soluciones SaaS",
     short: "Desarrollamos plataformas web multiusuario en la nube, con roles, integraciones y mantenimiento continuo.",
-    metaTitle: "Desarrollo de plataformas SaaS y aplicaciones web empresariales en Chile",
+    metaTitle: "Desarrollo de plataformas SaaS en Chile",
     metaDescription:
       "Desarrollo de plataformas SaaS y aplicaciones web empresariales en Chile: sistemas multiusuario, roles y permisos, suscripciones, integraciones y mantenimiento.",
     intro:
@@ -151,7 +151,7 @@ export const SERVICES: Service[] = [
     short: "Sitios profesionales, rápidos y listos para ser encontrados en Google.",
     metaTitle: "Desarrollo de páginas web en Chile",
     metaDescription:
-      "Creamos páginas web profesionales y rápidas para emprendedores y pymes en Chile: diseño responsive, SEO base, formulario y WhatsApp. Planes desde $149.990 + IVA.",
+      "Páginas web profesionales y rápidas para emprendedores y pymes en Chile: diseño responsive, SEO base, formulario y WhatsApp. Desde $149.990 + IVA.",
     intro:
       "Diseñamos y desarrollamos sitios web con alcance y precio definidos. Cada plan indica cuántas páginas incluye, cuántas revisiones tiene y qué debes entregar, para que sepas qué recibirás antes de empezar.",
     problems: [
@@ -183,7 +183,7 @@ export const SERVICES: Service[] = [
     line: "web",
     name: "Desarrollo de ecommerce",
     short: "Tienda online con catálogo, carrito y medio de pago para vender desde tu sitio.",
-    metaTitle: "Desarrollo de ecommerce y tiendas online en Chile",
+    metaTitle: "Ecommerce y tiendas online en Chile",
     metaDescription:
       "Desarrollamos tiendas online en Chile con catálogo, carrito, panel de administración y pasarela de pago. Plan Ecommerce desde $699.990 + IVA.",
     intro:
@@ -218,9 +218,9 @@ export const SERVICES: Service[] = [
     photo: PHOTOS.equipo,
     name: "Software a medida y sistemas empresariales",
     short: "Sistemas y plataformas diseñados para los procesos reales de tu empresa.",
-    metaTitle: "Desarrollo de software a medida y sistemas empresariales en Chile",
+    metaTitle: "Software a medida en Chile",
     metaDescription:
-      "Desarrollamos software a medida, plataformas web y sistemas empresariales para empresas en Chile. Cotización personalizada, por etapas y con arquitectura definida.",
+      "Software a medida, plataformas web y sistemas empresariales para empresas en Chile. Cotización personalizada, por etapas y con arquitectura definida.",
     intro:
       "Cuando una planilla o un sistema genérico ya no alcanza, diseñamos software que se adapta a cómo trabaja tu organización: usuarios, roles, reportes y reglas de negocio propias.",
     problems: [
@@ -253,7 +253,7 @@ export const SERVICES: Service[] = [
     photo: PHOTOS.servidores,
     name: "Arquitectura de software y consultoría tecnológica",
     short: "Diseño técnico para que tu plataforma sea escalable, segura y mantenible.",
-    metaTitle: "Arquitectura de software y consultoría tecnológica en Chile",
+    metaTitle: "Arquitectura de software y consultoría",
     metaDescription:
       "Consultoría y arquitectura de software en Chile: diseño de plataformas escalables, revisión técnica, seguridad y modernización de sistemas existentes.",
     intro:
@@ -287,7 +287,7 @@ export const SERVICES: Service[] = [
     line: "ingenieria",
     name: "Aplicaciones móviles",
     short: "Apps para Android e iOS con Flutter, conectadas a tus sistemas y APIs.",
-    metaTitle: "Desarrollo de aplicaciones móviles con Flutter en Chile",
+    metaTitle: "Apps móviles con Flutter en Chile",
     metaDescription:
       "Desarrollamos aplicaciones móviles para Android e iOS con Flutter, conectadas a APIs y sistemas existentes. Cotización según alcance.",
     intro:
@@ -318,9 +318,9 @@ export const SERVICES: Service[] = [
     photo: PHOTOS.red,
     name: "Integración de sistemas y APIs",
     short: "Conectamos tus sistemas, plataformas y servicios para que los datos fluyan solos.",
-    metaTitle: "Integración de sistemas y desarrollo de APIs en Chile",
+    metaTitle: "Integración de sistemas y APIs en Chile",
     metaDescription:
-      "Desarrollo de APIs REST e integración con ERP (SAP Business One Service Layer), CRM, facturación, pagos y aplicaciones propias. Autenticación segura, reintentos, registro y documentación. Cotización según alcance.",
+      "Desarrollo de APIs REST e integración con ERP (SAP Business One Service Layer), CRM, facturación y pagos. Autenticación segura, registro y documentación.",
     intro:
       "Muchas empresas usan varias herramientas que no se hablan entre sí. Diseñamos APIs e integraciones que conectan tus sistemas, incluido SAP Business One mediante Service Layer, reducen el doble ingreso de datos y dejan registro de lo que ocurre.",
     problems: [
@@ -353,7 +353,7 @@ export const SERVICES: Service[] = [
     photo: PHOTOS.almacen,
     name: "Automatización y modernización de procesos",
     short: "Eliminamos tareas manuales y errores con flujos automatizados y sistemas simples.",
-    metaTitle: "Automatización de procesos y modernización de sistemas en Chile",
+    metaTitle: "Automatización de procesos en Chile",
     metaDescription:
       "Automatizamos procesos administrativos y operativos de tu empresa en Chile: reportes, notificaciones, carga de datos y flujos entre sistemas.",
     intro:

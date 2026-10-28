@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/seo"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import PageHero from "@/components/layout/PageHero"
@@ -21,12 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const p = find(slug)
   if (!p) return {}
-  return {
-    title: `${p.name}: ${p.kind.toLowerCase()}`,
-    description: p.summary,
-    alternates: { canonical: `/proyectos/${p.slug}` },
-    openGraph: { url: `/proyectos/${p.slug}`, title: `${p.name} | Byd Light Solutions`, description: p.summary },
-  }
+  return pageMetadata({ title: `${p.name}: ${p.kind.toLowerCase()}`, description: p.summary, path: `/proyectos/${p.slug}` })
 }
 
 function hostOf(url?: string) {

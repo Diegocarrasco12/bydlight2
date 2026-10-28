@@ -4,21 +4,28 @@ import PageHero from "@/components/layout/PageHero"
 import ContactForm from "@/components/contact/ContactForm"
 import JsonLd from "@/components/seo/JsonLd"
 import { SITE, absoluteUrl, whatsappLink } from "@/lib/site"
+import { breadcrumbLd, pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  title: "Contacto",
+export const metadata: Metadata = pageMetadata({
+  title: "Contacto y cotización de proyectos web",
   description:
     "Cuéntanos tu proyecto web o de software a medida. Respondemos por correo o WhatsApp con una propuesta clara y sin compromiso.",
-  alternates: { canonical: "/contacto" },
-}
+  path: "/contacto",
+})
 
 export default function ContactoPage() {
   const ld = {
     "@context": "https://schema.org",
-    "@type": "ContactPage",
-    url: absoluteUrl("/contacto"),
-    name: "Contacto Byd Light Solutions",
-    about: { "@id": absoluteUrl("/#organization") },
+    "@graph": [
+      {
+        "@type": "ContactPage",
+        url: absoluteUrl("/contacto"),
+        name: "Contacto Byd Light Solutions",
+        inLanguage: "es-CL",
+        about: { "@id": absoluteUrl("/#organization") },
+      },
+      breadcrumbLd([{ name: "Contacto", path: "/contacto" }]),
+    ],
   }
   return (
     <>

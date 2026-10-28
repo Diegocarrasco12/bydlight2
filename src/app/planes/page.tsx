@@ -4,14 +4,14 @@ import PageHero from "@/components/layout/PageHero"
 import { Faq, FinalCta, MaintenanceBlock, PlanComparison, PlansGrid } from "@/components/home/sections"
 import { PLANS, PLANS_FAQ } from "@/lib/plans"
 import { absoluteUrl } from "@/lib/site"
+import { pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  title: "Planes y precios de páginas web, ecommerce y software",
+export const metadata: Metadata = pageMetadata({
+  title: "Planes y precios de páginas web",
   description:
-    "Planes de desarrollo web en Chile: Emprendedor desde $149.990, Web Profesional desde $299.990, Web Empresa desde $499.990 y Ecommerce desde $699.990, más IVA. Software a medida con cotización.",
-  alternates: { canonical: "/planes" },
-  openGraph: { url: "/planes", title: "Planes y precios | Byd Light Solutions" },
-}
+    "Planes de desarrollo web en Chile: Emprendedor desde $149.990, Profesional $299.990, Empresa $499.990 y Ecommerce $699.990, más IVA. Software a medida a cotizar.",
+  path: "/planes",
+})
 
 export default function PlanesPage() {
   const ld = {

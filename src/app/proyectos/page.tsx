@@ -2,18 +2,20 @@ import type { Metadata } from "next"
 import PageHero from "@/components/layout/PageHero"
 import { FinalCta } from "@/components/home/sections"
 import { DesktopShowcase, ProjectFeature, ProjectGrid } from "@/components/portfolio/Portfolio"
+import JsonLd from "@/components/seo/JsonLd"
+import { breadcrumbLd, pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Portafolio de proyectos web y software",
   description:
-    "Proyectos reales de Byd Light Solutions: ecommerce Only Energy, plataforma de empleabilidad del CFT de Magallanes, sitios corporativos y software de escritorio para Windows.",
-  alternates: { canonical: "/proyectos" },
-  openGraph: { url: "/proyectos" },
-}
+    "Proyectos reales de Byd Light Solutions: ecommerce Only Energy, plataforma de empleabilidad del CFT de Magallanes, sitios corporativos y software para Windows.",
+  path: "/proyectos",
+})
 
 export default function ProyectosPage() {
   return (
     <>
+      <JsonLd data={{ "@context": "https://schema.org", "@graph": [breadcrumbLd([{ name: "Proyectos", path: "/proyectos" }])] }} />
       <PageHero
         crumbs={[{ label: "Proyectos" }]}
         eyebrow="Portafolio"

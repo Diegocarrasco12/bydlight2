@@ -6,7 +6,7 @@ import { EnterpriseBand } from "@/components/home/enterprise"
 import { SITE, absoluteUrl } from "@/lib/site"
 
 export const metadata: Metadata = {
-  title: { absolute: "Desarrollo web y software a medida en Chile | Byd Light Solutions" },
+  title: { absolute: "Desarrollo web y software a medida en Chile | Byd Light" },
   description:
     "Ingeniería de software en Chile: soluciones ERP y SaaS, integraciones y APIs, sistemas a medida, ecommerce y automatización. Páginas web desde $149.990 + IVA.",
   alternates: { canonical: "/" },
