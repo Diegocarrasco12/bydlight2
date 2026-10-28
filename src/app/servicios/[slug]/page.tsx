@@ -7,6 +7,7 @@ import { Faq, FinalCta } from "@/components/home/sections"
 import { Photo } from "@/components/home/enterprise"
 import { PLANS, planHref } from "@/lib/plans"
 import { SERVICES, getService } from "@/lib/services"
+import { SERVICE_EXTRAS, SERVICE_STEPS } from "@/lib/service-extras"
 import { absoluteUrl } from "@/lib/site"
 import { pageMetadata } from "@/lib/seo"
 
@@ -31,6 +32,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const plans = PLANS.filter((p) => s.planIds.includes(p.id))
   const priced = plans.filter((p) => p.priceFrom !== null)
   const url = absoluteUrl(`/servicios/${s.slug}`)
+  const extra = SERVICE_EXTRAS[s.slug]
+  const faqs = extra ? [...s.faq, ...extra.faqMore] : s.faq
 
   const ld = {
     "@context": "https://schema.org",
@@ -51,14 +54,6 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           { "@type": "ListItem", position: 2, name: "Servicios", item: absoluteUrl("/servicios") },
           { "@type": "ListItem", position: 3, name: s.name, item: url },
         ],
-      },
-      {
-        "@type": "FAQPage",
-        mainEntity: s.faq.map((f) => ({
-          "@type": "Question",
-          name: f.q,
-          acceptedAnswer: { "@type": "Answer", text: f.a },
-        })),
       },
     ],
   }
@@ -114,6 +109,32 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
               <h2>Ideal para</h2>
               <ul>{s.fitsFor.map((d) => <li key={d}>{d}</li>)}</ul>
             </section>
+            {extra && (
+              <>
+                <section>
+                  <h2>Enfoque y tecnologías</h2>
+                  <ul>{extra.approach.map((d) => <li key={d}>{d}</li>)}</ul>
+                </section>
+                <section>
+                  <h2>Cómo trabajamos</h2>
+                  <ol>{SERVICE_STEPS.map(([t, d]) => <li key={t}><b>{t}.</b> {d}</li>)}</ol>
+                </section>
+                <section>
+                  <h2>Qué necesitamos para cotizar</h2>
+                  <ul>{extra.quoteInfo.map((d) => <li key={d}>{d}</li>)}</ul>
+                  <p>Si aún no tienes todo claro, no hay problema: <Link href="/contacto">cuéntanos tu caso</Link> y lo definimos juntos.</p>
+                </section>
+                <section>
+                  <h2>Servicios relacionados</h2>
+                  <ul>
+                    {extra.related.map((slug) => {
+                      const r = getService(slug)
+                      return r ? <li key={slug}><Link href={`/servicios/${r.slug}`}>{r.name}</Link>: {r.short}</li> : null
+                    })}
+                  </ul>
+                </section>
+              </>
+            )}
           </div>
 
           <aside className="bd-aside" aria-label="Cotizar este servicio">
@@ -139,7 +160,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
-      <Faq items={s.faq} title={`Preguntas sobre ${s.name.toLowerCase().replace(/erp/, "ERP").replace(/saas/, "SaaS")}`} />
+      <Faq items={faqs} title={`Preguntas sobre ${s.name.toLowerCase().replace(/erp/, "ERP").replace(/saas/, "SaaS")}`} />
       <FinalCta />
     </>
   )

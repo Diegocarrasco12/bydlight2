@@ -60,6 +60,8 @@ const organization = {
       "@type": "Organization",
       "@id": absoluteUrl("/#organization"),
       name: SITE.name,
+      legalName: `${SITE.name} SpA`,
+      alternateName: SITE.shortName,
       url: SITE.url,
       logo: absoluteUrl(SITE.logo),
       email: SITE.email,

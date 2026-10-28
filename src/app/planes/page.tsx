@@ -35,14 +35,6 @@ export default function PlanesPage() {
         })),
       },
       {
-        "@type": "FAQPage",
-        mainEntity: PLANS_FAQ.map((f) => ({
-          "@type": "Question",
-          name: f.q,
-          acceptedAnswer: { "@type": "Answer", text: f.a },
-        })),
-      },
-      {
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Inicio", item: absoluteUrl("/") },

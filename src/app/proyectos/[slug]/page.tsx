@@ -22,7 +22,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const p = find(slug)
   if (!p) return {}
-  return pageMetadata({ title: `${p.name}: ${p.kind.toLowerCase()}`, description: p.summary, path: `/proyectos/${p.slug}` })
+  return pageMetadata({
+    title: p.slug === "software-escritorio-windows" ? "Software de escritorio para Windows" : p.name.length > 24 ? p.name : `${p.name}: ${p.kind.toLowerCase()}`,
+    description: p.summary.length < 110 ? `${p.summary} Portafolio de Byd Light Solutions.` : p.summary,
+    path: `/proyectos/${p.slug}`,
+  })
 }
 
 function hostOf(url?: string) {
