@@ -1,0 +1,148 @@
+/* ==========================================================================
+   VARIANTE D · BYDLIGHT SIGNATURE  (~70 % minimalismo tecnologico de A + ~30 % ingenieria de C)
+   Se apoya en a.css (que tambien aplica a D, ver su primer selector) y SOLO sobrescribe lo que define la identidad propia:
+   - Base A: negro azulado, mucho aire, titulos Space Grotesk 500, texto Inter, bordes casi invisibles, botones sobrios.
+   - Toque C (selectivo): rotulos y cifras en IBM Plex Mono, secciones numeradas, separadores finos con marca naranja,
+     reticula tenue solo en la cabecera, indicadores de estado, esquema de capas de un sistema en el hero.
+   - Naranja Bydlight: boton principal, marca de seccion, estado activo, plan recomendado. Nunca como contorno de tarjetas.
+   Solo se aplica con <html data-variant="d"> (laboratorio, solo desarrollo).
+   ========================================================================== */
+html[data-variant="d"] {
+  --ink: #07090d;
+  --ink-2: #0a0d13;
+  --ink-3: #10141c;
+  --panel: rgba(255, 255, 255, 0.022);
+  --line: rgba(255, 255, 255, 0.075);
+  --line-2: rgba(255, 255, 255, 0.15);
+  --text: #eef0f3;
+  --muted: #8f95a1;
+  --cyan: #c9ced8; /* enlaces y anillo de foco: neutro claro, sin azul decorativo */
+  --blue: #6b8cff;
+  --orange: #ff7a1a;
+  --orange-2: #ffab70;
+  --ok: #5dd39e;
+  --err: #ff7b7b;
+  --radius: 12px;
+  --radius-sm: 9px;
+  --max: 1200px;
+  --display: var(--lab-space-grotesk), system-ui, sans-serif;
+  --body: var(--lab-inter), system-ui, sans-serif;
+  --mono: var(--lab-plex-mono), ui-monospace, monospace;
+
+  & body { counter-reset: sec; font-weight: 400; }
+  & :where(a, button, input, textarea, select, summary):focus-visible { outline: 2px solid var(--orange-2); outline-offset: 3px; }
+
+  /* ---------- Rotulos tecnicos (mono) y numeracion ---------- */
+  & .bd-eyebrow { font-family: var(--mono); font-size: 0.72rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; display: inline-flex; align-items: center; gap: 0; }
+  & .hn-head .bd-eyebrow::before, & .ph .bd-eyebrow::before { display: inline-block; content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 0 3px rgba(255, 122, 26, 0.18); margin-right: 12px; opacity: 1; flex: none; }
+  & .bd-head > .bd-eyebrow { counter-increment: sec; }
+  & .bd-head > .bd-eyebrow::before { display: inline-block; content: counter(sec, decimal-leading-zero) " /"; width: auto; height: auto; background: none; box-shadow: none; border-radius: 0; color: var(--orange); margin-right: 12px; opacity: 1; letter-spacing: 0.08em; }
+
+  /* Cabecera de seccion: filete completo con marca naranja corta, alineada a la izquierda */
+  & .bd-head, & .bd-head.center { max-width: none; margin: 0 0 72px; text-align: left; border-top: 1px solid var(--line-2); padding-top: 26px; }
+  & .bd-head::before { content: ""; display: block; width: 44px; height: 1px; background: var(--orange); margin-top: -27px; margin-bottom: 26px; }
+  & .bd-head .bd-h2 { max-width: 24ch; margin-inline: 0; }
+  & .bd-head .bd-lead, & .bd-head.center .bd-lead { margin-inline: 0; }
+  & .bd-section { padding: 128px 0; }
+
+  /* ---------- Botones: principal naranja de marca, resto neutro ---------- */
+  & .bd-btn-primary { background: var(--orange); color: #0a0b0d; font-weight: 600; border-color: transparent; }
+  & .bd-btn-primary:hover { background: var(--orange-2); color: #0a0b0d; box-shadow: none; }
+  & .bd-btn-ghost:hover { border-color: rgba(255, 255, 255, 0.28); }
+
+  /* ---------- Navegacion ---------- */
+  & .bd-header-inner { background: rgba(7, 9, 13, 0.7); }
+  & .bd-header.scrolled .bd-header-inner, & .bd-header.open .bd-header-inner { background: rgba(7, 9, 13, 0.9); }
+  & .bd-nav a { color: var(--muted); }
+  & .bd-nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.04); }
+  & .bd-nav a[aria-current="page"] { color: var(--text); }
+  & .bd-nav a[aria-current="page"]::after { background: var(--orange); }
+  & .bd-mega { background: #0b0e14; }
+  & .bd-mega p { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  & .bd-sheet { background: var(--ink); }
+
+  /* ---------- Hero: se conserva el hero cinematografico con escena 3D (aprobado); solo se afina el texto ---------- */
+  & .hn-head .bd-eyebrow { border: 0; padding: 0; margin-bottom: 26px; }
+  & .hn-copy h1 { letter-spacing: -0.04em; }
+  & .hn-chips a { border-radius: 8px; border-color: var(--line-2); background: rgba(7, 9, 13, 0.55); color: var(--text); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em; }
+  & .hn-chips a:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.3); }
+  & .hn-proof { font-family: var(--mono); font-size: 0.74rem; }
+
+  /* ---------- Capacidades y servicios: lista con filete y numero, sin tarjeta ---------- */
+  & .bento, & .bd-services { counter-reset: t; gap: 64px 48px; }
+  & .bento { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  & .bento-tile, & .bd-service { counter-increment: t; background: none; border: 0; border-top: 1px solid var(--line-2); border-radius: 0; padding: 26px 0 0; min-height: 0; gap: 14px; grid-column: auto; grid-row: auto; }
+  & .bento-tile:hover, & .bd-service:hover { background: none; border-top-color: var(--orange); }
+  & .bento-tile::before, & .bd-service::before { display: block; content: counter(t, decimal-leading-zero); position: static; inset: auto; width: auto; height: auto; background: none; opacity: 1; transform: none; filter: none; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+  & .bento-tile .bp { display: none; }
+  & .bento-tile svg { background: none; border: 0; padding: 0; width: 26px; height: 26px; color: var(--muted); }
+  & .bento-tile h3, & .bd-service h3 { font-size: 1.28rem; }
+  & .bento-tile .more { border: 0; width: auto; height: auto; color: var(--muted); }
+  & .bento-tile:hover .more { color: var(--orange-2); }
+  & .t1 h3 { font-size: 1.28rem; }
+  & .t1 p { font-size: 0.95rem; }
+
+  /* Etiquetas y datos tecnicos discretos */
+  & .ent-tag, & .bd-tags li, & .api-chips li, & .pc-body .kind, & .bd-ribbon { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.04em; }
+  & .ent-tag { color: var(--ok); border-color: rgba(93, 211, 158, 0.3); text-transform: none; }
+  & .ent-body li::before, & .bd-checks li::before, & .bd-plan ul.feat li::before, & .bd-maint ul.inc li::before { border-color: var(--orange); }
+  & .msteps .n { color: var(--orange); font-size: 0.78rem; }
+  & .method-list .n { color: var(--muted); font-family: var(--mono); font-size: 1.6rem; }
+  & .method-list li::before { border-color: var(--orange); }
+  & .bd-textlink, & .bd-note a { text-decoration-color: var(--orange); text-underline-offset: 4px; }
+  & .api-term { font-family: var(--mono); }
+
+  /* ---------- Planes ---------- */
+  & .bd-plan.recommended { border-color: var(--line-2); background: rgba(255, 255, 255, 0.035); box-shadow: inset 0 2px 0 var(--orange); }
+  & .bd-badge { background: var(--orange); color: #0a0b0d; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+  & .bd-price small, & .bd-price .iva { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+  & .bd-plan .meta { font-family: var(--mono); font-size: 0.72rem; line-height: 1.7; }
+  & .bd-table thead th { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 400; color: var(--muted); }
+  & .bd-table thead th.rec { color: var(--orange-2); }
+  & .bd-table td.rec { background: rgba(255, 122, 26, 0.035); }
+  & .bd-custom-side strong { font-family: var(--mono); }
+  & .bd-cta { background: radial-gradient(60% 120% at 50% 130%, rgba(255, 122, 26, 0.1), transparent 65%), var(--panel); }
+
+  /* ---------- Nosotros, contacto ---------- */
+  & .about-fig span { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; }
+  & .way span { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  & .bd-field input:focus, & .bd-field select:focus, & .bd-field textarea:focus { border-color: var(--orange-2); box-shadow: 0 0 0 3px rgba(255, 122, 26, 0.16); }
+
+  /* ---------- Cotizacion y pagos ---------- */
+  & .bd-flow { gap: 6px; margin-bottom: 36px; }
+  & .bd-flow li { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 7px; border-color: var(--line); padding: 10px 12px; }
+  & .bd-flow li.on { border-color: var(--orange); background: rgba(255, 122, 26, 0.08); color: var(--text); }
+  & .bd-flow li.done { border-color: rgba(93, 211, 158, 0.35); color: var(--ok); }
+  & .bd-result { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); box-shadow: inset 3px 0 0 var(--muted); }
+  & .bd-result.ok { border-color: var(--line); background: var(--panel); box-shadow: inset 3px 0 0 var(--ok); }
+  & .bd-result.bad { border-color: var(--line); background: var(--panel); box-shadow: inset 3px 0 0 var(--err); }
+  & .bd-result.warn { border-color: var(--line); background: var(--panel); box-shadow: inset 3px 0 0 var(--orange); }
+  & .bd-result.ok h2 { color: var(--ok); }
+  & .bd-result.bad h2 { color: var(--err); }
+  & .bd-result.warn h2 { color: var(--orange-2); }
+  & .bd-dl { gap: 0; }
+  & .bd-dl dt, & .bd-dl dd { padding: 12px 0; border-top: 1px solid var(--line); }
+  & .bd-dl dt { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; align-self: stretch; display: flex; align-items: center; }
+  & .bd-dl dd { padding-left: 28px; font-family: var(--display); font-weight: 500; font-size: 1.02rem; font-variant-numeric: tabular-nums lining-nums; }
+  & .bd-voucher-title { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  & .bd-checkout h2, & .bd-checkout h3 { font-family: var(--display); font-weight: 500; letter-spacing: -0.02em; }
+
+  /* ---------- Pie ---------- */
+  & .bd-footer-grid h2 { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+  & .bd-footer-bottom { font-family: var(--mono); font-size: 0.72rem; }
+  & .bd-dock { background: rgba(7, 9, 13, 0.94); }
+
+  /* ---------- Movil ---------- */
+  @media (max-width: 900px) {
+    & .bd-section { padding: 88px 0; }
+    & .bd-head, & .bd-head.center { margin-bottom: 44px; }
+    & .bento { grid-template-columns: 1fr; gap: 44px; }
+    & .bd-services { gap: 44px; }
+    & .bd-dl { grid-template-columns: 1fr; }
+    & .bd-dl dt { padding-bottom: 2px; }
+    & .bd-dl dd { border-top: 0; padding: 0 0 12px; }
+  }
+  @media (min-width: 901px) and (max-width: 1100px) {
+    & .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+}

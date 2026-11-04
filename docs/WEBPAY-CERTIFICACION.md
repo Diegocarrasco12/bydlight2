@@ -51,7 +51,7 @@ Reconstruye `attempts` (nuevo estado `PENDIENTE`, columnas `transaction_date` e 
 ## 8. Plan hasta la certificación
 1. **Hecho (esta fase)**: comprobante, estados inciertos, abandono, devoluciones administrativas, pruebas automáticas, pruebas reales de 3 casos + devolución en integración, borradores legales.
 2. **Titular**: decidir D1–D5 y abrir el formulario de validación de Transbank para ver los casos exactos requeridos.
-3. **Claude (con autorización)**: ejecutar en integración los casos restantes (AMEX, Redcompra, prepago, cuotas, expiración real, reversa el mismo día) y completar `docs/EVIDENCIAS-INTEGRACION-WEBPAY.md`.
+3. **Hecho en Fase 5 (2026-11-04)**: casos restantes en integración (AMEX, Redcompra, prepago, cuotas, expiración, reversa el mismo día) registrados en `docs/EVIDENCIAS-INTEGRACION-WEBPAY.md` §3b y `docs/WEBPAY-EXPEDIENTE-CERTIFICACION.md` §6.
 4. **Titular**: enviar el formulario con evidencias y logo. *No se declara certificado hasta recibir la conformidad de Transbank.*
 5. **Tras la conformidad**: llave secreta de producción en el servidor (`payments.json`, 0600), volumen `/data`, despliegue autorizado, compra real de $50, y recién entonces `ONLINE_CHECKOUT_UI=true`.
 
@@ -59,4 +59,4 @@ Reconstruye `attempts` (nuevo estado `PENDIENTE`, columnas `transaction_date` e 
 - `node:sqlite` sigue siendo experimental en Node 22 (`docs/PAGOS-SQLITE.md`).
 - Exclusión mutua solo en proceso: una única réplica del servicio.
 - Un `PENDIENTE` o `INCIERTA` requiere que alguien concilie; no hay tarea en segundo plano (se resuelve al visitar la orden, con «Verificar estado» o con la acción `reconcile`). Recomendable un `reconcile` periódico una vez en producción.
-- Aún no se probó una reversa el mismo día (`REVERSED`) ni el comportamiento en cuotas contra integración.
+- (Fase 5) La reversa el mismo día (`REVERSED`) y el pago en cuotas ya se probaron contra integración. La anulación parcial en cuotas se rechaza por validación **local** (código 53), no por respuesta real de Transbank; la ventana de anulación (error 284) no está publicada.

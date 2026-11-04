@@ -1,0 +1,57 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+
+const OPTIONS = [
+  { id: "", key: "0", label: "Actual" },
+  { id: "a", key: "1", label: "A · Linear" },
+  { id: "b", key: "2", label: "B · Editorial" },
+  { id: "c", key: "3", label: "C · Ingeniería" },
+  { id: "d", key: "4", label: "D · Signature" },
+]
+
+// Selector flotante del laboratorio. Cambia la variante con una cookie y refresca la MISMA ruta (conserva pagina,
+// scroll y estado de la URL). Atajos: Alt+0..4. No toca datos ni transacciones.
+export default function LabSwitcher({ current }: { current: string }) {
+  const router = useRouter()
+  const [open, setOpen] = useState(true)
+
+  function pick(id: string) {
+    document.cookie = `bd-variant=${id}; path=/; max-age=${id ? 60 * 60 * 24 * 30 : 0}; samesite=lax`
+    const y = window.scrollY
+    router.refresh()
+    requestAnimationFrame(() => window.scrollTo(0, y))
+  }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.altKey) return
+      const o = OPTIONS.find((x) => x.key === e.key)
+      if (o) {
+        e.preventDefault()
+        pick(o.id)
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  })
+
+  return (
+    <div className="lab-switch" data-lab-ui role="group" aria-label="Laboratorio de diseño (solo desarrollo)">
+      <button type="button" className="lab-toggle" aria-expanded={open} onClick={() => setOpen(!open)} title="Mostrar u ocultar el selector">
+        ◐ Lab
+      </button>
+      {open && (
+        <div className="lab-opts">
+          {OPTIONS.map((o) => (
+            <button key={o.label} type="button" aria-pressed={current === o.id} onClick={() => pick(o.id)} title={`Alt+${o.key}`}>
+              {o.label}
+            </button>
+          ))}
+          <a href="/lab">Índice</a>
+        </div>
+      )}
+    </div>
+  )
+}

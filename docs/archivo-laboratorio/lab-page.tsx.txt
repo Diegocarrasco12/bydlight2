@@ -1,0 +1,54 @@
+import { notFound } from "next/navigation"
+import { openDb } from "@/lib/payments/db"
+
+export const dynamic = "force-dynamic"
+export const metadata = { title: "Laboratorio de diseño", robots: { index: false, follow: false } }
+
+// Indice del laboratorio A/B/C. SOLO DESARROLLO: en produccion responde 404. No escribe datos.
+const PAGES: [string, string][] = [
+  ["/", "Inicio"],
+  ["/servicios", "Servicios"],
+  ["/servicios/soluciones-erp", "Servicio (detalle)"],
+  ["/planes", "Planes"],
+  ["/proyectos", "Proyectos"],
+  ["/proyectos/only-energy", "Proyecto (detalle)"],
+  ["/nosotros", "Nosotros"],
+  ["/contacto", "Contacto"],
+  ["/contacto?plan=profesional", "Cotización (contacto con plan)"],
+  ["/contratar?plan=profesional", "Solicitud de plan (flujo de contratación)"],
+  ["/terminos", "Términos (borrador)"],
+]
+
+export default async function LabIndex() {
+  if (process.env.NODE_ENV === "production") notFound()
+  let orders: { id: string; name: string; stage: string }[] = []
+  try {
+    orders = openDb().prepare("SELECT id, cust_name AS name, stage FROM orders WHERE cust_name LIKE 'Lab %' ORDER BY created_at").all() as typeof orders
+  } catch {
+    /* base de laboratorio no inicializada */
+  }
+  return (
+    <section className="bd-section" style={{ paddingTop: 140 }}>
+      <div className="bd-container">
+        <p className="bd-eyebrow">Laboratorio de diseño · solo desarrollo local</p>
+        <h1 className="bd-h2">Comparador A / B / C</h1>
+        <p className="bd-lead">
+          Usa el selector «◐ Lab» (abajo a la izquierda) o Alt+0 (actual), Alt+1 (A), Alt+2 (B), Alt+3 (C), Alt+4 (D). Al cambiar de variante se conserva la página.
+        </p>
+        <h2 className="bd-h2" style={{ fontSize: "1.4rem", marginTop: 40 }}>Páginas</h2>
+        <ul className="bd-checks">
+          {PAGES.map(([href, label]) => (
+            <li key={href}><a href={href}>{label}</a> <small>{href}</small></li>
+          ))}
+        </ul>
+        <h2 className="bd-h2" style={{ fontSize: "1.4rem", marginTop: 40 }}>Pantallas de pago (órdenes de ejemplo, base de pruebas)</h2>
+        <ul className="bd-checks">
+          {orders.map((o) => (
+            <li key={o.id}><a href={`/orden/${o.id}`}>{o.name}</a> <small>{o.stage}</small></li>
+          ))}
+          {orders.length === 0 && <li>Sin órdenes de ejemplo: ejecuta scripts/lab-seed.mjs.</li>}
+        </ul>
+      </div>
+    </section>
+  )
+}

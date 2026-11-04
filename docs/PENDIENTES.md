@@ -2,9 +2,16 @@
 
 Actualizados al cierre del 2026-10-28 (Fase 3 desplegada). **Ninguno debe ejecutarse sin que el titular lo pida**; los que tocan producción, Cloudflare o envían datos reales requieren autorización.
 
-## Webpay Plus (Fase 2 hecha en local 2026-11-04; nada desplegado)
+## Fase 6.1 — antes de publicar (a cargo del equipo; ver `ENTREGA-FASE6.md`)
+(1) Verificar `status`/`list-releases` (desplegado, anterior distinto, salud OK) y respaldar el estado del ejecutor; (2) push y publicación con el procedimiento de la entrega; (3) verificaciones posteriores y rollback si hace falta. Decidido: el temporizador del 3D se mantiene en 3,5 s y el rendimiento queda cerrado. El cliente `bd-deploy.ps1` falta en el equipo de Claude Code; no bloquea (publica el equipo).
 
-(a) Decidir D1–D7 de `docs/WEBPAY-CERTIFICACION.md` §7 (textos legales, retracto, privacidad, logo 130×59, modelo de administración); (b) abrir el formulario de validación de Transbank para ver los casos exactos y revisar el correo del seguimiento 1-12087316724; (c) ejecutar en integración los casos restantes (AMEX, Redcompra, prepago, cuotas, expiración real, reversa el mismo día) y completar `docs/EVIDENCIAS-INTEGRACION-WEBPAY.md`; (d) enviar el formulario (no se declara certificado hasta la conformidad de Transbank); (e) infraestructura (volumen `/data`, política del ejecutor, `accept-compose`) y llave de producción solo tras la conformidad; (f) programar `reconcile` periódico cuando haya producción.
+## Fase 6 — publicación visual (preparada, sin ejecutar)
+
+Autorizar `status`/`list-releases`; aprobar los 4 commits y el push; autorizar fetch→build→up ([plan](FASE6-PLAN-DESPLIEGUE.md)); completar datos legales ([propuestas](WEBPAY-PROPUESTAS-LEGALES.md)); decidir logos sin uso, logo oficial de Webpay, correos transaccionales y carpetas de evidencia pesadas. Activación de Webpay: [checklist](FASE6-CHECKLIST-ACTIVACION-WEBPAY.md), bloqueada hasta Transbank.
+
+## Webpay Plus (Fase 5 hecha en local 2026-11-04; nada desplegado ni en commit)
+
+Estado y evidencias: `docs/WEBPAY-EXPEDIENTE-CERTIFICACION.md`, `docs/WEBPAY-CHECKLIST-CERTIFICACION.md`, `docs/WEBPAY-REQUISITOS-OFICIALES.md`. **Hecho en Fase 5:** casos reales en integración (AMEX, Redcompra ×2, prepago, cuotas, cancelación y reintento, devoluciones, `REVERSED`, timeout, expiración) y borrador de correo. **Pendiente, en este orden:** (a) confirmar con Transbank la afiliación `1-12087316724` y el **código de comercio productivo** (sin él no validan); (b) enviar el correo `docs/WEBPAY-CORREO-CERTIFICACION.md` (borrador, **no enviado**) tras completar los datos y la pregunta de la cuenta de abono; (c) decidir D1–D13 de `docs/WEBPAY-PROPUESTAS-LEGALES.md` (22 campos legales, privacidad, retracto) con un asesor; (d) aprobar el logo `docs/evidencias-webpay/logo-130x59.png`; (e) abrir y completar el formulario de validación (`https://form.typeform.com/to/ibXdg6Av`; el titular, no Claude); (f) HTTPS público forzado (Cloudflare); (g) infraestructura (volumen `/data`, política del ejecutor, `accept-compose`), llave de producción y compra real de $50 solo tras la conformidad; (h) opcional: consultar `status` con `TBK_TOKEN` en el flujo abortado y programar `reconcile` periódico. No se declara certificado hasta la conformidad escrita de Transbank.
 
 ## Prioridad de la siguiente jornada
 
