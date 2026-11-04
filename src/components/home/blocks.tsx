@@ -186,7 +186,7 @@ export function ApiSection() {
         </div>
         <figure className="api-term rv" aria-label="Ejemplo ilustrativo de integración con SAP Business One Service Layer">
           <div className="api-bar"><i /><i /><i /><span>Service Layer · ejemplo ilustrativo</span></div>
-          <pre><code>{`# 1. Sesión
+          <pre tabIndex={0}><code>{`# 1. Sesión
 POST /b1s/v2/Login
 { "CompanyDB": "…", "UserName": "…", "Password": "<secreto>" }
 → 200  Set-Cookie: B1SESSION=…

@@ -6,7 +6,7 @@ export const SITE = {
   whatsappNumber: "56983249135",
   whatsappDisplay: "+56 9 8324 9135",
   country: "CL",
-  logo: "/img/logos/logo2.png",
+  logo: "/img/logos/logo2-512.png",
   logoSmall: "/img/logos/logo2-sm.png",
   description:
     "Desarrollo de páginas web, ecommerce, software a medida y arquitectura de software para emprendedores, pymes y empresas en Chile.",

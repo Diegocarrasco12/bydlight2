@@ -119,7 +119,7 @@ export default function Navbar() {
       </div>
 
       {/* Barra inferior solo en movil: la accion comercial siempre al alcance del pulgar. */}
-      <div className="bd-dock" role="group" aria-label="Contacto rápido">
+      <div className="bd-dock" role="region" aria-label="Contacto rápido">
         <a href={whatsappLink("Hola, quiero cotizar un proyecto con Byd Light Solutions.")} target="_blank" rel="noopener noreferrer" className="bd-dock-wa">
           WhatsApp
         </a>
