@@ -2,7 +2,10 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { headers } from "next/headers"
 import { notFound } from "next/navigation"
+import PrintButton from "@/components/checkout/PrintButton"
 import { paymentsEnabled } from "@/lib/payments/config"
+import { webpaySandbox } from "@/lib/payments/availability"
+import { LEGAL_PAGES_PUBLISHED } from "@/lib/legal"
 import { clientIp, rateLimited } from "@/lib/payments/http"
 import { amountDue, verifyOrder } from "@/lib/payments/service"
 import { isValidOrderId, readOrder } from "@/lib/payments/store"
@@ -44,6 +47,15 @@ function stepIndex(o: Order) {
   return 3
 }
 
+// Estado visible de la cotizacion, derivado SOLO de los datos validados por el servidor (etapa y vigencia de la orden).
+function quoteStatus(o: Order): { label: string; tone: "ok" | "warn" | "off" } {
+  if (o.stage === "PAGADA") return { label: "Pagada", tone: "ok" }
+  if (o.stage === "ANTICIPO_PAGADO") return { label: "Anticipo pagado", tone: "ok" }
+  if (o.stage === "SALDO_HABILITADO") return { label: "Saldo disponible", tone: "warn" }
+  if (o.quote && new Date(o.quote.validUntil).getTime() < Date.now()) return { label: "Cotización vencida", tone: "off" }
+  return { label: "Cotización aprobada", tone: "ok" }
+}
+
 function Result({ a, order }: { a: Attempt; order: Order }) {
   const label = a.kind === "anticipo" ? "anticipo" : "saldo"
   switch (a.status) {
@@ -52,6 +64,14 @@ function Result({ a, order }: { a: Attempt; order: Order }) {
       const refunded = (order.refunds ?? []).filter((x) => x.attemptId === a.id && x.status === "COMPLETADA")
       return (
         <div className="bd-result ok bd-voucher" role="status">
+          <div className="bd-print-brand" aria-hidden="true">
+            <img src={SITE.logoSmall} alt="" width={150} height={150} />
+            <div>
+              <strong>Byd Light Solutions SpA</strong>
+              <span>{SITE.url.replace("https://", "")} · {SITE.email}</span>
+              <span>Comprobante de pago · Orden {order.id}</span>
+            </div>
+          </div>
           <h2>Pago aprobado</h2>
           <p>Recibimos tu pago de {label} por {clp(a.amount)}. Guarda este comprobante.</p>
           <h3 className="bd-voucher-title">{v.title}</h3>
@@ -61,6 +81,7 @@ function Result({ a, order }: { a: Attempt; order: Order }) {
             ))}
           </dl>
           {refunded.length > 0 && <p className="bd-note">Se registró una devolución sobre este pago. Si tienes dudas, escríbenos con el código de la orden.</p>}
+          <div className="bd-voucher-actions"><PrintButton /></div>
         </div>
       )
     }
@@ -104,6 +125,7 @@ export default async function OrdenPage({
   const last = order.attempts[order.attempts.length - 1]
   const pending = order.attempts.some((a) => a.status === "INICIADO" || a.status === "PENDIENTE")
   const enabled = paymentsEnabled()
+  const sandbox = webpaySandbox()
   const dueDeposit = amountDue(order, "anticipo")
   const dueBalance = amountDue(order, "saldo")
   const q = order.quote
@@ -136,36 +158,52 @@ export default async function OrdenPage({
         )}
 
         {q && (
-          <div className="bd-panel">
-            <h2>Resumen de la cotización</h2>
+          <div className="bd-panel bd-quote">
+            <div className="bd-panel-head">
+              <h2>Resumen de la cotización</h2>
+              <span className={`bd-status ${quoteStatus(order).tone}`}>{quoteStatus(order).label}</span>
+            </div>
             <dl className="bd-dl">
               <dt>Plan</dt><dd>{order.planName}</dd>
               <dt>Total del proyecto</dt><dd>{clp(q.amount)}</dd>
               <dt>Anticipo ({q.depositPercent}%)</dt><dd>{clp(q.depositAmount)}</dd>
               <dt>Saldo</dt><dd>{clp(q.balanceAmount)}</dd>
               <dt>Cotización válida hasta</dt><dd>{when(q.validUntil)}</dd>
+              {enabled && (<><dt>Método de pago</dt><dd>Webpay Plus · tarjetas</dd></>)}
             </dl>
             {q.note && <p className="bd-note">{q.note}</p>}
+            <p className="bd-note">
+              El anticipo ({q.depositPercent}%) da inicio al proyecto; el saldo se habilita en esta página cuando corresponda según el avance.
+              {LEGAL_PAGES_PUBLISHED && <> Consulta los <Link href="/terminos" prefetch={false}>términos y condiciones de contratación</Link>.</>}
+            </p>
           </div>
         )}
 
         {enabled && dueDeposit !== null && !pending && (
-          <form method="post" action="/api/pagos/iniciar" className="bd-panel">
-            <h2>Pagar anticipo</h2>
-            <p>Pagarás <strong>{clp(dueDeposit)}</strong> con Webpay (tarjetas de crédito y débito). Los datos de tu tarjeta los ingresas en el sitio de Webpay; nosotros no los vemos ni los guardamos.</p>
+          <form method="post" action="/api/pagos/iniciar" className="bd-panel bd-pay">
+            <div className="bd-panel-head">
+              <h2>Pago seguro con Webpay Plus</h2>
+              {sandbox && <span className="bd-status warn">Ambiente de pruebas</span>}
+            </div>
+            <p>Paga el anticipo de tu proyecto con tarjetas compatibles. Serás redirigido a Transbank para completar la operación.</p>
+            {sandbox && <p className="bd-note">Ambiente de pruebas de Transbank: no se realizan cobros reales.</p>}
             <input type="hidden" name="orderId" value={order.id} />
             <input type="hidden" name="kind" value="anticipo" />
-            <button type="submit" className="bd-btn bd-btn-primary">Pagar anticipo con Webpay</button>
+            <button type="submit" className="bd-btn bd-btn-primary">Pagar anticipo de {clp(dueDeposit)}</button>
+            <p className="bd-note">Los datos de tu tarjeta los ingresas en el sitio de Webpay; nosotros no los vemos ni los guardamos.</p>
           </form>
         )}
 
         {enabled && dueBalance !== null && !pending && (
-          <form method="post" action="/api/pagos/iniciar" className="bd-panel">
-            <h2>Pagar saldo</h2>
-            <p>Saldo a pagar: <strong>{clp(dueBalance)}</strong>.</p>
+          <form method="post" action="/api/pagos/iniciar" className="bd-panel bd-pay">
+            <div className="bd-panel-head">
+              <h2>Pagar saldo</h2>
+              {sandbox && <span className="bd-status warn">Ambiente de pruebas</span>}
+            </div>
+            <p>Saldo a pagar con Webpay Plus: <strong>{clp(dueBalance)}</strong>. Serás redirigido a Transbank para completar la operación.</p>
             <input type="hidden" name="orderId" value={order.id} />
             <input type="hidden" name="kind" value="saldo" />
-            <button type="submit" className="bd-btn bd-btn-primary">Pagar saldo con Webpay</button>
+            <button type="submit" className="bd-btn bd-btn-primary">Pagar saldo de {clp(dueBalance)}</button>
           </form>
         )}
 

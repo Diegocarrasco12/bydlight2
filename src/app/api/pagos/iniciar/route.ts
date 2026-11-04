@@ -23,9 +23,12 @@ export async function POST(req: Request) {
 
   // El navegador debe enviar token_ws por POST a Webpay (formulario auto-enviado).
   const html = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Redirigiendo a Webpay…</title></head>
-<body style="background:#070b14;color:#f1f5f9;font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0">
-<form id="f" method="post" action="${esc(result.url)}"><input type="hidden" name="token_ws" value="${esc(result.token)}">
-<p>Redirigiendo a Webpay…</p><noscript><button type="submit">Continuar a Webpay</button></noscript></form>
+<body style="background:#07090d;color:#f1f5f9;font-family:Inter,system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center">
+<form id="f" method="post" action="${esc(result.url)}" style="display:grid;gap:14px;justify-items:center;padding:24px"><input type="hidden" name="token_ws" value="${esc(result.token)}">
+<img src="${esc(SITE.logoSmall)}" alt="${esc(SITE.name)}" width="150" height="150" style="margin:-30px 0">
+<p style="margin:0;font-size:1.15rem;font-weight:600">Te llevamos a Webpay para completar el pago</p>
+<p style="margin:0;color:#9aa3b2;font-size:.92rem">Los datos de tu tarjeta se ingresan en el sitio de Transbank. No cierres esta ventana.</p>
+<noscript><button type="submit" style="margin-top:8px;padding:12px 22px;border:0;border-radius:10px;background:#ff7a1a;color:#1a0d02;font-weight:700;cursor:pointer">Continuar a Webpay</button></noscript></form>
 <script>document.getElementById("f").submit()</script></body></html>`
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } })
 }
