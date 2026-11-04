@@ -7,6 +7,7 @@ import { clientIp, rateLimited } from "@/lib/payments/http"
 import { amountDue, verifyOrder } from "@/lib/payments/service"
 import { isValidOrderId, readOrder } from "@/lib/payments/store"
 import type { Attempt, Order } from "@/lib/payments/types"
+import { buildVoucher, formatClp, formatWhen } from "@/lib/payments/voucher"
 import { SITE, whatsappLink } from "@/lib/site"
 
 export const dynamic = "force-dynamic"
@@ -16,15 +17,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-const clp = (n: number) => new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(n)
+const clp = formatClp
 function hasStalePending(o: Order) {
-  return o.attempts.some((a) => a.status === "INICIADO" && Date.now() - new Date(a.createdAt).getTime() > 2 * 60_000)
+  return o.attempts.some((a) => (a.status === "INICIADO" || a.status === "PENDIENTE") && Date.now() - new Date(a.createdAt).getTime() > 2 * 60_000)
 }
 function maskEmail(e: string) {
   const [u, d] = e.split("@")
   return `${u.slice(0, 2)}${"•".repeat(Math.max(1, Math.min(6, u.length - 2)))}@${d}`
 }
-const when = (iso: string) => new Date(iso).toLocaleString("es-CL", { dateStyle: "medium", timeStyle: "short" })
+const when = formatWhen
 
 const AVISOS: Record<string, string> = {
   creada: "Recibimos tu solicitud. Guarda el código de esta orden.",
@@ -43,28 +44,34 @@ function stepIndex(o: Order) {
   return 3
 }
 
-function Result({ a }: { a: Attempt }) {
+function Result({ a, order }: { a: Attempt; order: Order }) {
   const label = a.kind === "anticipo" ? "anticipo" : "saldo"
   switch (a.status) {
-    case "AUTORIZADO":
+    case "AUTORIZADO": {
+      const v = buildVoucher(order, a)!
+      const refunded = (order.refunds ?? []).filter((x) => x.attemptId === a.id && x.status === "COMPLETADA")
       return (
-        <div className="bd-result ok" role="status">
+        <div className="bd-result ok bd-voucher" role="status">
           <h2>Pago aprobado</h2>
-          <p>Recibimos tu pago de {label} por {clp(a.amount)}.</p>
+          <p>Recibimos tu pago de {label} por {clp(a.amount)}. Guarda este comprobante.</p>
+          <h3 className="bd-voucher-title">{v.title}</h3>
           <dl className="bd-dl">
-            <dt>Comprobante</dt><dd>{a.buyOrder}</dd>
-            <dt>Código de autorización</dt><dd>{a.authorizationCode ?? "—"}</dd>
-            {a.cardLast4 && (<><dt>Tarjeta</dt><dd>•••• {a.cardLast4}</dd></>)}
-            <dt>Fecha</dt><dd>{when(a.updatedAt)}</dd>
+            {v.rows.map((row) => (
+              <div key={row.label} className="bd-dl-row"><dt>{row.label}</dt><dd>{row.value}</dd></div>
+            ))}
           </dl>
+          {refunded.length > 0 && <p className="bd-note">Se registró una devolución sobre este pago. Si tienes dudas, escríbenos con el código de la orden.</p>}
         </div>
       )
+    }
     case "RECHAZADO":
       return <div className="bd-result bad" role="status"><h2>Pago rechazado</h2><p>Tu banco o Webpay no autorizó el pago. No se realizó ningún cobro. Puedes reintentar con otro medio de pago.</p></div>
     case "CANCELADO":
       return <div className="bd-result warn" role="status"><h2>Pago cancelado</h2><p>Anulaste el pago en Webpay. No se realizó ningún cobro. Puedes reintentar cuando quieras.</p></div>
     case "EXPIRADO":
       return <div className="bd-result warn" role="status"><h2>Pago expirado</h2><p>El tiempo para completar el pago terminó. No se realizó ningún cobro. Puedes iniciar un nuevo pago.</p></div>
+    case "PENDIENTE":
+      return <div className="bd-result warn" role="status"><h2>Estamos confirmando tu pago</h2><p>Aún no tenemos la confirmación final de Webpay. <strong>No vuelvas a pagar:</strong> consultaremos el estado automáticamente. Puedes usar «Verificar estado» en unos minutos. Si el cargo aparece en tu tarjeta, escríbenos con el código de esta orden.</p></div>
     case "ERROR":
       return <div className="bd-result bad" role="status"><h2>No pudimos confirmar el pago</h2><p>{a.note ?? "Ocurrió un problema al confirmar."} Si viste un cargo, escríbenos con el código de esta orden y lo revisamos.</p></div>
     default:
@@ -95,7 +102,7 @@ export default async function OrdenPage({
   }
 
   const last = order.attempts[order.attempts.length - 1]
-  const pending = order.attempts.some((a) => a.status === "INICIADO")
+  const pending = order.attempts.some((a) => a.status === "INICIADO" || a.status === "PENDIENTE")
   const enabled = paymentsEnabled()
   const dueDeposit = amountDue(order, "anticipo")
   const dueBalance = amountDue(order, "saldo")
@@ -117,8 +124,8 @@ export default async function OrdenPage({
 
         {aviso && AVISOS[aviso] && <p className="bd-banner" role="status">{AVISOS[aviso]}</p>}
 
-        {last && last.status !== "INICIADO" && <Result a={last} />}
-        {pending && <Result a={order.attempts.find((a) => a.status === "INICIADO")!} />}
+        {last && last.status !== "INICIADO" && last.status !== "PENDIENTE" && <Result a={last} order={order} />}
+        {pending && <Result a={order.attempts.find((a) => a.status === "INICIADO" || a.status === "PENDIENTE")!} order={order} />}
 
         {order.stage === "SOLICITADA" && (
           <div className="bd-panel">

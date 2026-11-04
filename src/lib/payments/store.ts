@@ -2,7 +2,7 @@ import "server-only"
 import { randomInt } from "node:crypto"
 import { paymentsEnabled } from "./config"
 import { openDb } from "./db"
-import type { Attempt, Order } from "./types"
+import type { Attempt, Order, Refund } from "./types"
 
 // Persistencia en SQLite (ver db.ts y migrations.ts). La interfaz publica es la misma que tenia el
 // almacen de archivos: readOrder / writeOrder / storageWritable / withOrderLock.
@@ -24,6 +24,28 @@ type Row = Record<string, unknown>
 
 const str = (v: unknown) => (v == null ? undefined : String(v))
 const num = (v: unknown) => (v == null ? undefined : Number(v))
+
+export function rowToRefund(r: Row): Refund {
+  return {
+    id: String(r.id),
+    orderId: String(r.order_id),
+    attemptId: String(r.attempt_id),
+    amount: Number(r.amount),
+    status: r.status as Refund["status"],
+    type: str(r.type),
+    nullifiedAmount: num(r.nullified_amount),
+    balance: num(r.balance),
+    authorizationCode: str(r.authorization_code),
+    authorizationDate: str(r.authorization_date),
+    responseCode: num(r.response_code),
+    idempotencyKey: String(r.idempotency_key),
+    requestedBy: String(r.requested_by),
+    reason: str(r.reason),
+    error: str(r.error),
+    createdAt: String(r.created_at),
+    updatedAt: String(r.updated_at),
+  }
+}
 
 export async function readOrder(id: string): Promise<Order | null> {
   // Con los pagos apagados no se abre ni se crea la base (en produccion el disco es de solo lectura).
@@ -61,12 +83,16 @@ export async function readOrder(id: string): Promise<Order | null> {
       cardLast4: str(a.card_last4),
       paymentType: str(a.payment_type),
       installments: num(a.installments),
+      installmentsAmount: num(a.installments_amount),
+      transactionDate: str(a.transaction_date),
       responseCode: num(a.response_code),
       tbkStatus: str(a.tbk_status),
       note: str(a.note),
     })),
     events: events.map((e) => ({ at: String(e.at), type: String(e.type), ...(e.detail != null && { detail: String(e.detail) }) })),
   }
+  const refunds = db.prepare("SELECT * FROM refunds WHERE order_id = ? ORDER BY created_at, id").all(id) as Row[]
+  if (refunds.length) order.refunds = refunds.map(rowToRefund)
   if (q) {
     order.quote = {
       amount: Number(q.amount),
@@ -109,17 +135,18 @@ export async function writeOrder(order: Order): Promise<void> {
     }
     const upAttempt = db.prepare(
       `INSERT INTO attempts (id, order_id, kind, buy_order, amount, token, status, created_at, updated_at,
-         authorization_code, card_last4, payment_type, installments, response_code, tbk_status, note)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         authorization_code, card_last4, payment_type, installments, response_code, tbk_status, note, transaction_date, installments_amount)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET token = excluded.token, status = excluded.status, updated_at = excluded.updated_at,
          authorization_code = excluded.authorization_code, card_last4 = excluded.card_last4, payment_type = excluded.payment_type,
-         installments = excluded.installments, response_code = excluded.response_code, tbk_status = excluded.tbk_status, note = excluded.note`,
+         installments = excluded.installments, response_code = excluded.response_code, tbk_status = excluded.tbk_status, note = excluded.note,
+         transaction_date = excluded.transaction_date, installments_amount = excluded.installments_amount`,
     )
     for (const a of order.attempts) {
       upAttempt.run(
         a.id, order.id, a.kind, a.buyOrder, a.amount, a.token, a.status, a.createdAt, a.updatedAt,
         a.authorizationCode ?? null, a.cardLast4 ?? null, a.paymentType ?? null, a.installments ?? null,
-        a.responseCode ?? null, a.tbkStatus ?? null, a.note ?? null,
+        a.responseCode ?? null, a.tbkStatus ?? null, a.note ?? null, a.transactionDate ?? null, a.installmentsAmount ?? null,
       )
     }
     const have = (db.prepare("SELECT COUNT(*) AS n FROM events WHERE order_id = ?").get(order.id) as { n: number }).n

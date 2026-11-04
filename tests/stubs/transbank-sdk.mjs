@@ -17,5 +17,6 @@ export const WebpayPlus = {
     create(...a) { return globalThis.__tbk.create(...a) }
     commit(...a) { return globalThis.__tbk.commit(...a) }
     status(...a) { return globalThis.__tbk.status(...a) }
+    refund(...a) { return globalThis.__tbk.refund(...a) }
   },
 }

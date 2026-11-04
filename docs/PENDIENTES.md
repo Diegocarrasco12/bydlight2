@@ -2,6 +2,10 @@
 
 Actualizados al cierre del 2026-10-28 (Fase 3 desplegada). **Ninguno debe ejecutarse sin que el titular lo pida**; los que tocan producción, Cloudflare o envían datos reales requieren autorización.
 
+## Webpay Plus (Fase 2 hecha en local 2026-11-04; nada desplegado)
+
+(a) Decidir D1–D7 de `docs/WEBPAY-CERTIFICACION.md` §7 (textos legales, retracto, privacidad, logo 130×59, modelo de administración); (b) abrir el formulario de validación de Transbank para ver los casos exactos y revisar el correo del seguimiento 1-12087316724; (c) ejecutar en integración los casos restantes (AMEX, Redcompra, prepago, cuotas, expiración real, reversa el mismo día) y completar `docs/EVIDENCIAS-INTEGRACION-WEBPAY.md`; (d) enviar el formulario (no se declara certificado hasta la conformidad de Transbank); (e) infraestructura (volumen `/data`, política del ejecutor, `accept-compose`) y llave de producción solo tras la conformidad; (f) programar `reconcile` periódico cuando haya producción.
+
 ## Prioridad de la siguiente jornada
 
 **SEO (publicado 2026-10-28, `5fef157`):** (a) verificar el dominio en Google Search Console (TXT en Cloudflare), enviar `sitemap.xml`, pedir indexación de las páginas prioritarias y anotar la línea base (guía en `docs/SEO_ESTRATEGIA_GOOGLE.md` §6); (b) aprobar los temas del plan editorial y crear la sección de blog (SEO Fase 4); (c) perfiles externos coherentes («Byd Light Solutions SpA») por la confusión con BYD; (d) Cloudflare «Always Use HTTPS» (`http://` responde 200), con autorización; (e) comprobar con `-Op status` / `list-releases` en PowerShell que `anterior` sea distinto de `desplegado` (rollback); (f) medir a 30/60/90 días clics, impresiones, CTR y solicitudes de cotización.
@@ -28,7 +32,7 @@ Actualizados al cierre del 2026-10-28 (Fase 3 desplegada). **Ninguno debe ejecut
 - Videos: solo si se aporta material propio o con licencia verificable (la licencia «Restricted» de Mixkit no se pudo comprobar).
 - Evidencia de proyectos para tecnologías declaradas (Python, Java/Spring Boot, PHP, Flutter, SQL Server, PostgreSQL, MySQL, Windows Server/IIS, SAP Business One Service Layer): hoy son
   **capacidades**, no casos demostrables; añadir casos solo con respaldo y permiso del cliente.
-- Transbank/Webpay: en pausa. Reanudar requiere afiliación, documentos de Transbank, infraestructura (volumen + configuración) y `accept-compose` (`docs/ACTIVACION-WEBPAY.md`).
+- Transbank/Webpay: integración técnica avanzada en local (Fase 2); falta validación/certificación de Transbank, infraestructura (volumen + configuración) y `accept-compose` (`docs/ACTIVACION-WEBPAY.md`, `docs/WEBPAY-CERTIFICACION.md`).
 - Proyectos excluidos del portafolio por decisión previa: Logistic Control Center, Tu Farmacia Digital (dominio sin resolver al momento) y Constructora MYD (503 al momento). Reevaluar.
 - Revisión visual manual de todas las páginas internas en todos los anchos (hoy solo comprobación automática de desbordes más capturas selectivas).
 - Pruebas del ejecutor (`cd deploy/executor && python -B -m unittest discover -s tests`): reejecutar si cambia algo en `deploy/`.

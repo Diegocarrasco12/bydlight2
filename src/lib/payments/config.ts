@@ -25,6 +25,8 @@ export type FileConfig = {
   apiKey?: string
   publicBaseUrl?: string
   adminSecret?: string
+  /** Permiso explicito para devoluciones desde la API administrativa. Ausente o false = deshabilitadas. */
+  adminRefunds?: boolean
 }
 
 function configPath(): string {
@@ -101,6 +103,13 @@ export function returnBaseUrl(requestOrigin: string, siteUrl: string): string {
   const configured = process.env.PUBLIC_BASE_URL ?? fileConfig().publicBaseUrl
   if (configured) return configured.replace(/\/$/, "")
   return process.env.NODE_ENV === "production" ? siteUrl : requestOrigin
+}
+
+/** Las devoluciones por la API administrativa exigen, ademas de la firma, este permiso explicito (apagado por defecto). */
+export function adminRefundsEnabled(): boolean {
+  const flag = process.env.ADMIN_REFUNDS
+  if (flag === "false") return false
+  return flag === "true" || fileConfig().adminRefunds === true
 }
 
 /** Secreto de la API administrativa (>= 32 caracteres). Sin secreto, la API administrativa no existe. */

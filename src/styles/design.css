@@ -639,3 +639,21 @@ html { overflow-x: clip; }
 
 .hc-grid > *, .bd-contact-grid > *, .api-grid > *, .msplit > * { min-width: 0; }
 @media (max-width: 900px) { .api-grid, .msplit, .tech-feature { grid-template-columns: minmax(0, 1fr); } }
+
+/* Comprobante de pago y paginas legales en borrador */
+.bd-dl-row { display: contents; }
+.bd-voucher-title { font-family: var(--display); font-size: 1.05rem; margin-top: 18px; }
+@media (max-width: 560px) {
+  .bd-voucher .bd-dl { grid-template-columns: 1fr; gap: 2px 0; }
+  .bd-voucher .bd-dl dd { margin-bottom: 10px; }
+}
+@media print {
+  .bd-voucher { border: 1px solid #999; background: #fff; color: #000; }
+  .bd-voucher * { color: #000 !important; }
+}
+.bd-legal { max-width: 800px; }
+.bd-legal h2 { font-family: var(--display); font-size: 1.3rem; margin: 28px 0 8px; }
+.bd-legal p, .bd-legal li { color: var(--muted); line-height: 1.65; }
+.bd-legal ul { padding-left: 20px; display: grid; gap: 6px; }
+.bd-draft-banner { border: 1px dashed rgba(255, 162, 92, 0.8); background: rgba(255, 122, 26, 0.08); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; }
+.bd-pending { background: rgba(255, 213, 79, 0.18); border-radius: 4px; padding: 0 4px; font-weight: 600; }

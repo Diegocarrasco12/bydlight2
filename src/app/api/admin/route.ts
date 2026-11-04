@@ -1,6 +1,7 @@
 import { verifyAdminRequest } from "@/lib/payments/adminAuth"
 import { approveQuote, closeOrder, listOrders, reconcilePending, releaseBalance, showOrder } from "@/lib/payments/adminOps"
-import { paymentsEnabled } from "@/lib/payments/config"
+import { adminRefundsEnabled, paymentsEnabled } from "@/lib/payments/config"
+import { reconcileRefund, refundPayment } from "@/lib/payments/refunds"
 import { json } from "@/lib/payments/http"
 import { storageWritable } from "@/lib/payments/store"
 
@@ -48,6 +49,24 @@ export async function POST(req: Request) {
     case "close": {
       const r = await closeOrder(id)
       return r.ok ? json({ ok: true }) : json({ error: r.error }, 422)
+    }
+    case "refund":
+    case "reconcile-refund": {
+      // Permiso explicito aparte de la firma: sin `adminRefunds` la operacion no existe para el exterior.
+      if (!adminRefundsEnabled()) return json({ error: "Devoluciones no habilitadas." }, 403)
+      if (b.action === "reconcile-refund") {
+        const r = await reconcileRefund(id, typeof b.refundId === "string" ? b.refundId : "")
+        return r.ok ? json({ refund: r.data }) : json({ error: r.error }, 422)
+      }
+      const r = await refundPayment({
+        orderId: id,
+        attemptId: typeof b.attemptId === "string" ? b.attemptId : undefined,
+        amount: n(b.amount),
+        reason: typeof b.reason === "string" ? b.reason : undefined,
+        idempotencyKey: typeof b.idempotencyKey === "string" ? b.idempotencyKey : "",
+        requestedBy: "admin-api",
+      })
+      return r.ok ? json({ refund: r.data, replayed: r.replayed ?? false }) : json({ error: r.error }, 422)
     }
     case "reconcile":
       return json(await reconcilePending())

@@ -33,8 +33,17 @@ if (action === "approve") {
   if (opt("valid-days")) body.validDays = Number(opt("valid-days"))
   if (opt("note")) body.note = opt("note")
 }
-if (!["list", "show", "approve", "release-balance", "close", "reconcile"].includes(action ?? "")) {
-  die("Acciones: list | show <ID> | approve <ID> --amount N | release-balance <ID> | close <ID> | reconcile")
+if (action === "refund") {
+  // Devolucion: exige --amount y una clave de idempotencia (se genera si no se indica; guardala para reintentar la MISMA operacion).
+  body.amount = Number(opt("amount"))
+  body.idempotencyKey = opt("key") ?? randomBytes(16).toString("hex")
+  if (opt("attempt")) body.attemptId = opt("attempt")
+  if (opt("reason")) body.reason = opt("reason")
+  console.error(`idempotencyKey: ${body.idempotencyKey}`)
+}
+if (action === "reconcile-refund") body.refundId = opt("refund")
+if (!["list", "show", "approve", "release-balance", "close", "reconcile", "refund", "reconcile-refund"].includes(action ?? "")) {
+  die("Acciones: list | show <ID> | approve <ID> --amount N | release-balance <ID> | close <ID> | reconcile | refund <ID> --amount N [--key K] [--attempt A] [--reason T] | reconcile-refund <ID> --refund RF...")
 }
 
 const raw = JSON.stringify(body)

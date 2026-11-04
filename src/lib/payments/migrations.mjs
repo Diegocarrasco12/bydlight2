@@ -80,4 +80,63 @@ CREATE TABLE admin_nonces (
 CREATE INDEX admin_nonces_by_time ON admin_nonces(used_at);
 `,
   },
+  {
+    version: 3,
+    name: "estado-pendiente-y-devoluciones",
+    sql: `
+-- Estado PENDIENTE (confirmacion incierta), fecha y monto de cuota informados por Transbank, y tabla de devoluciones.
+CREATE TABLE attempts_new (
+  id                 TEXT PRIMARY KEY,
+  order_id           TEXT NOT NULL REFERENCES orders(id),
+  kind               TEXT NOT NULL CHECK (kind IN ('anticipo','saldo')),
+  buy_order          TEXT NOT NULL UNIQUE CHECK (length(buy_order) <= 26),
+  amount             INTEGER NOT NULL CHECK (amount > 0),
+  token              TEXT,
+  status             TEXT NOT NULL CHECK (status IN ('INICIADO','AUTORIZADO','RECHAZADO','CANCELADO','EXPIRADO','ERROR','PENDIENTE')),
+  created_at         TEXT NOT NULL,
+  updated_at         TEXT NOT NULL,
+  authorization_code TEXT,
+  card_last4         TEXT CHECK (card_last4 IS NULL OR length(card_last4) = 4),
+  payment_type       TEXT,
+  installments       INTEGER,
+  response_code      INTEGER,
+  tbk_status         TEXT,
+  note               TEXT,
+  transaction_date   TEXT,
+  installments_amount INTEGER
+) STRICT;
+INSERT INTO attempts_new (id, order_id, kind, buy_order, amount, token, status, created_at, updated_at, authorization_code,
+  card_last4, payment_type, installments, response_code, tbk_status, note)
+  SELECT id, order_id, kind, buy_order, amount, token, status, created_at, updated_at, authorization_code,
+  card_last4, payment_type, installments, response_code, tbk_status, note FROM attempts;
+DROP TABLE attempts;
+ALTER TABLE attempts_new RENAME TO attempts;
+CREATE INDEX attempts_by_order ON attempts(order_id);
+CREATE UNIQUE INDEX attempts_token ON attempts(token) WHERE token IS NOT NULL;
+CREATE UNIQUE INDEX attempts_one_authorized ON attempts(order_id, kind) WHERE status = 'AUTORIZADO';
+
+CREATE TABLE refunds (
+  id                 TEXT PRIMARY KEY,
+  order_id           TEXT NOT NULL REFERENCES orders(id),
+  attempt_id         TEXT NOT NULL REFERENCES attempts(id),
+  amount             INTEGER NOT NULL CHECK (amount > 0),
+  status             TEXT NOT NULL CHECK (status IN ('SOLICITADA','COMPLETADA','FALLIDA','INCIERTA')),
+  type               TEXT,
+  nullified_amount   INTEGER,
+  balance            INTEGER,
+  authorization_code TEXT,
+  authorization_date TEXT,
+  response_code      INTEGER,
+  idempotency_key    TEXT NOT NULL UNIQUE CHECK (length(idempotency_key) BETWEEN 16 AND 64),
+  requested_by       TEXT NOT NULL,
+  reason             TEXT,
+  error              TEXT,
+  created_at         TEXT NOT NULL,
+  updated_at         TEXT NOT NULL
+) STRICT;
+CREATE INDEX refunds_by_order ON refunds(order_id);
+-- A lo sumo una devolucion abierta (solicitada o incierta) por pago: impide devoluciones simultaneas o duplicadas.
+CREATE UNIQUE INDEX refunds_one_open ON refunds(attempt_id) WHERE status IN ('SOLICITADA','INCIERTA');
+`,
+  },
 ]

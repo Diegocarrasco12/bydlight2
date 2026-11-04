@@ -14,7 +14,8 @@ export type AttemptStatus =
   | "RECHAZADO"
   | "CANCELADO"
   | "EXPIRADO"
-  | "ERROR"
+  | "ERROR" // error tecnico o inconsistencia: requiere revision manual
+  | "PENDIENTE" // confirmacion incierta: el resultado real es desconocido; NO es un rechazo
 
 export type Attempt = {
   id: string
@@ -29,9 +30,33 @@ export type Attempt = {
   cardLast4?: string
   paymentType?: string
   installments?: number
+  installmentsAmount?: number
+  transactionDate?: string
   responseCode?: number
   tbkStatus?: string
   note?: string
+}
+
+export type RefundStatus = "SOLICITADA" | "COMPLETADA" | "FALLIDA" | "INCIERTA"
+
+export type Refund = {
+  id: string
+  orderId: string
+  attemptId: string
+  amount: number
+  status: RefundStatus
+  type?: string // REVERSED | NULLIFIED
+  nullifiedAmount?: number
+  balance?: number
+  authorizationCode?: string
+  authorizationDate?: string
+  responseCode?: number
+  idempotencyKey: string
+  requestedBy: string
+  reason?: string
+  error?: string
+  createdAt: string
+  updatedAt: string
 }
 
 export type Quote = {
@@ -55,5 +80,6 @@ export type Order = {
   message: string
   quote?: Quote
   attempts: Attempt[]
+  refunds?: Refund[]
   events: { at: string; type: string; detail?: string }[]
 }

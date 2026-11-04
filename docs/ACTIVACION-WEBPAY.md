@@ -33,7 +33,7 @@ Estado a 2026-10-27. **Nada de esto está aplicado en el servidor.** Los pagos s
 - Órdenes: código de 12 caracteres aleatorios (≈59 bits), límite de 40 consultas/10 min por IP, correo enmascarado, `Cache-Control: no-store`, `X-Robots-Tag: noindex`, `Referrer-Policy: same-origin`.
 - Recuperación: cada visita a una orden con pago "en curso" > 2 min consulta a Transbank; acción administrativa `reconcile` consulta todos.
 - Interruptor de emergencia: `enabled:false` en el archivo de configuración apaga los pagos en ≤ 5 s sin redeploy.
-- 17 pruebas automáticas (`npm test`, Node 22.23.4) y verificación manual contra el sandbox real (aprobado, rechazado, cancelado).
+- 40 pruebas automáticas con doble del SDK (`npm test`) y verificación manual contra el sandbox real (aprobado, rechazado, cancelado, devoluciones) — ver `docs/EVIDENCIAS-INTEGRACION-WEBPAY.md`. Fase 2 (estado `PENDIENTE`, abandono, devoluciones, comprobante): `docs/WEBPAY-CERTIFICACION.md`.
 
 ## 4. Configuración segura de producción (sin `environment` en Compose)
 Todo vive en el **volumen de datos**, fuera de Git y de la imagen:

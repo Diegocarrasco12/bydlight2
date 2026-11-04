@@ -3,6 +3,8 @@
 > Documento de entrada para retomar el proyecto en una sesión nueva. Léelo junto con `CLAUDE.md`.
 > Última actualización: **2026-10-28** (hero cinematográfico `5f00015` y SEO Fases 1-2 `5fef157`, desplegados por el titular). Jornada anterior: `docs/CIERRE_JORNADA_2026-10-27.md`.
 
+> **Webpay Plus, Fase 2 (2026-11-04, solo código local; NO desplegado):** comprobante, estado `PENDIENTE`, abandono, devoluciones administrativas, 4 páginas legales en borrador (404 en producción) y 40 pruebas. Producción sigue en `5fef157` con Webpay apagado. Ver `docs/WEBPAY-CERTIFICACION.md` y `docs/EVIDENCIAS-INTEGRACION-WEBPAY.md`.
+
 ## 1. Producción (2026-10-28: desplegado por el titular desde PowerShell; verificado en el dominio público; `status` no ejecutable desde Claude Code por el código 21)
 
 | Dato | Valor |

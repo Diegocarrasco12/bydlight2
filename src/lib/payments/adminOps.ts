@@ -69,7 +69,7 @@ export async function closeOrder(orderId: string): Promise<AdminResult<null>> {
   return withOrderLock(orderId, async () => {
     const order = await readOrder(orderId)
     if (!order) return fail("Orden no encontrada.")
-    if (order.attempts.some((a) => a.status === "INICIADO")) return fail("Hay un pago en curso; reconcilia antes de cerrar.")
+    if (order.attempts.some((a) => a.status === "INICIADO" || a.status === "PENDIENTE")) return fail("Hay un pago en curso; reconcilia antes de cerrar.")
     order.stage = "CERRADA"
     ev(order, "ORDEN_CERRADA")
     await writeOrder(order)
@@ -98,7 +98,7 @@ export async function showOrder(orderId: string) {
 /** Consulta a Transbank todos los pagos que quedaron "en curso" (cierre, caida o retorno perdido). */
 export async function reconcilePending(): Promise<{ checked: number }> {
   const db = openDb()
-  const rows = db.prepare("SELECT DISTINCT order_id FROM attempts WHERE status = 'INICIADO'").all() as { order_id: string }[]
+  const rows = db.prepare("SELECT DISTINCT order_id FROM attempts WHERE status IN ('INICIADO','PENDIENTE')").all() as { order_id: string }[]
   for (const r of rows) await verifyOrder(r.order_id)
   return { checked: rows.length }
 }

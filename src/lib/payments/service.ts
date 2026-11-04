@@ -4,7 +4,16 @@ import { createTransaction, tbkMode } from "./config"
 import { isValidOrderId, newOrderId, readOrder, withOrderLock, writeOrder } from "./store"
 import type { Attempt, Order, PaymentKind } from "./types"
 
-const PENDING_MAX_MIN = 15 // el formulario de Webpay dura 10 min en integracion y 4 en produccion
+/**
+ * Vigencia de un intento abandonado. El token de Webpay vive 5 min y el formulario dura 4 min en produccion y
+ * 10 min en integracion (transbankdevelopers.cl). Pasado este plazo (con margen) un intento ya no puede autorizarse:
+ * se consulta el estado real a Transbank antes de cerrarlo o de permitir un reintento.
+ */
+export function abandonMinutes(): number {
+  return tbkMode() === "production" ? 6 : 11
+}
+/** Transbank conserva la consulta de estado 7 dias; pasado ese plazo un resultado desconocido solo puede revisarse a mano. */
+const STATUS_RETENTION_MS = 7 * 24 * 3_600_000
 
 function log(event: string, f: Record<string, unknown> = {}) {
   // Nunca registrar tokens, tarjetas ni credenciales: solo identificadores de la orden.
@@ -92,6 +101,8 @@ export async function startPayment(orderId: string, kind: PaymentKind, baseUrl: 
     const order = await readOrder(orderId)
     if (!order) return { ok: false, reason: "Orden no encontrada.", code: "no-existe" }
 
+    // Antes de bloquear: los intentos vencidos se resuelven con el estado real de Transbank (nunca por suposicion).
+    if (await settleStale(order)) await writeOrder(order)
     // El monto sale SIEMPRE de la cotizacion guardada en el servidor, nunca del navegador.
     const amount = amountDue(order, kind)
     if (!order.quote || amount === null || !Number.isInteger(amount) || amount < 50) {
@@ -102,9 +113,8 @@ export async function startPayment(orderId: string, kind: PaymentKind, baseUrl: 
     }
     if (paidAmountOf(order, kind)) return { ok: false, reason: "Este pago ya fue realizado.", code: "pagado" }
 
-    const pending = order.attempts.find(
-      (a) => a.status === "INICIADO" && Date.now() - new Date(a.createdAt).getTime() < PENDING_MAX_MIN * 60_000,
-    )
+    // Mientras exista un intento potencialmente vigente o de resultado desconocido no se crea otro cobro.
+    const pending = order.attempts.find((a) => a.status === "INICIADO" || a.status === "PENDIENTE")
     if (pending) return { ok: false, reason: "Ya hay un pago en curso. Verifica su estado antes de reintentar.", code: "en-curso" }
 
     // En produccion el retorno de Webpay debe ser siempre https.
@@ -159,31 +169,112 @@ function applyAuthorized(order: Order, attempt: Attempt) {
   }
 }
 
-/** Valida la respuesta de Transbank contra lo que guardamos y actualiza el intento. */
+/**
+ * Interpreta una respuesta de Transbank (commit o status) y actualiza el intento.
+ *  - AUTHORIZED + response_code 0 + datos coincidentes -> AUTORIZADO
+ *  - FAILED o response_code distinto de 0 sin autorizacion -> RECHAZADO
+ *  - cualquier otra cosa -> PENDIENTE (resultado desconocido: NO es un rechazo)
+ */
 function evaluate(order: Order, attempt: Attempt, res: Record<string, unknown>) {
-  attempt.tbkStatus = String(res.status ?? "")
-  attempt.responseCode = typeof res.response_code === "number" ? res.response_code : undefined
-  const approved = res.status === "AUTHORIZED" && res.response_code === 0
-  if (!approved) {
-    attempt.status = "RECHAZADO"
+  const st = String(res.status ?? "")
+  const code = typeof res.response_code === "number" ? res.response_code : undefined
+  attempt.tbkStatus = st
+  attempt.responseCode = code
+  if (st === "AUTHORIZED" && code === 0) {
+    const consistent =
+      res.buy_order === attempt.buyOrder && res.session_id === order.id && Number(res.amount) === attempt.amount
+    if (!consistent) {
+      // Transbank autorizo pero los datos no coinciden con la orden: NO se marca como pagada.
+      attempt.status = "ERROR"
+      attempt.note = "Inconsistencia entre la respuesta de Transbank y la orden. Requiere revisión manual."
+      addEvent(order, "REVISION_MANUAL", attempt.buyOrder)
+      return
+    }
+    const card = res.card_detail as { card_number?: string } | undefined
+    attempt.status = "AUTORIZADO"
+    attempt.authorizationCode = typeof res.authorization_code === "string" ? res.authorization_code : undefined
+    attempt.cardLast4 = card?.card_number ? String(card.card_number).slice(-4) : undefined
+    attempt.paymentType = typeof res.payment_type_code === "string" ? res.payment_type_code : undefined
+    attempt.installments = typeof res.installments_number === "number" ? res.installments_number : undefined
+    attempt.installmentsAmount = typeof res.installments_amount === "number" ? res.installments_amount : undefined
+    attempt.transactionDate = typeof res.transaction_date === "string" ? res.transaction_date : undefined
+    attempt.note = undefined
+    applyAuthorized(order, attempt)
     return
   }
-  const consistent =
-    res.buy_order === attempt.buyOrder && res.session_id === order.id && Number(res.amount) === attempt.amount
-  if (!consistent) {
-    // Transbank autorizo pero los datos no coinciden con la orden: NO se marca como pagada.
+  if (st === "FAILED" || (st !== "AUTHORIZED" && code !== undefined && code !== 0)) {
+    attempt.status = "RECHAZADO"
+    attempt.note = undefined
+    return
+  }
+  if (st === "AUTHORIZED") {
     attempt.status = "ERROR"
-    attempt.note = "Inconsistencia entre la respuesta de Transbank y la orden. Requiere revisión manual."
+    attempt.note = "Transbank informó AUTHORIZED con un código de respuesta inesperado. Requiere revisión manual."
     addEvent(order, "REVISION_MANUAL", attempt.buyOrder)
     return
   }
-  const card = res.card_detail as { card_number?: string } | undefined
-  attempt.status = "AUTORIZADO"
-  attempt.authorizationCode = typeof res.authorization_code === "string" ? res.authorization_code : undefined
-  attempt.cardLast4 = card?.card_number ? String(card.card_number).slice(-4) : undefined
-  attempt.paymentType = typeof res.payment_type_code === "string" ? res.payment_type_code : undefined
-  attempt.installments = typeof res.installments_number === "number" ? res.installments_number : undefined
-  applyAuthorized(order, attempt)
+  attempt.status = "PENDIENTE"
+  attempt.note = "Resultado de Transbank no concluyente; se confirmará automáticamente."
+}
+
+const ageMinutes = (a: Attempt) => (Date.now() - new Date(a.createdAt).getTime()) / 60_000
+
+/**
+ * Resuelve un intento INICIADO (vencido, o cualquiera si early) o PENDIENTE consultando el estado real a Transbank (status).
+ * Devuelve true si el intento cambio. Una consulta fallida NUNCA cierra ni rechaza el intento.
+ */
+async function reconcileAttempt(order: Order, a: Attempt, early = false): Promise<boolean> {
+  if (a.status !== "INICIADO" && a.status !== "PENDIENTE") return false
+  const age = ageMinutes(a)
+  if (!early && a.status === "INICIADO" && age <= abandonMinutes()) return false // el cliente puede seguir en Webpay
+  if (!a.token) {
+    a.status = "EXPIRADO"
+    return true
+  }
+  let res: Record<string, unknown>
+  try {
+    res = (await createTransaction().status(a.token)) as Record<string, unknown>
+  } catch {
+    if (Date.now() - new Date(a.createdAt).getTime() > STATUS_RETENTION_MS) {
+      a.status = "ERROR"
+      a.note = "No fue posible confirmar el resultado con Transbank dentro de 7 días. Requiere revisión manual."
+      return true
+    }
+    return false // sigue bloqueando reintentos hasta tener respuesta
+  }
+  const st = String(res?.status ?? "")
+  if (st === "AUTHORIZED" || st === "FAILED") {
+    evaluate(order, a, res)
+    return true
+  }
+  a.tbkStatus = st
+  if (["REVERSED", "NULLIFIED", "PARTIALLY_NULLIFIED", "CAPTURED"].includes(st)) {
+    a.status = "ERROR"
+    a.note = `Transbank informa el estado ${st} para un pago no registrado como autorizado. Requiere revisión manual.`
+    addEvent(order, "REVISION_MANUAL", a.buyOrder)
+    return true
+  }
+  // INITIALIZED u otro estado no final: sin autorizacion. Solo se cierra cuando el token ya no puede usarse.
+  if (age > abandonMinutes()) {
+    a.status = "EXPIRADO"
+    return true
+  }
+  return false
+}
+
+/** Resuelve los intentos vencidos de una orden (con el bloqueo de la orden ya tomado). */
+async function settleStale(order: Order, early = false): Promise<boolean> {
+  let changed = false
+  for (const a of order.attempts) {
+    if (a.status !== "INICIADO" && a.status !== "PENDIENTE") continue
+    const before = a.status
+    if (await reconcileAttempt(order, a, early)) {
+      a.updatedAt = new Date().toISOString()
+      addEvent(order, `VERIFICADO_${a.status}`, `${a.buyOrder} (antes ${before})`)
+      changed = true
+    }
+  }
+  return changed
 }
 
 export async function handleReturn(orderId: string, p: ReturnParams): Promise<void> {
@@ -198,22 +289,29 @@ export async function handleReturn(orderId: string, p: ReturnParams): Promise<vo
     if (p.tokenWs && !p.tbkToken) {
       const attempt = order.attempts.find((a) => a.token === p.tokenWs)
       if (!attempt) return log("return_unknown_token", { orderId })
+      if (attempt.status === "PENDIENTE") {
+        // Retorno repetido de un pago de resultado incierto: NO se vuelve a confirmar; solo se consulta su estado.
+        if (await reconcileAttempt(order, attempt)) {
+          attempt.updatedAt = now
+          addEvent(order, `PAGO_${attempt.status}`, attempt.buyOrder)
+          await writeOrder(order)
+        }
+        return log("return_replayed_pending", { orderId, buyOrder: attempt.buyOrder, status: attempt.status })
+      }
       if (attempt.status !== "INICIADO") return log("return_replayed", { orderId, buyOrder: attempt.buyOrder }) // idempotencia
       try {
-        const res = await tx.commit(p.tokenWs)
-        evaluate(order, attempt, res)
+        evaluate(order, attempt, await tx.commit(p.tokenWs))
       } catch {
-        // Si el commit falla (red, 422 por estado, etc.) se consulta el estado real a Transbank.
+        // El commit fallo (red, 422, etc.): el resultado es DESCONOCIDO, no un rechazo. Se consulta el estado real.
+        attempt.status = "PENDIENTE"
+        attempt.note = "No se pudo confirmar aún con Transbank; se verificará automáticamente."
         try {
-          const res = await tx.status(p.tokenWs)
-          if (res?.status === "AUTHORIZED") evaluate(order, attempt, res)
-          else {
-            attempt.status = "ERROR"
-            attempt.tbkStatus = String(res?.status ?? "")
-            attempt.note = "No se pudo confirmar el pago."
-          }
+          const res = (await tx.status(p.tokenWs)) as Record<string, unknown>
+          const st = String(res?.status ?? "")
+          attempt.tbkStatus = st
+          if (st === "AUTHORIZED" || st === "FAILED") evaluate(order, attempt, res)
         } catch {
-          attempt.note = "No se pudo confirmar aún. Verifica el estado en unos minutos."
+          /* queda PENDIENTE */
         }
       }
       attempt.updatedAt = now
@@ -270,31 +368,6 @@ export async function verifyOrder(orderId: string): Promise<void> {
   await withOrderLock(orderId, async () => {
     const order = await readOrder(orderId)
     if (!order) return
-    let changed = false
-    for (const attempt of order.attempts) {
-      if (attempt.status !== "INICIADO" || !attempt.token) continue
-      const ageMin = (Date.now() - new Date(attempt.createdAt).getTime()) / 60_000
-      try {
-        const res = await createTransaction().status(attempt.token)
-        if (res?.status === "AUTHORIZED") {
-          evaluate(order, attempt, res)
-          changed = true
-        } else if (ageMin > PENDING_MAX_MIN) {
-          attempt.status = "EXPIRADO"
-          attempt.tbkStatus = String(res?.status ?? "")
-          changed = true
-        }
-      } catch {
-        if (ageMin > PENDING_MAX_MIN) {
-          attempt.status = "EXPIRADO"
-          changed = true
-        }
-      }
-      if (changed) {
-        attempt.updatedAt = new Date().toISOString()
-        addEvent(order, `VERIFICADO_${attempt.status}`, attempt.buyOrder)
-      }
-    }
-    if (changed) await writeOrder(order)
+    if (await settleStale(order, true)) await writeOrder(order) // consulta explicita: tambien adelanta pagos recientes
   })
 }
