@@ -53,7 +53,7 @@ export function parseSolicitud(body: Record<string, unknown>): { ok: true; data:
   if (!EMAIL_RE.test(data.email)) errors.push("Ingresa un correo válido.")
   if (data.phone && !/^[0-9+()\-\s]{6,30}$/.test(data.phone)) errors.push("El teléfono no es válido.")
   if (data.message.length < 10) errors.push("Cuéntanos brevemente qué necesitas (mínimo 10 caracteres).")
-  if (body.accept !== true && body.accept !== "on" && body.accept !== "true") errors.push("Debes aceptar las condiciones de contratación.")
+  if (body.accept !== true && body.accept !== "on" && body.accept !== "true") errors.push("Marca la casilla para confirmar que entiendes que esto es una solicitud de cotización.")
   return errors.length ? { ok: false, errors } : { ok: true, data }
 }
 

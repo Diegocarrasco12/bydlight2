@@ -50,6 +50,8 @@ export function PlansGrid({ headingLevel = "h2", showHead = true }: { headingLev
         </div>
         )}
 
+        {/* Sin cabecera visible, los nombres de plan (h3) quedaban sin h2 previo: encabezado solo para lectores de pantalla. */}
+        {!showHead && <h2 className="sr-only">Planes de desarrollo web</h2>}
         <div className="bd-plans">
           {PLANS.filter((p) => p.priceFrom !== null).map((p) => (
             <article key={p.id} className={`bd-plan${p.recommended ? " recommended" : ""}`}>
@@ -165,7 +167,7 @@ export function PlanComparison() {
   )
 }
 
-export function MaintenanceBlock() {
+export function MaintenanceBlock({ extraRules = [] }: { extraRules?: string[] }) {
   return (
     <section className="bd-section" id="mantenimiento" aria-labelledby="maint-title">
       <div className="bd-container">
@@ -189,7 +191,7 @@ export function MaintenanceBlock() {
           ))}
         </div>
         <ul className="bd-rules">
-          {PLAN_RULES.map((r) => <li key={r}>{r}</li>)}
+          {[...PLAN_RULES, ...extraRules].map((r) => <li key={r}>{r}</li>)}
         </ul>
       </div>
     </section>

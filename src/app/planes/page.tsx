@@ -4,6 +4,7 @@ import PageHero from "@/components/layout/PageHero"
 import { Faq, FinalCta, MaintenanceBlock, PlanComparison, PlansGrid } from "@/components/home/sections"
 import { PLANS, PLANS_FAQ } from "@/lib/plans"
 import { absoluteUrl } from "@/lib/site"
+import { WEBPAY_PLANS_NOTE, webpayAnnounced } from "@/lib/payments/availability"
 import { pageMetadata } from "@/lib/seo"
 
 export const metadata: Metadata = pageMetadata({
@@ -55,7 +56,8 @@ export default function PlanesPage() {
       />
       <PlansGrid showHead={false} />
       <PlanComparison />
-      <MaintenanceBlock />
+      {/* El mensaje de Webpay solo aparece si el checkout esta habilitado (ver lib/payments/availability.ts). */}
+      <MaintenanceBlock extraRules={webpayAnnounced() ? [WEBPAY_PLANS_NOTE] : []} />
       <Faq items={PLANS_FAQ} />
       <FinalCta />
     </>

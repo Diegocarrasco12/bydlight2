@@ -371,3 +371,13 @@ test("17. solicitudes: validacion y campos de precio del cliente ignorados", () 
   assert.ok(p.ok)
   assert.deepEqual(Object.keys(p.data).sort(), ["company", "email", "message", "name", "phone", "planId"])
 })
+
+test("17b. solicitudes: la casilla sigue siendo obligatoria y su mensaje no habla de terminos legales", () => {
+  for (const accept of [undefined, false, "", "no", 0]) {
+    const r = svc.parseSolicitud({ ...solicitud, accept })
+    assert.equal(r.ok, false)
+    assert.match(r.errors.join(" "), /casilla.*solicitud de cotizaci/)
+    assert.doesNotMatch(r.errors.join(" "), /condiciones de contrataci/)
+  }
+  for (const accept of [true, "on", "true"]) assert.equal(svc.parseSolicitud({ ...solicitud, accept }).ok, true)
+})

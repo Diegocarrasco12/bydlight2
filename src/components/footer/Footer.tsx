@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { SITE } from "@/lib/site"
 import { SERVICES } from "@/lib/services"
+import { WEBPAY_FOOTER_NOTE, webpayAnnounced } from "@/lib/payments/availability"
 
 export default function Footer() {
   return (
@@ -54,7 +55,8 @@ export default function Footer() {
         </div>
 
         <div className="bd-footer-bottom">
-          © {new Date().getFullYear()} {SITE.name}. Todos los derechos reservados.
+          <span>© {new Date().getFullYear()} {SITE.name}. Todos los derechos reservados.</span>
+          {webpayAnnounced() && <span className="bd-footer-pay">{WEBPAY_FOOTER_NOTE}</span>}
         </div>
       </div>
     </footer>
