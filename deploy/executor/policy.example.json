@@ -23,6 +23,7 @@
     "port": 8200,
     "container_port": 3000,
     "networks": ["app"],
+    "data_volume": {"name": "bydlight_data", "target": "/data"},
     "http_checks": ["/", "/servicios", "/proyectos", "/nosotros", "/contacto"],
     "keep_releases": 5
   }

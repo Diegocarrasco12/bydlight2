@@ -103,6 +103,29 @@ test("1. pago aprobado: confirma con Transbank, guarda autorizacion y solo ultim
   assert.doesNotMatch(JSON.stringify(o), /4051885600446623/)
 })
 
+test("1b. compra de prueba de $50 (exigida por Transbank): cotizacion de $100 con anticipo 50% cobra exactamente $50", async () => {
+  const parsed = svc.parseSolicitud(solicitud)
+  assert.ok(parsed.ok)
+  const order = await svc.createOrder(parsed.data)
+  // Limites reales: la cotizacion minima es $100 y el cobro minimo $50; por eso el $50 sale del anticipo.
+  assert.equal((await admin.approveQuote(order.id, { amount: 99 })).ok, false)
+  const r = await admin.approveQuote(order.id, { amount: 100, depositPercent: 50 })
+  assert.ok(r.ok, r.error)
+  assert.deepEqual(r.data, { amount: 100, deposit: 50, balance: 50 })
+  const s = await svc.startPayment(order.id, "anticipo", BASE)
+  assert.ok(s.ok)
+  let o = await store.readOrder(order.id)
+  assert.equal(o.attempts[0].amount, 50)
+  tbk.commit = async () => {
+    calls.commit++
+    return authorized(o, o.attempts[0])
+  }
+  await svc.handleReturn(order.id, { tokenWs: s.token })
+  o = await store.readOrder(order.id)
+  assert.equal(o.attempts[0].status, "AUTORIZADO")
+  assert.equal(o.attempts[0].amount, 50)
+})
+
 test("2. pago rechazado: no se marca pagado y se puede reintentar", async () => {
   const id = await newQuoted()
   const s = await svc.startPayment(id, "anticipo", BASE)

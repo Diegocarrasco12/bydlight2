@@ -12,6 +12,8 @@ services:
     user: "1000:1000"
     init: true
     read_only: true
+    volumes:
+      - bydlight_data:/data
     tmpfs:
       - /tmp
       - /app/.next/cache:uid=1000,gid=1000,mode=0700
@@ -40,3 +42,6 @@ services:
 
 networks:
   app: {}
+
+volumes:
+  bydlight_data: {}

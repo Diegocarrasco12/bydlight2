@@ -21,6 +21,7 @@ JOB_RE = re.compile(r"\A[0-9a-f]{16}\Z")
 LINES_RE = re.compile(r"\A[0-9]{1,3}\Z")
 REQUEST_RE = re.compile(r"\A[a-z0-9-]+( [a-z0-9-]+){0,2}\Z")
 NAME_RE = re.compile(r"\A[a-z][a-z0-9-]{2,30}\Z")
+VOLUME_NAME_RE = re.compile(r"\A[a-z][a-z0-9_]{2,30}\Z")
 PATH_RE = re.compile(r"\A/[A-Za-z0-9._/-]*\Z")
 BRANCH_RE = re.compile(r"\A[A-Za-z0-9][A-Za-z0-9._-]{0,40}\Z")
 REMOTE_RE = re.compile(r"\Agit@github\.com:[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9._-]{1,100}\.git\Z")
@@ -138,6 +139,15 @@ def validate_policy(p: dict) -> dict:
         raise ValueError("politica: http_checks invalido (rutas relativas al sitio, al menos una)")
     if not isinstance(pr.get("keep_releases"), int) or isinstance(pr.get("keep_releases"), bool) or not 2 <= pr["keep_releases"] <= 20:
         raise ValueError("politica: keep_releases debe estar entre 2 y 20")
+    dv = pr.get("data_volume")
+    if dv is not None:
+        # Opcional y explicito: sin esta clave, Compose NO puede declarar volumenes. Un unico volumen nombrado.
+        if not isinstance(dv, dict) or set(dv) != {"name", "target"}:
+            raise ValueError("politica: project.data_volume debe tener solo 'name' y 'target'")
+        if not isinstance(dv["name"], str) or not VOLUME_NAME_RE.fullmatch(dv["name"]):
+            raise ValueError("politica: project.data_volume.name invalido")
+        if dv["target"] != "/data":
+            raise ValueError("politica: project.data_volume.target solo puede ser /data")
     return p
 
 
@@ -164,11 +174,11 @@ def container_name(policy: dict) -> str:
 # Validacion de la configuracion EFECTIVA de compose (docker compose config --format json)
 # --------------------------------------------------------------------------------------
 
-ALLOWED_TOP = {"name", "services", "networks"}
+ALLOWED_TOP = {"name", "services", "networks", "volumes"}
 # Claves de servicio benignas. Cualquier otra (privileged, network_mode, pid, cap_add, devices, volumes, ...) se rechaza.
 ALLOWED_SERVICE_KEYS = {"build", "image", "restart", "user", "init", "read_only", "tmpfs", "cap_drop", "security_opt",
                         "mem_limit", "cpus", "pids_limit", "ports", "networks", "healthcheck", "logging",
-                        "command", "entrypoint"}
+                        "command", "entrypoint", "volumes"}
 BUILD_KEYS = {"context", "dockerfile"}
 
 
@@ -203,7 +213,41 @@ def validate_compose(rendered: dict, policy: dict) -> list:
             out.append("opciones de red no permitidas")
         if spec.get("ipam"):
             out.append("ipam personalizado no permitido")
+    out += _validate_volumes(rendered.get("volumes"), pr)
     return out
+
+
+def _validate_volumes(vols, pr: dict) -> list:
+    """Volumenes de nivel superior: ninguno, salvo el unico volumen nombrado que la politica declare (project.data_volume)."""
+    dv = pr.get("data_volume")
+    if not vols:
+        return []
+    if not dv:
+        return ["clave de nivel superior no permitida 'volumes'"]
+    out = []
+    if set(vols) != {dv["name"]}:
+        out.append("volumen de nivel superior no autorizado")
+    for n, spec in vols.items():
+        spec = spec or {}
+        if n == dv["name"] and (set(spec) != {"name"} or spec.get("name") != f"{pr['project']}_{n}"):
+            out.append("opciones de volumen no permitidas (solo volumen nombrado del proyecto, sin driver ni external)")
+    return out
+
+
+def _validate_service_volumes(vols, policy: dict) -> list:
+    pr = policy["project"]
+    dv = pr.get("data_volume")
+    if not vols:
+        return []
+    if not dv:
+        return ["clave no permitida 'volumes'"]
+    if len(vols) != 1:
+        return ["solo se permite un volumen"]
+    v = vols[0]
+    ok = (isinstance(v, dict) and v.get("type") == "volume" and v.get("source") == dv["name"]
+          and v.get("target") == dv["target"] and set(v) <= {"type", "source", "target", "volume"}
+          and (v.get("volume") in (None, {})))
+    return [] if ok else ["volumes: montaje no autorizado (solo el volumen de datos de la politica, sin bind ni opciones)"]
 
 
 def _validate_service(s: dict, policy: dict) -> list:
@@ -213,6 +257,7 @@ def _validate_service(s: dict, policy: dict) -> list:
     for k in s:
         if k not in ALLOWED_SERVICE_KEYS:
             out.append(f"clave no permitida '{k}'")
+    out += _validate_service_volumes(s.get("volumes"), policy)
     # Ni command ni entrypoint pueden sobrescribirse (compose los normaliza a null cuando no se definen).
     for k in ("command", "entrypoint"):
         if s.get(k) not in (None, [], ""):

@@ -64,7 +64,20 @@
         "/tmp",
         "/app/.next/cache:uid=1000,gid=1000,mode=0700"
       ],
-      "user": "1000:1000"
+      "user": "1000:1000",
+      "volumes": [
+        {
+          "source": "bydlight_data",
+          "target": "/data",
+          "type": "volume",
+          "volume": {}
+        }
+      ]
+    }
+  },
+  "volumes": {
+    "bydlight_data": {
+      "name": "bydlight-prod_bydlight_data"
     }
   }
 }

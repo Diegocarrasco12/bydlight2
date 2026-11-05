@@ -139,5 +139,49 @@ class PoliticaInvalida(unittest.TestCase):
                     L.validate_policy(self._p(**{path: v}))
 
 
+class VolumenDeDatos(unittest.TestCase):
+    """El unico volumen permitido es el declarado en project.data_volume (/data). Sin esa clave, ninguno."""
+
+    def _r(self):
+        return copy.deepcopy(common.fixture())
+
+    def test_el_volumen_declarado_se_acepta(self):
+        self.assertEqual(L.validate_compose(self._r(), P), [])
+
+    def test_sin_data_volume_en_la_politica_se_rechaza_todo_volumen(self):
+        p = copy.deepcopy(P)
+        del p["project"]["data_volume"]
+        out = L.validate_compose(self._r(), p)
+        self.assertTrue(any("volumes" in m for m in out), out)
+
+    def test_variantes_peligrosas_se_rechazan_aun_con_el_volumen_permitido(self):
+        W = lambda r: r["services"]["web"]
+        casos = {
+            "bind del host": lambda r: W(r).update(volumes=[{"type": "bind", "source": "/srv", "target": "/data"}]),
+            "otro destino": lambda r: W(r).update(volumes=[{"type": "volume", "source": "bydlight_data", "target": "/etc", "volume": {}}]),
+            "otro volumen": lambda r: W(r).update(volumes=[{"type": "volume", "source": "otro", "target": "/data", "volume": {}}]),
+            "dos montajes": lambda r: W(r).update(volumes=W(r)["volumes"] + [{"type": "volume", "source": "bydlight_data", "target": "/mnt", "volume": {}}]),
+            "solo lectura extra/opciones": lambda r: W(r).update(volumes=[{"type": "volume", "source": "bydlight_data", "target": "/data", "volume": {"nocopy": True}}]),
+            "volumen externo": lambda r: r["volumes"].update(bydlight_data={"name": "datos_de_otro_proyecto", "external": True}),
+            "nombre fuera del proyecto": lambda r: r["volumes"].update(bydlight_data={"name": "otro-proyecto_bydlight_data"}),
+            "driver_opts (bind encubierto)": lambda r: r["volumes"].update(bydlight_data={"name": "bydlight-prod_bydlight_data", "driver": "local", "driver_opts": {"type": "none", "o": "bind", "device": "/"}}),
+            "volumen extra de nivel superior": lambda r: r["volumes"].update(extra={"name": "bydlight-prod_extra"}),
+        }
+        for nombre, mut in casos.items():
+            with self.subTest(nombre):
+                r = self._r()
+                mut(r)
+                self.assertTrue(L.validate_compose(r, P), f"{nombre}: debia rechazarse")
+
+    def test_politica_rechaza_data_volume_invalido(self):
+        for dv in ({"name": "bydlight_data", "target": "/etc"}, {"name": "X;id", "target": "/data"},
+                   {"name": "bydlight_data"}, {"name": "bydlight_data", "target": "/data", "mode": "rw"}, "/data"):
+            with self.subTest(dv=dv):
+                p = copy.deepcopy(P)
+                p["project"]["data_volume"] = dv
+                with self.assertRaises(ValueError):
+                    L.validate_policy(p)
+
+
 if __name__ == "__main__":
     unittest.main()
