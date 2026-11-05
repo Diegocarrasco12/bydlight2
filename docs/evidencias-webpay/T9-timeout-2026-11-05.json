@@ -1,0 +1,40 @@
+{
+  "caso": "T9 - Transaccion timeout desde formulario (Webpay Plus, integracion)",
+  "ambiente": "integracion (webpay3gint.transbank.cl), credenciales publicas del SDK; sin tarjetas; sin credenciales productivas",
+  "token": "01ab7b2315df39870172260b927dbdf301f13bb47fa2f5da7d38566205e4b781",
+  "buy_order": "BL2SVEEWHN97MC-01",
+  "session_id": "2SVEEWHN97MC",
+  "monto": 25000,
+  "monto_nota": "Anticipo del 50% de una cotizacion de $50.000 (el monto de la transaccion en Transbank es 25000)",
+  "creada_utc": "2026-11-05T16:30:38.594Z",
+  "creada_chile": "2026-11-05T13:30:38 (America/Santiago, UTC-3)",
+  "formulario_webpay_abierto_utc": "2026-11-05T16:30:40Z",
+  "interaccion_del_usuario": "ninguna: no se ingreso tarjeta ni se pulso nada en el formulario de Webpay",
+  "timeout_retorno_utc": "2026-11-05T16:40:41.926Z",
+  "timeout_retorno_chile": "2026-11-05T13:40:41 (America/Santiago, UTC-3)",
+  "duracion_hasta_timeout": "10 min 3 s (coincide con los 10 min del formulario en integracion)",
+  "retorno_observado": {
+    "metodo_y_ruta": "GET /api/pagos/retorno/2SVEEWHN97MC?TBK_ORDEN_COMPRA=BL2SVEEWHN97MC-01&TBK_ID_SESION=2SVEEWHN97MC",
+    "respuesta_de_nuestro_servidor": "303 a /orden/2SVEEWHN97MC",
+    "nota": "Esta vez Webpay redirigio solo, sin pulsar nada, con los parametros documentados para timeout (TBK_ORDEN_COMPRA y TBK_ID_SESION) y sin token_ws ni TBK_TOKEN. En la prueba del 2026-11-04 (caso 12) el retorno habia llegado sin parametros tras pulsar 'Intentar nuevamente'."
+  },
+  "estado_en_nuestra_base": {
+    "intento": "2SVEEWHN97MC-1",
+    "status": "EXPIRADO",
+    "eventos": ["SOLICITUD_CREADA", "COTIZACION_APROBADA", "PAGO_INICIADO", "PAGO_EXPIRADO"]
+  },
+  "pagina_vista_por_el_cliente": "«Pago expirado. El tiempo para completar el pago termino. No se realizo ningun cobro. Puedes iniciar un nuevo pago.» (captura c2-T9-timeout.png)",
+  "status_sdk_transbank": {
+    "amount": 25000,
+    "status": "INITIALIZED",
+    "buy_order": "BL2SVEEWHN97MC-01",
+    "session_id": "2SVEEWHN97MC",
+    "accounting_date": "1105",
+    "transaction_date": "2026-11-05T16:30:38.524Z",
+    "installments_number": 0
+  },
+  "vigencia_7_dias_hasta": "2026-11-12T16:30:38Z (2026-11-12 13:30 Chile)",
+  "captura": "docs/evidencias-webpay/c2-T9-timeout.png (pantalla del cliente tras el retorno; el mensaje de Webpay no se alcanzo a capturar porque Webpay redirigio solo al cumplirse el tiempo)",
+  "veredicto": "PASS: timeout real del formulario de Webpay sin interaccion; Transbank devolvio el retorno de timeout documentado y el pago quedo EXPIRADO sin cobro. status del SDK = INITIALIZED (comportamiento esperado: una transaccion sin pagar ni anular no tiene otro estado).",
+  "limitaciones": "La API de status de Transbank no distingue 'timeout' de 'abandono' (ambos INITIALIZED); la prueba del timeout es el retorno real con TBK_ORDEN_COMPRA y TBK_ID_SESION registrado en el log del servidor y el estado EXPIRADO en nuestra base."
+}
