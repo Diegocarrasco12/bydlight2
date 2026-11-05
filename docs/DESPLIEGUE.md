@@ -140,3 +140,9 @@ en un proceso sin consola, y revisar eventos de Kaspersky sobre `ssh.exe`. Regis
 
 ## 10. Registro: despliegue 2026-10-28 (`5fef157411e565c093f1be62ecc79ae22ae0b69e`, hero cinematográfico + SEO 1-2)
 Claude Code hizo el `push` (`origin/main` avanzó `5f00015` → `5fef157`, fast-forward) y las validaciones previas; el ejecutor devolvió código 21 en `status` y luego el cliente no existía en `~/.claude/tools/bd-deploy/` (restaurable desde `deploy/executor/claude-code/bd-deploy.ps1`). El titular ejecutó la secuencia desde PowerShell normal. Verificación pública posterior por Claude Code: 21 URL en 200, títulos/canonical/OG nuevos, favicon 200, hero 3D activo tras logo y recarga, 0 errores de consola (escritorio y móvil), `/contratar` 307 y `/orden` 404. No se leyó `status` ni `list-releases` desde Claude Code.
+
+## 11. Registro: despliegue 2026-11-05 (`df19553c28e0c0c24d3d725e7eae373fa366a00c`, refinamiento Signature + borradores legales ocultos)
+- Claude Code: `git push origin HEAD:main` (fast-forward `16806f3` -> `df19553`), `fetch` (12 archivos), `preflight` OK (18 contenedores ajenos como línea base), `compose-diff` (política CUMPLE, línea base igual; sin `accept-compose`), `build` (trabajo `d1588b2321429a2c`, imagen `bydlight-web:df19553c28e0`).
+- Titular (PowerShell normal, por la eliminación recurrente del cliente por Kaspersky): `up`, `verify` y `status`: OK. `status`: desplegado `df19553c…`, anterior `611353ef…` (rollback), 5 releases, compose aceptado, salud OK.
+- Verificación pública de solo lectura (Claude): `/` y `/nosotros` 200 con el CSS del sello publicado; `/privacidad`, `/informacion-comercial`, `/terminos`, `/devoluciones`, `/soporte`, `/servicios-digitales`, `/orden*` 404; `/contratar` 307 a `/contacto`; `POST /api/solicitudes` sin origen 403; la portada no contiene «Webpay», «Transbank», «WordPress» ni «Divi».
+- Rollback: `-Op rollback` a `611353ef1b0db5baf33af0700c5bbac9973ab510` (solo con autorización). No ejecutado.

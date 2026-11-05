@@ -3,7 +3,7 @@
 ## Leer primero
 1. `docs/ESTADO_ACTUAL.md` (dónde quedó el proyecto; SHA desplegado y de rollback).
 2. `docs/PENDIENTES.md`. Detalle: `docs/ARQUITECTURA.md`, `docs/DESPLIEGUE.md`, `docs/DECISIONES_TECNICAS.md`, `docs/CALIDAD_Y_PRUEBAS.md`, `docs/CREDITOS-RECURSOS.md`.
-3. Producción (2026-11-04): el titular desplegó y validó la **Fase 6** (diseño Signature, Webpay apagado). SHA de la entrega: **`611353ef1b0db5baf33af0700c5bbac9973ab510`** (`origin/main` verificado en ese SHA; lo desplegado en el servidor no fue verificado por Claude: confirmar con `status`/el titular). Rollback esperado: `5fef157411e565c093f1be62ecc79ae22ae0b69e` (antes: hero cinematográfico + SEO 1-2, 2026-10-28). Instrucciones y verificaciones: `docs/ENTREGA-FASE6.md`.
+3. Producción (2026-11-05): el titular desplegó `df19553c28e0c0c24d3d725e7eae373fa366a00c` (refinamiento Signature, sello 13+, legales ocultos; verificado con `status`, salud OK). Rollback: `611353ef1b0db5baf33af0700c5bbac9973ab510` (antes: Fase 6 `611353e`, y `5fef157`). Webpay apagado. Detalle: `docs/ESTADO_ACTUAL.md`, `docs/ENTREGA-FASE6.md`.
    Commits posteriores de documentación no implican despliegue. Verificar siempre con `status` antes de afirmar el estado real.
 
 ## Alcance
