@@ -158,3 +158,27 @@ Recomendación: **A + B**. Si Transbank insistiera en ver el flujo, valorar **C*
 | Notas | Pegar §6 (opcional) |
 
 Todo lo demás está resuelto en §1, §3 y §9 (copiar y pegar: tipo de desarrollo, lenguaje, producto, tokens T1–T8).
+
+
+## 13. Nuevo validador (`validador.transbankdevelopers.cl`): 9 escenarios, mapeo verificado (2026-11-05)
+Actualización: el validador nuevo pide 9 escenarios. Se mapearon contra la campaña (T1–T8) y la prueba adicional T9 (timeout real). Todos en **integración** (código público de integración `597055555532`; no se usó el código productivo ni llaves). Consulta `status` de Transbank hecha el 2026-11-05 sobre cada token. Vigencia: 7 días desde la creación.
+
+| # | Campo del validador | Prueba | Token | Resultado verificado | Vigente hasta (Chile) |
+|---|---|---|---|---|---|
+| 1 | Aprobada crédito | T1 | `01ab64165fc7861681a58dda170c2fd516f93914f7dcc38015c10914b9d44d90` | `AUTHORIZED`, VN (crédito), sin cuotas, aut. 1213 | 12-11 12:36 |
+| 2 | Aprobada con cuotas | T3 | `01ab2dca029d610f6fbadaca0a6dbedaf05ea0fc70106de8d878488c67ca0676` | `AUTHORIZED`, SI, 3 cuotas, aut. 1213 | 12-11 12:40 |
+| 3 | Aprobada débito | T4 | `01ab7870a80943b52b0274a5a03cc10f4ef2eb476978abd453aab30c64452f99` | `AUTHORIZED`, VD (débito), aut. 1415 | 12-11 12:41 |
+| 4 | Rechazada crédito | T2 | `01ab0c2c60338ff771579964b65ffcc22f1b881dd9c0d373f2ef886ab2ebb33c` | `FAILED`, VN, rc -1 | 12-11 12:38 |
+| 5 | Rechazada débito | T5 | `01ab297597efe5c84ad370bdfc4a9f35b321a359cf90cd491bb1d7b6862e03f5` | `FAILED`, VD (débito), rc -1 | 12-11 12:41 |
+| 6 | Anulada desde formulario | T6 | `01abee67d12ba127fdd01c05942a012533f6f8f343c05b77d64249095fabe2c7` | «Anular compra y volver al comercio»; `status` = `INITIALIZED` (sin cobro); en nuestra base `CANCELADO` | 12-11 12:42 |
+| 7 | Reembolsada monto parcial | T7 | `01ab0eb45a38e8e4f497d633257fd3edbd54387fabb1ec7387cbc2edc01047c2` | `PARTIALLY_NULLIFIED` ($20.000 de $50.000; el `refund` devolvió `type NULLIFIED`, saldo $30.000, aut. 603538) | 12-11 12:42 |
+| 8 | Reembolsada monto total | T8 | `01ab890947c88468be53f0729f8f59571312df41e41f3b770ee40d688bb57037` | `REVERSED` ($50.000) | 12-11 12:43 |
+| 9 | Timeout desde formulario | **T9** (nueva) | `01ab7b2315df39870172260b927dbdf301f13bb47fa2f5da7d38566205e4b781` | Formulario abierto sin tocar 10 min 3 s; Webpay redirigió solo a `/api/pagos/retorno/…?TBK_ORDEN_COMPRA=BL2SVEEWHN97MC-01&TBK_ID_SESION=…`; nuestra base `EXPIRADO`; `status` = `INITIALIZED` (la API no distingue timeout de abandono) | 12-11 13:30 |
+
+**Resumen:** 9/9 escenarios con token, todos vigentes. **Primer vencimiento: 2026-11-12 12:36 (Chile).** Evidencias: `campana-integracion-2026-11-05.json` (T1–T8), `T9-timeout-2026-11-05.json`, capturas `c2-T*.png`.
+
+**Salvedades honestas:**
+- **Escenario 6 («anulada desde formulario»):** se asume que corresponde al flujo «Anular compra y volver al comercio» (en el formulario anterior se llamaba «Transacción Cancelada»). No hay texto oficial del validador nuevo leído (es una aplicación web que necesita navegador); si el validador describe otra cosa, ese escenario se reabre. No es un reembolso (7 y 8) ni un timeout (9).
+- **Escenario 9:** la consulta de estado de Transbank no marca el timeout (queda `INITIALIZED`, igual que la cancelación). La evidencia es el retorno real con `TBK_ORDEN_COMPRA`/`TBK_ID_SESION` registrado por el servidor, y el estado `EXPIRADO` en nuestra base. La captura muestra la pantalla de nuestro sitio tras el retorno, no la de Webpay (redirección automática).
+- El monto de T9 es $25.000 (anticipo del 50 % de una cotización de $50.000); no afecta al escenario.
+- Los tokens son de la **integración compartida** de Transbank (código `597055555532`), no del código productivo `597053109914`: es el procedimiento oficial. Si el validador exigiera asociarlos al código productivo, Transbank lo informará al validar.

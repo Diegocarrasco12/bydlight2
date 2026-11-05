@@ -23,3 +23,6 @@ Detalle y respuestas campo por campo: `WEBPAY-FORMULARIO-VALIDACION-RESPUESTAS.m
 ## Después del envío
 13. [ ] Esperar la API Key (≈24 h hábiles). **No** la pegue en ningún chat ni en Git: va solo en `payments.json` del servidor.
 14. [ ] Con la API Key: infraestructura (`/data`, `payments.json`, `accept-compose`), textos legales aprobados, activación y **compra real de $50** (autorización expresa, por separado).
+
+## Actualización: nuevo validador con 9 escenarios (2026-11-05)
+El plazo duro pasa a ser **2026-11-12 12:36 (Chile)** (primer token). Tokens y mapeo de los 9 campos: `WEBPAY-FORMULARIO-VALIDACION-RESPUESTAS.md` §13. Se añadió T9 (timeout real) con evidencia propia. Formulario/validador no enviado; solo Diego lo envía.
