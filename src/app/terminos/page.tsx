@@ -43,7 +43,7 @@ export default function TerminosPage() {
       <h2>8. Cancelación y devoluciones</h2>
       <p>Ver la <a href="/devoluciones">Política de cancelación y devoluciones</a>.</p>
       <h2>9. Datos personales</h2>
-      <p>Los datos entregados se usan para gestionar la solicitud y el proyecto. Política de privacidad: <Pend>redactar y aprobar</Pend>.</p>
+      <p>Los datos entregados se usan para gestionar la solicitud y el proyecto. Ver la <a href="/privacidad">Política de privacidad</a> (borrador, <Pend>pendiente de revisión legal</Pend>).</p>
       <h2>10. Ley aplicable y reclamos</h2>
       <p>Ley chilena. Tribunales competentes y procedimiento de reclamos: <Pend>validar con asesor legal</Pend>.</p>
     </LegalPage>
