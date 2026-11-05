@@ -1,5 +1,7 @@
 # Webpay Plus — expediente técnico para validación con Transbank
 
+> **Actualización 2026-11-05:** Transbank creó el código de comercio productivo `597053109914` (identificador, no API Key). El formulario oficial es público y se conoce su contenido: **ver `docs/WEBPAY-FORMULARIO-VALIDACION-RESPUESTAS.md`** (campos, respuestas, tokens de la campaña de integración T1–T8 del 2026-11-05, plazo de 7 días, bloqueos). Donde este documento dice «formulario sin verificar», «código productivo pendiente» o «casos oficiales no verificados», prevalece esa actualización. Formulario no enviado; Webpay sigue apagado en producción.
+
 Versión: Fase 5 · fecha: **2026-11-04** · rama `feature/rediseno-2026` (sin commit de esta fase) · producción: sitio en `5fef157`, **Webpay apagado e invisible**.
 Este expediente **no es una certificación ni una aprobación**: la validación solo puede otorgarla Transbank. Todo resultado de este documento ocurrió en el **ambiente de integración** (`webpay3gint.transbank.cl`, credenciales públicas de pruebas, sin dinero). Los casos con doble del SDK se rotulan «mock»; no se presentan como resultados oficiales. Documentos relacionados: `WEBPAY-CHECKLIST-CERTIFICACION.md`, `WEBPAY-REQUISITOS-OFICIALES.md`, `EVIDENCIAS-INTEGRACION-WEBPAY.md`, `WEBPAY-PROPUESTAS-LEGALES.md`, `WEBPAY-CORREO-CERTIFICACION.md`, `PAGOS-SQLITE.md`, `ACTIVACION-WEBPAY.md`.
 

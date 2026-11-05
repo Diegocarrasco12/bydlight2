@@ -1,5 +1,7 @@
 # Webpay Plus — checklist de validación con Transbank
 
+> **Actualización 2026-11-05:** Transbank creó el código de comercio productivo `597053109914` (identificador, no API Key). El formulario oficial es público y se conoce su contenido: **ver `docs/WEBPAY-FORMULARIO-VALIDACION-RESPUESTAS.md`** (campos, respuestas, tokens de la campaña de integración T1–T8 del 2026-11-05, plazo de 7 días, bloqueos). Donde este documento dice «formulario sin verificar», «código productivo pendiente» o «casos oficiales no verificados», prevalece esa actualización. Formulario no enviado; Webpay sigue apagado en producción.
+
 Fecha: **2026-11-04**. Estados posibles: **CUMPLIDO** (verificado con evidencia), **PARCIAL**, **PENDIENTE**, **BLOQUEADO** (depende de un tercero), **NO VERIFICADO** (no hay fuente o prueba), **N/A**. «Obligatorio» = publicado como exigencia en la documentación oficial (`WEBPAY-REQUISITOS-OFICIALES.md`). **Estado global: NO LISTO** (hay obligatorios pendientes). No se declara READY mientras alguno de los obligatorios siguientes siga pendiente.
 
 ## A. Obligatorios publicados por Transbank

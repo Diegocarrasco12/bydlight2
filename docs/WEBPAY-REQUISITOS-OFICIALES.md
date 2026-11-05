@@ -1,5 +1,7 @@
 # Webpay Plus — requisitos oficiales (auditoría de documentación)
 
+> **Actualización 2026-11-05:** Transbank creó el código de comercio productivo `597053109914` (identificador, no API Key). El formulario oficial es público y se conoce su contenido: **ver `docs/WEBPAY-FORMULARIO-VALIDACION-RESPUESTAS.md`** (campos, respuestas, tokens de la campaña de integración T1–T8 del 2026-11-05, plazo de 7 días, bloqueos). Donde este documento dice «formulario sin verificar», «código productivo pendiente» o «casos oficiales no verificados», prevalece esa actualización. Formulario no enviado; Webpay sigue apagado en producción.
+
 Fecha de consulta: **2026-11-04**. Fuentes oficiales leídas ese día (solo lectura, sin autenticarse en nada):
 - <https://www.transbankdevelopers.cl/documentacion/webpay-plus>
 - <https://www.transbankdevelopers.cl/documentacion/como_empezar>
