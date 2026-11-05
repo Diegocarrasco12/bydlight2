@@ -21,7 +21,7 @@ Fecha: **2026-11-05**. Fuente: definición **pública** del formulario «SDK: Fo
 | ¿Validación para un PSP de Transbank? | Sí | **No** | Es un comercio con su propio código |
 | ¿Eres integrador? | Sí | **No** | Integración propia del comercio. (Si se contestara «Sí» pide RUT y empresa del integrador.) |
 | RUT / empresa del integrador | Solo si «Sí» | No aplica | |
-| Logo (GIF o PNG 130×59 px) | No | `docs/evidencias-webpay/logo-130x59.png` | **Pendiente: que Diego apruebe el logo** (derivado de `logo2.png`, fondo blanco) |
+| Logo (GIF o PNG 130×59 px) | No | `docs/evidencias-webpay/logo-130x59-v2.png` (recomendado) | **Diego debe aprobarlo.** Ver §8: el anterior `logo-130x59.png` cumple el tamaño pero el contenido ocupa solo 45×21 px |
 | ¿Integración dentro de una app móvil nativa? | Sí | **No** | Es un sitio web |
 | Revisión del sitio (3 requisitos) | Sí | Ver §2: hoy **«No, aún me faltan algunos requisitos»** | Marcar «No» **permite continuar** («tu equipo se pondrá en contacto para coordinar») |
 | URL para revisar el e-commerce | Sí | `https://bydlightsolutions.com` (o la URL de pruebas que se habilite; ver §2) | |
@@ -78,8 +78,10 @@ Campaña ejecutada el **2026-11-05 entre 12:36 y 12:44 (hora de Chile)** contra 
 - **Plazo:** la primera transacción (T1) se creó 2026-11-05 12:36 (Chile). El formulario rechaza transacciones de más de 7 días: **enviar a más tardar el 2026-11-12 antes de las 12:36 (Chile)**, o repetir la campaña.
 - **T7:** anulación parcial de $20.000 sobre $50.000 (VISA, sin cuotas). El `refund` devolvió `type NULLIFIED` con saldo $30.000 (autorización 603538) y la consulta `status` posterior muestra `PARTIALLY_NULLIFIED`. El formulario pide «PARTIALLY_NULLIFIED»: es lo que aparece en `status`; es un dato para anotar en Notas.
 - **T8:** anulación total de $50.000 el mismo día: `type REVERSED`.
-- **T5:** tarjeta de rechazo `5186 0085 4123 3829`, tomada de las evidencias del 4/11 (caso Redcompra/prepago rechazado). **No se verificó contra la tabla oficial vigente que sea de débito/prepago**; si Transbank lo observa, repetir T5 con la tarjeta de débito o prepago de rechazo publicada en <https://www.transbankdevelopers.cl/documentacion/como_empezar#ambientes>.
+- **T5 (verificado 2026-11-05):** la tarjeta `5186 0085 4123 3829` figura en la tabla oficial de «Ambientes» (transbankdevelopers.cl, `como_empezar`) como **Redcompra (débito), rechazada**, y la consulta `status` de Transbank confirma tipo `VD` (débito), `FAILED`, `response_code -1`. **No hizo falta repetirla.** (Alternativa oficial si se quisiera otra: Prepago MasterCard `5186 1741 1062 9480`, rechazada.)
 - **Complementarios:** `status` por SDK sobre todos los tokens coincide con la base; `commit` repetido sobre T1 devolvió el estado vigente (`AUTHORIZED`, $50.000, autorización 1213) sin error.
+- **Validación de tokens (2026-11-05, consulta `status` de Transbank con las credenciales públicas de integración):** los 8 tokens existen y coinciden con su caso y su `buy_order`: T1 `AUTHORIZED` (VN), T2 `FAILED` (VN, rc -1), T3 `AUTHORIZED` (SI, 3 cuotas), T4 `AUTHORIZED` (VD), T5 `FAILED` (VD, rc -1), T6 `INITIALIZED` (cancelada, sin cobro), T7 `PARTIALLY_NULLIFIED`, T8 `REVERSED`. Todos de $50.000. Edad al verificar: ~0,3 h (quedan ~167 h de las 168 de la ventana).
+- **Plazo exacto:** la ventana vence **2026-11-12 12:36 (Chile)** para T1; el resto, minutos después.
 
 ## 5. Qué sigue faltando (resumen)
 | # | Pendiente | Quién |
@@ -96,5 +98,63 @@ Campaña ejecutada el **2026-11-05 entre 12:36 y 12:44 (hora de Chile)** contra 
 > Integración propia de Webpay Plus (REST, captura simultánea) con el SDK oficial de Node.js 6.1.1. Los pagos corresponden al anticipo de proyectos de software previamente cotizados y aprobados. El checkout en línea está desactivado en producción hasta recibir la conformidad de la validación; podemos habilitar un recorrido de prueba en el sitio si lo requieren. Todas las pruebas se hicieron en integración en la fecha indicada.
 
 ## 7. Documentos a adjuntar
-- **Logo** `logo-130x59.png` (único archivo que pide el formulario).
+- **Logo** `logo-130x59-v2.png` (único archivo que pide el formulario; ver §8).
 - No se pide ningún otro adjunto. Las **capturas** de `docs/evidencias-webpay/` son respaldo propio (no se suben al formulario; guardarlas por si Soporte las pide).
+
+## 8. Logo 130×59 px (verificado 2026-11-05)
+| Archivo | Tamaño | Formato | Observación |
+|---|---|---|---|
+| `logo-130x59.png` (Fase 5) | 130×59 | PNG RGB, fondo blanco, 1,8 KB | **Cumple el formato**, pero el logo ocupa solo ~45×21 px del lienzo (≈35 % del ancho): «SOLUTIONS» queda de ~3 px de alto, casi ilegible |
+| `logo-130x59-v2.png` (nuevo) | 130×59 | PNG RGB, fondo blanco | Recorte ajustado del contenido de `public/img/logos/logo2.png` (el mismo logo del sitio), ~112×51 px de contenido, legible. **Recomendado.** Sin cambios de diseño: solo recorte y escala |
+
+Impedimentos para aprobarlo: ninguno técnico. Es la marca que Diego ya usa en el sitio; solo debe confirmar que quiere esa versión (fondo blanco, color azul) y no otra. El formulario lo marca como **no obligatorio**.
+
+## 9. Revisión de las respuestas técnicas
+| Respuesta | ¿Correcta? | Fundamento |
+|---|---|---|
+| Tipo de desarrollo: SDK oficial | Sí | `transbank-sdk` 6.1.1 (paquete oficial de Transbank para Node.js, versión fijada) |
+| Lenguaje: Node.js | Sí | Next.js 16, Node ≥ 22.13 |
+| Producto: Webpay Plus | Sí | Captura simultánea, REST; el correo de afiliación dice «Solución: Webpay Plus», «Canal: Recaudación por internet» |
+| PSP: No | Sí | Comercio con código propio |
+| Integrador: No | Sí | La integración es del propio comercio (no se integra para terceros) |
+| App móvil nativa: No | Sí | Sitio web |
+| Moneda: CLP | Sí, **a confirmar con el contrato** | El sistema envía `amount` entero en CLP; el correo de afiliación no indica moneda |
+| Anulaciones implementadas: Sí | Sí | Probado: T7 (parcial) y T8 (total, `REVERSED`). En producción se ejecutan solo por la API administrativa firmada, apagada por defecto |
+
+## 10. Cómo facilitar la revisión del checkout sin cobros reales (análisis)
+**Hecho clave:** antes de aprobar la validación **no existe la llave productiva**, así que **en producción nadie puede completar un pago** (ni Transbank ni nosotros): no hay forma de que un revisor «pague» sin un cobro real. La validación misma se hace con **tokens de integración** (ya generados). Lo que el formulario revisa del sitio es la URL, el rubro y que haya algo «para probar». Opciones, de menor a mayor impacto:
+
+| Opción | Qué implica | Riesgo / costo | Quién |
+|---|---|---|---|
+| **A. Marcar «No» en la revisión y coordinar** | El formulario lo permite («nuestro equipo se pondrá en contacto»). Ofrecer en «Notas» capturas y un recorrido | Ninguno; puede alargar la validación | Diego |
+| **B. Material de respaldo** | Ya existen capturas del flujo completo (T1–T8, `c2-*.png`): aprobado, rechazado y cancelado | Ninguno | Listo |
+| **C. Entorno de revisión en integración (subdominio)** | Segundo contenedor con la misma imagen, `env: integration` (sin dinero) y checkout visible, en un subdominio | Requiere cambios de infraestructura (Compose, túnel/DNS de Cloudflare) y `accept-compose`: **fuera de mi alcance, requiere autorización** | Administrador |
+| **D. Activar el checkout en producción antes de validar** | `ONLINE_CHECKOUT_UI=true` + rebuild + despliegue | **No recomendado**: mostraría un pago que no puede funcionar en producción sin llave y contradice «pagos apagados» | — |
+
+Recomendación: **A + B**. Si Transbank insistiera en ver el flujo, valorar **C**. No se tocó nada de lo anterior.
+
+## 11. Consistencia: titular de la afiliación frente a «Byd Light Solutions SpA»
+**Hallazgos (verificables en el repositorio y en el correo de afiliación):**
+- El correo de Transbank del número `1-12087316724` está a nombre de **una persona natural** (nombre y RUT de Diego Carrasco): contacto, **cuenta de abono personal** y «Canal: Recaudación por internet». **No aparece la razón social «Byd Light Solutions SpA»** ni el RUT de una sociedad.
+- El sitio se presenta como **«Byd Light Solutions SpA»**: JSON-LD `legalName` (`src/app/layout.tsx:69`), nombre del comercio en el comprobante de pago (`src/lib/payments/voucher.ts:6`, `COMMERCE_NAME`), página de la orden y los textos legales.
+- El repositorio **no contiene el RUT de la SpA**; los textos legales lo dejan «PENDIENTE».
+
+**Conclusión:** **sí hay una inconsistencia aparente**: el comercio autorizado por Transbank parece pertenecer a la persona natural, mientras el sitio y el comprobante lo presentan como una SpA. Desde aquí no se puede determinar si la SpA existe, si es la titular real del código ni qué RUT figura en el contrato de Transbank.
+
+**Qué podría causar:** observaciones de Transbank (rubro y nombre en el sitio frente al contrato), comprobantes con un nombre distinto al titular de la cuenta de abono y problemas tributarios (boletas o facturas emitidas por una entidad distinta de quien recibe el dinero). Sin asesoría tributaria no se debe cambiar nada.
+
+**Qué debe hacer Diego** (no lo decido yo): (1) preguntar a Transbank quién es el titular de `597053109914` y con qué RUT está registrado; (2) si debe ser la SpA, regularizar la afiliación con su RUT y su cuenta; si es la persona natural, decidir con su contador cómo presentar el comercio en el sitio y el comprobante (implicaría un cambio de código y textos que solo haré con su autorización).
+
+## 12. Campos que debe completar Diego personalmente
+| Campo | Dato |
+|---|---|
+| R.U.T. asociado al código de comercio | El que figure en el contrato de Transbank (ver §11) |
+| Nombre y apellido | Suyo |
+| Correo | Uno que lea a diario |
+| Teléfono | Suyo |
+| Logo | Elegir y subir `logo-130x59-v2.png` (o el anterior) |
+| Revisión del sitio | «No, aún me faltan algunos requisitos» (recomendado) o «Sí» solo si lo cree cierto |
+| Moneda | Confirmar con su contrato que es CLP |
+| Notas | Pegar §6 (opcional) |
+
+Todo lo demás está resuelto en §1, §3 y §9 (copiar y pegar: tipo de desarrollo, lenguaje, producto, tokens T1–T8).
