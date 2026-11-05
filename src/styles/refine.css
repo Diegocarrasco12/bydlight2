@@ -1,0 +1,97 @@
+/* ==========================================================================
+   BYDLIGHT SIGNATURE · refinamiento (2026-11-05). Se carga DESPUES de signature.css; no la reemplaza.
+   1) Ritmo de contraste entre secciones (grafito/pizarra alternando con negro azulado, sin pasar a tema claro).
+   2) Sello «13+» con volumen (capas concentricas, bisel metalico, luz direccional) solo con CSS y transform.
+   Nota historica: el repositorio no conserva una version 3D anterior del circulo (solo la plana de af71054); este
+   diseno es nuevo y toma de referencia el «nucleo de luz» azul de esa version.
+   ========================================================================== */
+html:root {
+  --graphite: #16181e;
+  --slate: #111319;
+  --muted: #a1a5b0; /* antes #8d919b: mas contraste de texto secundario sobre grafito */
+  --line-3: rgba(255, 255, 255, 0.1);
+
+  /* ---------- Ritmo de secciones ---------- */
+  & .bd-section-alt, & .ent, & .stack, & .bd-light, & .bd-light.showcase {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 160px),
+      var(--graphite);
+    border-block: 1px solid var(--line-3);
+  }
+  & .apis, & .method { background: linear-gradient(180deg, var(--slate), var(--ink) 85%); }
+  & .home-contact { background: radial-gradient(70% 90% at 50% 0%, rgba(91, 140, 255, 0.08), transparent 70%), var(--ink); }
+  & .bd-footer { border-top-color: var(--line-3); }
+
+  /* Tarjetas con mas definicion, mas aun sobre secciones grafito */
+  & .bento-tile, & .bd-service, & .bd-plan, & .pc, & .ent-card, & .way, & .bd-maint, & .tech-group, & .tech-feature, & .bd-panel, & .sv-ben, & .teaser, & .bd-custom, & .bd-aside {
+    border-color: var(--line-3);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 40px -28px rgba(0, 0, 0, 0.8);
+  }
+  & .bd-light .pc, & .bd-section-alt .bd-service { background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025)); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 18px 40px -28px rgba(0, 0, 0, 0.9); }
+  & .bento-tile, & .bd-service, & .pc, & .ent-card, & .bd-plan, & .way { transition: border-color 0.35s ease, background 0.35s ease, transform 0.35s ease; }
+  & .bento-tile:hover, & .bd-service:hover, & .pc:hover, & .ent-card:hover, & .bd-plan:hover, & .way:hover { border-color: rgba(255, 255, 255, 0.2); }
+
+  /* Foco visible consistente */
+  & a:focus-visible, & button:focus-visible, & summary:focus-visible, & input:focus-visible, & textarea:focus-visible, & select:focus-visible {
+    outline: 2px solid var(--orange); outline-offset: 3px; border-radius: 8px;
+  }
+
+  /* ---------- Sello 13+ con volumen ---------- */
+  & .about-fig {
+    --lx: 30%; --ly: 22%;
+    isolation: isolate;
+    border: 0;
+    max-width: 400px;
+    width: 100%;
+    margin-inline: auto;
+    background:
+      radial-gradient(120% 90% at var(--lx) var(--ly), rgba(255, 255, 255, 0.14), transparent 46%),
+      radial-gradient(80% 80% at 50% 62%, rgba(91, 140, 255, 0.1), transparent 70%),
+      radial-gradient(circle at 50% 50%, #1d2027 0%, #121419 62%, #0a0b0e 100%);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      inset 0 2px 1px rgba(255, 255, 255, 0.12),
+      inset 0 -26px 46px rgba(0, 0, 0, 0.55),
+      inset 0 0 70px rgba(0, 0, 0, 0.35),
+      0 40px 70px -30px rgba(0, 0, 0, 0.9),
+      0 12px 24px -12px rgba(0, 0, 0, 0.7);
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.7s ease;
+    will-change: transform;
+  }
+  /* Bisel metalico exterior: anillo conico con luz direccional, rota muy lento */
+  & .about-fig::after {
+    content: ""; position: absolute; inset: -5%; border-radius: 50%; border: 0; z-index: -1;
+    background: conic-gradient(from 200deg, #3a3e49, #b4b9c6 10%, #4a4e5a 24%, #15171c 46%, #3d414d 62%, #9da2b0 78%, #3a3e49);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+    opacity: 0.85;
+    animation: seal-turn 90s linear infinite;
+  }
+  /* Disco interior hundido con un filete naranja discreto */
+  & .about-fig::before {
+    content: ""; position: absolute; inset: 11%; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.08); z-index: 0;
+    background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.05), transparent 55%), #0e1014;
+    box-shadow: inset 0 10px 24px rgba(0, 0, 0, 0.7), inset 0 -2px 0 rgba(255, 255, 255, 0.06), 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+  & .about-fig b, & .about-fig span { position: relative; z-index: 1; }
+  & .about-fig b {
+    background: linear-gradient(180deg, #ffffff 10%, #b9bdc9 55%, #7c808c 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.55)) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
+  }
+  & .about-fig span { color: #b4b8c3; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6); }
+}
+@keyframes seal-turn { to { transform: rotate(360deg); } }
+@media (hover: hover) {
+  html:root .about-fig:hover { transform: perspective(1000px) rotateX(5deg) rotateY(-7deg) translateY(-4px); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 2px 1px rgba(255, 255, 255, 0.16), inset 0 -26px 46px rgba(0, 0, 0, 0.55), inset 0 0 70px rgba(0, 0, 0, 0.35), 0 50px 80px -30px rgba(0, 0, 0, 0.95), 0 14px 28px -12px rgba(255, 138, 61, 0.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:root .about-fig, html:root .about-fig::after { animation: none; transition: none; }
+  html:root .about-fig:hover { transform: none; }
+}
+@media (max-width: 760px) {
+  html:root .about-fig { max-width: 280px; }
+  html:root .about-fig::after { animation: none; }
+}
