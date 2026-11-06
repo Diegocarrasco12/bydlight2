@@ -35,6 +35,9 @@ html:root {
   & .pb-methods { display: flex; flex-wrap: wrap; gap: 4px 18px; padding: 0; margin: 0; list-style: none; color: var(--muted); font-size: 0.84rem; }
   & .pb-methods li { display: inline-flex; align-items: center; gap: 7px; }
   & .pb-methods svg { color: var(--orange-2); }
+  & .pb-processor { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.62); }
+  & .pb-processor img { display: block; height: 24px; width: auto; }
+  & .pb-compact .pb-processor { margin-left: auto; }
   & .pb-compact { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; padding: 14px 20px; margin-top: 36px; }
   & .pb-lead { font-family: var(--display); font-size: 1rem; letter-spacing: -0.01em; color: var(--text); }
   & .pb-compact .pb-brands { flex-wrap: nowrap; gap: 8px; }

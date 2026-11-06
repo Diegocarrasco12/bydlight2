@@ -8,16 +8,16 @@ import { previewMode } from "@/lib/preview"
  * Marcas de pago para PaymentBrandShowcase.
  *
  *  - PUBLICAS (produccion): solo las de PAYMENT_LOGOS (archivos en public/img/pagos/, con autorizacion verificada).
- *  - VISTA PREVIA LOCAL: ademas, los archivos oficiales descargados que aun NO estan autorizados, desde
+ *  - VISTA PREVIA LOCAL: ademas, los logos de tarjetas descargados cuya marca aun NO esta confirmada, desde
  *    assets-pendientes/pagos/ (carpeta fuera de public/, ignorada por git y por Docker). Se sirven solo en vista previa por
  *    /vista-previa/logos/<id>.<ext>. En produccion esta ruta no existe, asi que una marca no verificada no puede publicarse.
  */
 
 export type BrandId = "webpay" | "visa" | "mastercard" | "amex" | "redcompra"
 
-/** Estado de cada marca (ver docs/WEBPAY-LOGOS-FUENTES.md). Ninguna esta verificada para uso publico. */
+/** Estado de cada marca (ver docs/WEBPAY-LOGOS-FUENTES.md). Webpay Plus y Transbank: autorizados por escrito. Tarjetas: pendientes de confirmar con el area comercial. */
 export const BRAND_STATUS: Record<BrandId, { name: string; file: string; pending: string }> = {
-  webpay: { name: "Webpay Plus", file: "webpay-plus.png", pending: "Autorización escrita de Transbank S.A. para usar la marca en el sitio." },
+  webpay: { name: "Webpay Plus", file: "webpay-plus.png", pending: "Autorizado por escrito por Transbank (comercio con productos contratados); ya publicado." },
   visa: { name: "Visa", file: "visa", pending: "Confirmar que Visa está habilitada en el contrato del comercio y descargar el logo desde brand.visa.com." },
   mastercard: { name: "Mastercard", file: "mastercard", pending: "Confirmar que Mastercard está habilitada y aceptar el Artwork Download Agreement en mastercard.com/brandcenter." },
   amex: { name: "American Express", file: "amex", pending: "No confirmada para el comercio: requiere habilitación y material oficial de American Express." },
@@ -25,7 +25,6 @@ export const BRAND_STATUS: Record<BrandId, { name: string; file: string; pending
 }
 
 const ROOT = join(process.cwd(), "assets-pendientes", "pagos")
-export const WEBPAY_PENDING_FILE = join(ROOT, "webpay-plus", "PNG_WebpayPlus", "_FondoNegro_PNG", "_800PX", "2.WebpayPlus_FN_800px.png")
 export const CARD_DIR = join(ROOT, "cards")
 export const CARD_IDS = ["visa", "mastercard", "amex", "redcompra"] as const
 
@@ -42,16 +41,15 @@ function svgSize(file: string): { width: number; height: number } | null {
   } catch { return null }
 }
 
+/** Logotipo de Transbank (procesador de pagos), autorizado por escrito. */
+export function transbankLogo(): BrandLogo | null { return PAYMENT_LOGOS.transbank }
+
 export type ResolvedBrand = { id: BrandId; name: string; logo: BrandLogo | null; pending: boolean }
 
 /** Marcas que se muestran: publicas verificadas, o (solo vista previa) archivos oficiales pendientes y recuadros rotulados. */
 export function resolveBrands(): { webpay: ResolvedBrand; cards: ResolvedBrand[] } {
   const preview = previewMode()
   const webpay: ResolvedBrand = { id: "webpay", name: BRAND_STATUS.webpay.name, logo: PAYMENT_LOGOS.webpay, pending: false }
-  if (!webpay.logo && preview && existsSync(WEBPAY_PENDING_FILE)) {
-    const d = pngSize(WEBPAY_PENDING_FILE)
-    if (d) { webpay.logo = { src: "/vista-previa/logos/webpay-plus.png", alt: "Webpay Plus de Transbank", ...d }; webpay.pending = true }
-  }
   const cards: ResolvedBrand[] = []
   if (PAYMENT_LOGOS.cards.length) {
     PAYMENT_LOGOS.cards.forEach((l) => cards.push({ id: "visa", name: l.alt, logo: l, pending: false }))

@@ -5,7 +5,7 @@ import { notFound } from "next/navigation"
 import PrintButton from "@/components/checkout/PrintButton"
 import { TERMS_VERSION } from "@/lib/terms"
 import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
-import { paymentsEnabled } from "@/lib/payments/config"
+import { checkoutMode, paymentsEnabled } from "@/lib/payments/config"
 import { webpaySandbox } from "@/lib/payments/availability"
 import { legalVisible } from "@/lib/legal"
 import { previewMode } from "@/lib/preview"
@@ -110,6 +110,12 @@ function Result({ a, order }: { a: Attempt; order: Order }) {
             ))}
           </dl>
           {refunded.length > 0 && <p className="bd-note">Se registró una devolución sobre este pago. Si tienes dudas, escríbenos con el código de la orden.</p>}
+          <div className="bd-voucher-brand">
+            <span>Pago procesado por Webpay Plus de Transbank</span>
+            {/* Logotipos oficiales sin modificar: version negativa en pantalla (fondo oscuro), positiva al imprimir (fondo blanco). */}
+            <img className="scr" src="/img/pagos/webpay-plus-negativo-300.png" alt="Webpay Plus de Transbank" width={301} height={76} loading="lazy" />
+            <img className="prn" src="/img/pagos/webpay-plus-positivo-300.png" alt="Webpay Plus de Transbank" width={301} height={76} loading="lazy" />
+          </div>
           <div className="bd-voucher-actions"><PrintButton /></div>
         </div>
       )
@@ -231,6 +237,7 @@ export default async function OrdenPage({
           ))}
         </ol>
 
+        {!preview && checkoutMode() === "pilot" && !sandbox && <p className="bd-banner" role="status"><strong>Prueba productiva controlada.</strong> Esta orden usa Webpay en producción: el cobro es real.</p>}
         {aviso && AVISOS[aviso] && <p className="bd-banner" role="status">{AVISOS[aviso]}</p>}
 
         {last && last.status !== "INICIADO" && last.status !== "PENDIENTE" && <Result a={last} order={order} />}

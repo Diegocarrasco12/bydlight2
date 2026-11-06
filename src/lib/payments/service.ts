@@ -62,7 +62,7 @@ export function parseSolicitud(body: Record<string, unknown>): { ok: true; data:
   return errors.length ? { ok: false, errors } : { ok: true, data }
 }
 
-export async function createOrder(input: SolicitudInput): Promise<Order> {
+export async function createOrder(input: SolicitudInput, opts: { pilot?: boolean } = {}): Promise<Order> {
   const plan = PLANS.find((p) => p.id === input.planId)!
   const now = new Date().toISOString()
   const order: Order = {
@@ -79,6 +79,7 @@ export async function createOrder(input: SolicitudInput): Promise<Order> {
   }
   addEvent(order, "SOLICITUD_CREADA", plan.id)
   addEvent(order, "TERMINOS_ACEPTADOS", termsEventDetail("solicitud"))
+  if (opts.pilot) addEvent(order, "ACCESO_PILOTO", "prueba productiva controlada")
   await writeOrder(order)
   log("order_created", { orderId: order.id, planId: plan.id })
   return order

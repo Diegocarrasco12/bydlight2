@@ -413,6 +413,9 @@ html:root .bd-state-note { margin-top: 26px; color: var(--muted); font-family: v
 
 /* Comprobante: cabecera de marca solo para imprimir y version imprimible limpia (guardar como PDF) */
 .bd-print-brand { display: none; }
+.bd-voucher-brand { margin-top: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-dim, rgba(255, 255, 255, 0.62)); }
+.bd-voucher-brand img { height: 30px; width: auto; display: block; }
+.bd-voucher-brand .prn { display: none; }
 .bd-voucher-actions { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
 @media print {
   @page { margin: 16mm; }
@@ -427,6 +430,8 @@ html:root .bd-state-note { margin-top: 26px; color: var(--muted); font-family: v
   .bd-voucher .bd-print-brand img { width: 120px; height: 120px; margin: -30px 0; object-fit: contain; }
   .bd-voucher .bd-print-brand div { display: grid; gap: 2px; font-size: 0.85rem; }
   .bd-voucher .bd-print-brand strong { font-size: 1.05rem; }
+  .bd-voucher .bd-voucher-brand .scr { display: none !important; }
+  .bd-voucher .bd-voucher-brand .prn { display: block !important; height: 26px; }
   .bd-voucher h2 { font-size: 1.3rem; margin: 0 0 6px; }
 }
 @media print {

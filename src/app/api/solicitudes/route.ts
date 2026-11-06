@@ -1,4 +1,5 @@
-import { paymentsEnabled } from "@/lib/payments/config"
+import { checkoutOpenFor } from "@/lib/payments/access"
+import { checkoutMode, paymentsEnabled } from "@/lib/payments/config"
 import { clientIp, json, rateLimited, sameOrigin } from "@/lib/payments/http"
 import { createOrder, parseSolicitud } from "@/lib/payments/service"
 import { storageWritable } from "@/lib/payments/store"
@@ -12,7 +13,14 @@ export async function POST(req: Request) {
     // Vista previa: la solicitud NO se guarda ni se envia; se devuelve una orden de demostracion.
     return json({ id: "DEMOSOLICITA" }, 201)
   }
-  if (!paymentsEnabled() || !(await storageWritable())) {
+  if (!paymentsEnabled()) {
+    return json({ error: "Las solicitudes en línea no están disponibles por ahora. Escríbenos por WhatsApp." }, 503)
+  }
+  // Modo piloto: solo quien entro con el enlace firmado puede crear ordenes (terceros reciben el mismo 503).
+  if (!checkoutOpenFor(req.headers.get("cookie"))) {
+    return json({ error: "Las solicitudes en línea no están disponibles por ahora. Escríbenos por WhatsApp." }, 503)
+  }
+  if (!(await storageWritable())) {
     return json({ error: "Las solicitudes en línea no están disponibles por ahora. Escríbenos por WhatsApp." }, 503)
   }
   if (rateLimited(`sol:${clientIp(req)}`, 5, 10 * 60_000)) {
@@ -34,6 +42,6 @@ export async function POST(req: Request) {
   const parsed = parseSolicitud(body)
   if (!parsed.ok) return json({ error: parsed.errors.join(" ") }, 422)
 
-  const order = await createOrder(parsed.data)
+  const order = await createOrder(parsed.data, { pilot: checkoutMode() === "pilot" })
   return json({ id: order.id }, 201)
 }

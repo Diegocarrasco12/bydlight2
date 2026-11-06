@@ -9,6 +9,8 @@ import {
   WebpayPlus,
 } from "transbank-sdk"
 import { previewMode } from "@/lib/preview"
+import { ONLINE_CHECKOUT_UI } from "@/lib/plans"
+import { LEGAL_PAGES_PUBLISHED } from "@/lib/legal"
 
 // Solo el servidor importa este modulo ("server-only"): las credenciales nunca llegan al navegador.
 //
@@ -28,6 +30,11 @@ export type FileConfig = {
   adminSecret?: string
   /** Permiso explicito para devoluciones desde la API administrativa. Ausente o false = deshabilitadas. */
   adminRefunds?: boolean
+  /**
+   * Quien puede usar el checkout cuando enabled=true. Ausente = "pilot" en produccion (acceso controlado por enlace firmado).
+   * "public" solo surte efecto si el codigo publicado tiene ONLINE_CHECKOUT_UI=true Y LEGAL_PAGES_PUBLISHED=true.
+   */
+  access?: "pilot" | "public"
 }
 
 function configPath(): string {
@@ -70,6 +77,31 @@ export function paymentsEnabled(): boolean {
   if (fileFlag === false) return false
   if (flag === "true" || fileFlag === true) return true
   return process.env.NODE_ENV !== "production"
+}
+
+/**
+ * Modo de acceso al checkout (solicitudes, /contratar, inicio de pago). Explicito y reversible:
+ *  - closed: pagos apagados (enabled=false o sin configuracion). Nada se abre.
+ *  - pilot:  pagos habilitados pero SOLO quien entre con el enlace firmado del administrador (cookie HMAC de corta vida).
+ *            Es el modo de la prueba productiva: terceros no pueden crear ordenes ni iniciar cobros.
+ *  - public: abierto a todos. Exige access="public" en payments.json Y, en el codigo desplegado, ONLINE_CHECKOUT_UI=true y
+ *            LEGAL_PAGES_PUBLISHED=true (si falta alguno, se degrada a pilot).
+ * Los retornos de Webpay, la verificacion de estado y la API administrativa dependen de paymentsEnabled(), no de este modo.
+ * En desarrollo (NODE_ENV != production) y en la vista previa el valor por defecto es public (sandbox, sin cobros reales).
+ */
+export type CheckoutMode = "closed" | "pilot" | "public"
+
+export function publicCheckoutReady(): boolean {
+  return ONLINE_CHECKOUT_UI && LEGAL_PAGES_PUBLISHED
+}
+
+export function checkoutMode(): CheckoutMode {
+  if (previewMode()) return "public"
+  if (!paymentsEnabled()) return "closed"
+  const explicit = process.env.PAYMENTS_ACCESS ?? fileConfig().access
+  if (explicit === "public") return publicCheckoutReady() ? "public" : "pilot"
+  if (explicit === "pilot") return "pilot"
+  return process.env.NODE_ENV === "production" ? "pilot" : "public"
 }
 
 export type TbkMode = "integration" | "production"

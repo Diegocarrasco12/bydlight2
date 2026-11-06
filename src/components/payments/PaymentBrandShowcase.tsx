@@ -1,9 +1,11 @@
 import { PAY_HEADLINE, PAY_SUBTITLE, PAY_TRUST, webpayAnnounced } from "@/lib/payments/availability"
-import { resolveBrands, type ResolvedBrand } from "@/lib/payments/brand-assets"
+import { resolveBrands, transbankLogo, type ResolvedBrand } from "@/lib/payments/brand-assets"
+import { paymentsEnabled } from "@/lib/payments/config"
 import { previewMode } from "@/lib/preview"
 
 /**
- * Banda de medios de pago (Webpay Plus). Solo se renderiza si el checkout esta habilitado (webpayAnnounced).
+ * Banda de medios de pago (Webpay Plus). Las variantes publicas (hero, compact) solo se renderizan con el anuncio publico
+ * habilitado (webpayAnnounced); la variante checkout tambien en modo piloto (paymentsEnabled), porque ahi ya se va a pagar.
  *
  * Variantes del mismo componente (sin duplicar estilos):
  *  - hero: portada y planes. Primero las marcas, despues el texto.
@@ -46,7 +48,7 @@ function Tile({ b, size }: { b: ResolvedBrand; size: "lg" | "md" }) {
     return (
       <li className={`pb-tile ${size}`} data-brand={b.id} title={b.pending ? "Logotipo oficial · uso pendiente de autorización (solo vista previa)" : b.name}>
         {/* Logotipo oficial sin modificar: solo se escala manteniendo su proporcion (height fija, width automatico). */}
-        <img src={b.logo.src} alt={b.logo.alt} width={b.logo.width} height={b.logo.height} loading="lazy" decoding="async" />
+        <img src={b.logo.src} srcSet={b.logo.srcSet} sizes={b.logo.srcSet ? "(max-width: 640px) 220px, 300px" : undefined} alt={b.logo.alt} width={b.logo.width} height={b.logo.height} loading="lazy" decoding="async" />
       </li>
     )
   }
@@ -54,6 +56,18 @@ function Tile({ b, size }: { b: ResolvedBrand; size: "lg" | "md" }) {
     return <li className={`pb-tile pb-empty ${size}`} data-brand={b.id}><b>{b.name}</b><small>logo pendiente</small></li>
   }
   return b.id === "webpay" ? <li className={`pb-tile pb-word ${size}`}><b>Webpay Plus</b></li> : null
+}
+
+/** Procesador de pagos: logotipo oficial de Transbank (autorizado por escrito), sin modificar. */
+function Processor() {
+  const l = transbankLogo()
+  if (!l) return null
+  return (
+    <p className="pb-processor">
+      <span>Pagos procesados por</span>
+      <img src={l.src} srcSet={l.srcSet} sizes="120px" alt={l.alt} width={l.width} height={l.height} loading="lazy" decoding="async" />
+    </p>
+  )
 }
 
 function Brands({ size }: { size: "lg" | "md" }) {
@@ -67,7 +81,7 @@ function Brands({ size }: { size: "lg" | "md" }) {
 }
 
 export default function PaymentBrandShowcase({ variant = "hero", id }: { variant?: ShowcaseVariant; id?: string }) {
-  if (!webpayAnnounced()) return null
+  if (variant === "checkout" ? !paymentsEnabled() && !webpayAnnounced() : !webpayAnnounced()) return null
 
   if (variant === "compact") {
     return (
@@ -75,6 +89,7 @@ export default function PaymentBrandShowcase({ variant = "hero", id }: { variant
         <span className="pb-lead">Paga con tarjeta</span>
         <Brands size="md" />
         <Methods />
+        <Processor />
       </aside>
     )
   }
@@ -85,6 +100,7 @@ export default function PaymentBrandShowcase({ variant = "hero", id }: { variant
         <Brands size="md" />
         <Methods />
         <p className="pb-trust"><Icon name="shield" /><span><strong>Pago seguro.</strong> {PAY_TRUST}</span></p>
+        <Processor />
       </aside>
     )
   }

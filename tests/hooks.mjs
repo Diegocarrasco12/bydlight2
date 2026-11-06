@@ -14,6 +14,7 @@ const tryExt = (base) => {
 
 export async function resolve(specifier, context, next) {
   if (specifier === "server-only") return { url: pathToFileURL(pathResolve(root, "tests/stubs/empty.mjs")).href, shortCircuit: true }
+  if (specifier === "next/navigation") return { url: pathToFileURL(pathResolve(root, "tests/stubs/next-navigation.mjs")).href, shortCircuit: true }
   if (specifier === "transbank-sdk") return { url: pathToFileURL(pathResolve(root, "tests/stubs/transbank-sdk.mjs")).href, shortCircuit: true }
   if (specifier.startsWith("@/")) {
     const u = tryExt(pathResolve(root, "src", specifier.slice(2)))

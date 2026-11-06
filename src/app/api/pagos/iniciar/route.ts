@@ -1,3 +1,4 @@
+import { checkoutOpenFor } from "@/lib/payments/access"
 import { paymentsEnabled, returnBaseUrl } from "@/lib/payments/config"
 import { clientIp, rateLimited, redirectTo, sameOrigin } from "@/lib/payments/http"
 import { amountDue, startPayment } from "@/lib/payments/service"
@@ -27,6 +28,8 @@ export async function POST(req: Request) {
     return new Response(redirectPreviewHtml({ backHref: `/orden/${orderId}`, amountLabel: due ? formatClp(due) : undefined }), { headers: HTML_HEADERS })
   }
   if (!paymentsEnabled()) return redirectTo(`/orden/${orderId}?aviso=error`)
+  // Modo piloto: solo con la cookie firmada del administrador se puede iniciar un cobro.
+  if (!checkoutOpenFor(req.headers.get("cookie"))) return redirectTo(`/orden/${orderId}?aviso=error`)
   if (rateLimited(`pay:${clientIp(req)}`, 10, 10 * 60_000)) return redirectTo(`/orden/${orderId}?aviso=error`)
 
   // Aceptacion de terminos: validada aqui en el servidor (la casilla del navegador no basta) y registrada en la orden.

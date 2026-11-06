@@ -4,7 +4,10 @@ import { redirect } from "next/navigation"
 import ContractForm from "@/components/checkout/ContractForm"
 import { TERMS_VERSION } from "@/lib/terms"
 import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
-import { paymentsEnabled } from "@/lib/payments/config"
+import { cookies } from "next/headers"
+import { checkoutOpenFor } from "@/lib/payments/access"
+import { checkoutMode, paymentsEnabled } from "@/lib/payments/config"
+import { PILOT_COOKIE } from "@/lib/payments/pilot"
 import { storageWritable } from "@/lib/payments/store"
 import { previewMode } from "@/lib/preview"
 import { legalVisible } from "@/lib/legal"
@@ -23,7 +26,9 @@ export const metadata: Metadata = {
 export default async function ContratarPage({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
   const { plan } = await searchParams
   // Sin pagos habilitados el checkout no existe: se redirige a contacto (nada de solicitudes ni ordenes).
-  if (!paymentsEnabled()) redirect(`/contacto${plan && PLANS.some((p) => p.id === plan) ? `?plan=${plan}` : ""}`)
+  // En modo piloto solo entra quien tiene la cookie firmada; los demas ven lo mismo que con los pagos apagados.
+  const jar = await cookies()
+  if (!paymentsEnabled() || !checkoutOpenFor(`${PILOT_COOKIE}=${jar.get(PILOT_COOKIE)?.value ?? ""}`)) redirect(`/contacto${plan && PLANS.some((p) => p.id === plan) ? `?plan=${plan}` : ""}`)
   const initial = PLANS.some((p) => p.id === plan) ? (plan as string) : "profesional"
   const available = paymentsEnabled() && (previewMode() || (await storageWritable()))
   const options = PLANS.map((p) => ({ id: p.id, name: p.name, priceLabel: p.priceLabel, fixed: p.priceFrom !== null }))
@@ -49,6 +54,7 @@ export default async function ContratarPage({ searchParams }: { searchParams: Pr
             <li>Confirmación</li>
           </ol>
 
+          {checkoutMode() === "pilot" && <p className="bd-banner" role="status"><strong>Prueba productiva controlada.</strong> Acceso restringido: los cobros de esta etapa son reales.</p>}
           <PaymentBrandShowcase variant="checkout" />
 
           {available ? (

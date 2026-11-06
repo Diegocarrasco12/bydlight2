@@ -8,6 +8,7 @@ const CSS = `
 body{background:#08090b;color:#f1f2f4;font-family:Inter,system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center;line-height:1.55}
 .card{width:100%;max-width:440px;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:36px 28px 30px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));display:grid;gap:14px;justify-items:center}
 img{margin:-34px 0 -26px}
+img.wp{margin:0;height:38px;width:auto}
 h1{margin:0;font-size:1.2rem;font-weight:600;letter-spacing:-.01em}
 p{margin:0;color:#a1a5b0;font-size:.93rem}
 .lock{display:inline-flex;align-items:center;gap:8px;color:#a1a5b0;font-size:.82rem;border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:6px 14px}
@@ -29,6 +30,7 @@ export function redirectToWebpayHtml(opts: { url: string; token: string; amountL
   return shell(`<form id="f" class="card" method="post" action="${esc(opts.url)}"><input type="hidden" name="token_ws" value="${esc(opts.token)}">
 <img src="${esc(SITE.logoSmall)}" alt="${esc(SITE.name)}" width="150" height="150">
 <div class="spin" role="progressbar" aria-label="Redirigiendo"></div>
+<img class="wp" src="/img/pagos/webpay-plus-negativo-300.png" srcset="/img/pagos/webpay-plus-negativo-300.png 301w, /img/pagos/webpay-plus-negativo-800.png 800w" sizes="152px" alt="Webpay Plus de Transbank" width="301" height="76">
 <h1>Te llevamos a Webpay Plus para completar el pago</h1>
 ${opts.amountLabel ? `<p>Monto a pagar: <strong style="color:#f1f2f4">${esc(opts.amountLabel)}</strong></p>` : ""}
 <span class="lock">${LOCK} Conexión segura con Transbank</span>
