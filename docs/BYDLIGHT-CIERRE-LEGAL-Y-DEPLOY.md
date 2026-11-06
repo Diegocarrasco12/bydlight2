@@ -63,7 +63,7 @@ Sin cambios: lógica financiera, montos, Transbank, credenciales, `payments.json
 `tsc` limpio · ESLint `src scripts tests` limpio · `npm test` **81/81** (73 + 8 nuevas de cierre legal) · build correcto · `verify:prod` 36/36 · `verify:pilot` 32/32 (se actualizó la versión de términos del script) · 8 páginas × 4 anchos (1440/768/390/320) sin desbordes, sin `[PENDIENTE]`, con RUT de la sociedad y todos los enlaces internos en 200 · Sin secretos en el diff. Pruebas de Webpay/pagos sin cambios (73 previas verdes). El lint completo (`npm run lint`) sigue fallando por la carpeta ajena `bydlightredes/` (no es de este proyecto).
 
 ## 7. SHA del release
-Ver §11 (se registra tras el commit).
+Commit local de código: `a44f90186cb88239b0e77ebd30c61df570952ca8` (rama `feature/rediseno-2026`, **sin push**). Parte de `dfc7fbd0e7a0084532fd24cb2370004c8c8891ee`. El SHA a desplegar será el del commit final que usted autorice publicar (un commit posterior de documentación no cambia el código). Producción actual: `530b95c645fff70b3a2385fbc1ca4c41fe09d423`; anterior estable `df19553c28e0c0c24d3d725e7eae373fa366a00c`.
 
 ## 8. Comandos de despliegue (del runbook `docs/DESPLIEGUE-WEBPAY-UBUNTU.md`, sin cambios; Compose no cambia → sin `accept-compose`)
 ```
