@@ -1,6 +1,6 @@
 # Webpay Plus en producción: informe de cierre del desarrollo, plan de despliegue y prueba real de $50 (2026-11-06)
 
-Estado: **desarrollo y pruebas locales terminados; nada desplegado, nada activado, ningún cobro real.** `payments.json` de producción (`enabled:false`, `adminRefunds:false`, credenciales y secreto instalados) no se toca desde aquí. Este documento reemplaza para este flujo a `WEBPAY-PROCEDIMIENTO-ACTIVACION.md` (fases B–D) y se complementa con `DESPLIEGUE-MANUAL-UBUNTU.md` (respaldo/rollback) y `PAGOS-SQLITE.md`.
+Estado: **desarrollo y pruebas locales terminados; nada desplegado, nada activado, ningún cobro real.** `payments.json` de producción (`enabled:false`, `adminRefunds:false`, credenciales y secreto instalados) no se toca desde aquí. **Procedimiento operativo para copiar y pegar en Ubuntu: `DESPLIEGUE-WEBPAY-UBUNTU.md`** (este documento es la explicación y la evidencia). Reemplaza para este flujo a `WEBPAY-PROCEDIMIENTO-ACTIVACION.md` (fases B–D) y se complementa con `DESPLIEGUE-MANUAL-UBUNTU.md` (respaldo/rollback) y `PAGOS-SQLITE.md`.
 
 ## 1. Qué cambió (resumen)
 | Tema | Antes | Ahora |

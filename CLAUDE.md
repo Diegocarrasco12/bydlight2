@@ -3,7 +3,7 @@
 ## Leer primero
 1. `docs/ESTADO_ACTUAL.md` (dónde quedó el proyecto; SHA desplegado y de rollback).
 2. `docs/PENDIENTES.md`. Detalle: `docs/ARQUITECTURA.md`, `docs/DESPLIEGUE.md`, `docs/DECISIONES_TECNICAS.md`, `docs/CALIDAD_Y_PRUEBAS.md`, `docs/CREDITOS-RECURSOS.md`.
-3. Producción (2026-11-05): el titular desplegó `df19553c28e0c0c24d3d725e7eae373fa366a00c` (refinamiento Signature, sello 13+, legales ocultos; verificado con `status`, salud OK). Rollback: `611353ef1b0db5baf33af0700c5bbac9973ab510` (antes: Fase 6 `611353e`, y `5fef157`). Webpay apagado. Detalle: `docs/ESTADO_ACTUAL.md`, `docs/ENTREGA-FASE6.md`.
+3. Producción (2026-11-06): el titular tiene desplegado `530b95c645fff70b3a2385fbc1ca4c41fe09d423` (volumen `/data`, credenciales y secreto HMAC instalados; `payments.json` con `enabled:false` y devoluciones apagadas). Anterior estable: `df19553c28e0c0c24d3d725e7eae373fa366a00c`. Webpay apagado y checkout público bloqueado por código. El modo piloto y los logos oficiales de Webpay Plus/Transbank están en `origin/main` **sin desplegar**; el titular despliega con `docs/DESPLIEGUE-WEBPAY-UBUNTU.md`. Detalle: `docs/ESTADO_ACTUAL.md`, `docs/PLAN-ACTIVACION-WEBPAY-PRODUCCION.md`.
    Commits posteriores de documentación no implican despliegue. Verificar siempre con `status` antes de afirmar el estado real.
 
 ## Alcance
