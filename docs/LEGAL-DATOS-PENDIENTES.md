@@ -17,14 +17,17 @@ Las 6 páginas legales siguen en borrador y responden 404 en producción (`LEGAL
 | Jurídico | ley aplicable, tribunales y reclamos ⚖; «pendiente de revisión legal» | Abogado | términos |
 
 ## 2. Qué ya está resuelto (aceptación de términos)
-Ítem 18 de la lista anterior: **implementado** casilla propia obligatoria en `/contratar` y en `/orden/<id>` (antes de pagar), validada en el servidor (`src/lib/terms.ts`, `checkTerms`) y registrada como evento `TERMINOS_ACEPTADOS` con versión y contexto (solicitud / pago-anticipo / pago-saldo). Pruebas incluidas (52/52).
+Ítem 18 de la lista anterior: **implementado** casilla propia obligatoria en `/contratar` y en `/orden/<id>` (antes de pagar), validada en el servidor (`src/lib/terms.ts`, `checkTerms`) y registrada como evento `TERMINOS_ACEPTADOS` con versión y contexto (solicitud / pago-anticipo / pago-saldo). Pruebas incluidas.
 - `TERMS_VERSION` es hoy `borrador-2026-11-06`. **Al publicar el texto final hay que cambiarla** (los formularios abiertos con la versión vieja serán rechazados y pedirán recargar).
 - Mientras las páginas legales estén ocultas, la casilla se muestra sin enlaces. **Orden obligatorio:** publicar las páginas legales antes de abrir el checkout al público. Para la compra de prueba de $50 (solo titular) basta el borrador, si usted lo decide.
 
+## 2b. Qué cubre y qué no cubre la prueba piloto de $50
+El modo piloto (`PLAN-ACTIVACION-WEBPAY-PRODUCCION.md`) permite la compra de $50 del titular con las páginas legales todavía ocultas: la casilla de términos aparece sin enlaces y se registra la versión `borrador-2026-11-06`. **No** habilita el checkout para el público: eso exige los textos legales publicados (`LEGAL_PAGES_PUBLISHED=true`), que el código verifica.
+
 ## 3. Bloqueos que no son de texto
-1. **Titularidad del comercio:** el comercio Transbank está registrado a nombre de una persona natural, no de la SpA. Los textos legales deben coincidir con quien cobra. Decidir: ¿se regulariza a nombre de la SpA o se redactan para el titular?
-2. **Logos de marcas** (Webpay Plus, Redcompra, Visa, Mastercard, Amex): ver `WEBPAY-LOGOS-FUENTES.md`. Hoy no se publica ninguno.
-3. **Código de comercio productivo y API Key**: las ingresa usted en el servidor (ver `DESPLIEGUE-MANUAL-UBUNTU.md`, paso 7).
+1. **Titularidad del comercio (bloquea el checkout público, no el piloto):** el comercio Transbank está registrado a nombre de una persona natural, no de la SpA. Los textos legales deben coincidir con quien cobra. Decidir: ¿se regulariza a nombre de la SpA o se redactan para el titular?
+2. **Logos de marcas:** Webpay Plus y Transbank ya están autorizados y publicados. Visa, Mastercard, Amex y Redcompra siguen sin anunciarse hasta que el área comercial de Transbank confirme las marcas habilitadas: ver `WEBPAY-LOGOS-FUENTES.md`.
+3. **Credenciales productivas:** ya están instaladas en el servidor (`payments.json`, 0600); no se vuelven a pedir ni a tocar.
 
 ## 4. Qué hacer cuando entregue los datos
 1. Se incorporan los datos y se eliminan los `[PENDIENTE]`; se muestra el texto final para su aprobación expresa.
