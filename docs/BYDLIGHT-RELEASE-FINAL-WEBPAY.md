@@ -46,7 +46,7 @@ Ver `docs/PRIVACIDAD-MATRIZ-CONSERVACION.md`: datos reales, finalidades, proveed
 `tsc` limpio · ESLint `src scripts tests` limpio · `npm test` **99/99** (81 previas + 18 nuevas R1–R18; una prueba previa se actualizó por los campos nuevos) · build correcto · `verify:prod` 36/36 · `verify:pilot` 32/32 · formulario de contratación sin desborde (1440/390/320) · búsqueda de secretos y de datos personales del solicitante sin hallazgos en `src`, `scripts` y `tests` · `git diff --check` sin errores de espacios. `npm run lint` completo sigue fallando por la carpeta ajena `bydlightredes/` (no modificada). El build muestra una advertencia de tracing de Turbopack (el modo standalone incluye `demos/`); no afecta al funcionamiento; no se comprobó si ya existía antes de estos cambios.
 
 ## 10. SHA final del release
-Ver §15 (se registra tras el commit). HEAD de partida: `1b2442d55776b256d67b8e5325bcc5cb5119295a` (SHA de código del cierre legal: `a44f90186cb88239b0e77ebd30c61df570952ca8`).
+**Commit local de código del release: `41b4c0bac3237e408cad1e80140b6f4f3b26947a`** (rama `feature/rediseno-2026`, sin push). Un commit posterior solo de documentación no cambia el código; el SHA a desplegar es el del último commit que usted autorice publicar (confírmelo con `git rev-parse HEAD`). HEAD de partida: `1b2442d55776b256d67b8e5325bcc5cb5119295a` (SHA de código del cierre legal: `a44f90186cb88239b0e77ebd30c61df570952ca8`).
 
 ## 11. Requisitos pendientes
 1. Configurar el correo (§3) y probar con `mail-test`.
@@ -81,4 +81,4 @@ Prerrequisitos: §11 completos, respaldo vigente, rollback ensayado, correo prob
 Inmediato, sin redeploy: `payments-config-set.mjs … enabled=false` o `access=pilot`; `mail-config-set.mjs … enabled=false`. De código: `sudo bd-run rollback` (versión anterior estable `530b95c…`), luego `verify` y `status`. La migración 4 es aditiva: el código anterior sigue funcionando con la base migrada (las columnas y la tabla nuevas se ignoran). Nunca `down -v` ni borrar el volumen; restaurar el respaldo solo ante corrupción.
 
 ## 15. Registro del release
-(Se completa tras el commit.)
+- Código: `41b4c0bac3237e408cad1e80140b6f4f3b26947a`. Sin push ni despliegue realizados.
