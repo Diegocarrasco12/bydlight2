@@ -2,6 +2,9 @@
 
 Actualizados al cierre del 2026-10-28 (Fase 3 desplegada). **Ninguno debe ejecutarse sin que el titular lo pida**; los que tocan producción, Cloudflare o envían datos reales requieren autorización.
 
+## Habilitación para clientes reales (preparada 2026-11-06, ver `WEBPAY-HABILITACION-PRODUCCION.md`)
+Código listo en el commit local `52e11dd` (sin push). Bloqueos de la activación pública: datos legales y titularidad, marcas de tarjeta, correos transaccionales, documento tributario. Etapa A (despliegue técnico, checkout cerrado) y Etapa B (activación) con su aprobación expresa.
+
 ## Webpay Plus: del despliegue a la activación (2026-11-06)
 1. **Titular:** desplegar con `docs/DESPLIEGUE-WEBPAY-UBUNTU.md` (solo `bd-run`, cobros apagados) y verificar. 2. **Titular:** modo piloto + cotización de prueba ($100, anticipo $50) + **compra real de $50**, y verificar el comprobante. 3. **Información externa:** marcas de tarjeta habilitadas (área comercial de Transbank), datos legales y titularidad del comercio (persona natural vs SpA): `LEGAL-DATOS-PENDIENTES.md`. 4. **Después, con aprobación:** publicar legales, `ONLINE_CHECKOUT_UI=true`, `LEGAL_PAGES_PUBLISHED=true`, despliegue y `access=public`. Devoluciones (`adminRefunds`) siguen apagadas.
 

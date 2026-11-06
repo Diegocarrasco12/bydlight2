@@ -67,4 +67,4 @@ Programar en el servidor (cron/systemd del titular, usando el contenedor efímer
 Sin correos (el cliente debe guardar el código de orden); limitador en memoria y una sola instancia; devoluciones deshabilitadas por decisión (gestión por Transbank/administrador); conciliación manual hasta programar tareas; textos legales y titularidad sin resolver; anuncio ligado a la apertura pública (§7).
 
 ## 11. SHA del release
-Ver `docs/ESTADO_ACTUAL.md` y el informe de entrega (el código de este documento va en el commit local indicado allí; un commit posterior solo de documentación registra el SHA).
+Código y pruebas: commit local `52e11dd6602bf4944aefa26e05448dcb326d1aa7` (sin push; `origin/main` sigue en `5e4599f66e810a2e14dec4a3ce5988e3fdfefb9e`, el desplegado y probado en el piloto). El commit siguiente solo registra este SHA en la documentación; el SHA completo para `fetch`/`build`/`up` es el de `HEAD` de la rama una vez autorizado el push (se informa en ese momento). Sin push ni despliegue hasta su aprobación.
