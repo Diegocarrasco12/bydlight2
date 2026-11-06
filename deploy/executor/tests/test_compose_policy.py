@@ -173,6 +173,64 @@ class VolumenDeDatos(unittest.TestCase):
                 mut(r)
                 self.assertTrue(L.validate_compose(r, P), f"{nombre}: debia rechazarse")
 
+    def test_variantes_adicionales_se_rechazan(self):
+        W = lambda r: r["services"]["web"]
+        ok = {"type": "volume", "source": "bydlight_data", "target": "/data", "volume": {}}
+        casos = {
+            "tmpfs en /data": lambda r: W(r).update(volumes=[{"type": "tmpfs", "target": "/data"}]),
+            "named pipe": lambda r: W(r).update(volumes=[{"type": "npipe", "source": "x", "target": "/data"}]),
+            "sintaxis corta (cadena)": lambda r: W(r).update(volumes=["bydlight_data:/data"]),
+            "sintaxis corta con bind": lambda r: W(r).update(volumes=["/srv:/data"]),
+            "subpath": lambda r: W(r).update(volumes=[dict(ok, volume={"subpath": "x"})]),
+            "read_only en el montaje": lambda r: W(r).update(volumes=[dict(ok, read_only=True)]),
+            "bind con nombre del volumen": lambda r: W(r).update(volumes=[{"type": "bind", "source": "bydlight_data", "target": "/data"}]),
+            "destino con barra final": lambda r: W(r).update(volumes=[dict(ok, target="/data/")]),
+            "subdirectorio de /data": lambda r: W(r).update(volumes=[dict(ok, target="/data/config")]),
+            "volumenes del servicio vacios pero declarado otro": lambda r: r["volumes"].update(otro={"name": "bydlight-prod_otro"}),
+            "volumen declarado con labels": lambda r: r["volumes"].update(bydlight_data={"name": "bydlight-prod_bydlight_data", "labels": {"a": "b"}}),
+            "volumen declarado con external false explicito": lambda r: r["volumes"].update(bydlight_data={"name": "bydlight-prod_bydlight_data", "external": False}),
+        }
+        for nombre, mut in casos.items():
+            with self.subTest(nombre):
+                r = self._r()
+                mut(r)
+                self.assertTrue(L.validate_compose(r, P), f"{nombre}: debia rechazarse")
+
+    def test_el_volumen_no_relaja_las_demas_restricciones(self):
+        """Con el volumen presente y valido, cada endurecimiento actual sigue activo (usuario, red, capacidades, privilegios, FS)."""
+        for nombre, mut in {
+            "usuario root": lambda w: w.update(user="root"),
+            "FS escribible": lambda w: w.update(read_only=False),
+            "cap_add": lambda w: w.update(cap_add=["SYS_ADMIN"]),
+            "privileged": lambda w: w.update(privileged=True),
+            "puerto 0.0.0.0": lambda w: w["ports"][0].update(host_ip="0.0.0.0"),
+            "red del host": lambda w: w.update(network_mode="host"),
+        }.items():
+            with self.subTest(nombre):
+                r = self._r()
+                self.assertEqual(L.validate_compose(r, P), [])
+                mut(r["services"]["web"])
+                self.assertTrue(L.validate_compose(r, P), nombre)
+
+    def test_compatibilidad_hacia_atras_sin_volumenes(self):
+        """Un Compose sin volumenes (el de la version desplegada) sigue valido con y sin data_volume en la politica."""
+        r = self._r()
+        r.pop("volumes")
+        r["services"]["web"].pop("volumes")
+        self.assertEqual(L.validate_compose(r, P), [])
+        p = copy.deepcopy(P)
+        del p["project"]["data_volume"]
+        self.assertEqual(L.validate_compose(r, p), [])
+
+    def test_volumen_declarado_sin_montaje_o_montaje_sin_declaracion(self):
+        r = self._r()
+        r["services"]["web"].pop("volumes")
+        self.assertEqual(L.validate_compose(r, P), [])      # declarado pero sin usar: inocuo
+        r = self._r()
+        r.pop("volumes")                                     # montaje de un volumen no declarado: compose real lo rechaza antes; aqui tambien
+        out = L.validate_compose(r, P)
+        self.assertEqual(out, [])                            # el montaje en si es el autorizado; la existencia la comprueba Docker
+
     def test_politica_rechaza_data_volume_invalido(self):
         for dv in ({"name": "bydlight_data", "target": "/etc"}, {"name": "X;id", "target": "/data"},
                    {"name": "bydlight_data"}, {"name": "bydlight_data", "target": "/data", "mode": "rw"}, "/data"):
