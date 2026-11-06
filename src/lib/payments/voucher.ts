@@ -3,7 +3,9 @@ import type { Attempt, Order, Refund } from "./types"
 // Comprobante de la transaccion. Solo contiene lo que Transbank informo y lo que el servidor guardo:
 // nunca tokens, credenciales ni numero completo de tarjeta. Los campos que Transbank no entrega se omiten.
 
-export const COMMERCE_NAME = "Byd Light Solutions SpA"
+import { COMPANY } from "@/lib/company"
+
+export const COMMERCE_NAME = COMPANY.legalName
 
 /** Codigos de tipo de pago de Webpay Plus (documentacion de Transbank). */
 export function paymentTypeLabel(code?: string): string | undefined {
@@ -50,6 +52,7 @@ export function buildVoucher(order: Order, a: Attempt): Voucher | null {
   if (a.status !== "AUTORIZADO") return null
   const rows: VoucherRow[] = [
     { label: "Comercio", value: COMMERCE_NAME },
+    { label: "RUT del comercio", value: COMPANY.rut },
     { label: "Orden Bydlight", value: order.id },
     { label: "Orden de compra", value: a.buyOrder },
     { label: "Descripción", value: `${order.planName} — ${a.kind === "anticipo" ? "anticipo" : "saldo"}` },

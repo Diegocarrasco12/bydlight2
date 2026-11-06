@@ -44,8 +44,7 @@ export default function LegalPage({
           <article className="bd-legal">
             {!LEGAL_PAGES_PUBLISHED && (
               <p className="bd-draft-banner" role="note">
-                <strong>BORRADOR — pendiente de aprobación.</strong> Este texto aún no es vigente ni ha sido revisado por el titular o un
-                asesor legal. Los datos marcados como <span className="bd-pending">[PENDIENTE]</span> deben completarse antes de publicar.
+                <strong>BORRADOR — pendiente de revisión legal y aprobación del titular.</strong> Este texto aún no es vigente. No constituye asesoría jurídica ni certificación de cumplimiento normativo.
               </p>
             )}
             {children}

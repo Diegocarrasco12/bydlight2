@@ -16,7 +16,7 @@ export default function LegalIndexPage() {
         crumbs={[{ label: "Información legal" }]}
         eyebrow="Información legal"
         title="Información legal y condiciones"
-        lead="Términos, medios de pago, devoluciones, privacidad y soporte de Byd Light Solutions SpA."
+        lead="Términos, medios de pago, devoluciones, privacidad y soporte de Bydlight Solutions SpA."
       />
       <section className="bd-section">
         <div className="bd-container">

@@ -15,6 +15,7 @@ import { amountDue, verifyOrder } from "@/lib/payments/service"
 import { isValidOrderId, readOrder } from "@/lib/payments/store"
 import type { Attempt, Order } from "@/lib/payments/types"
 import { buildVoucher, formatClp, formatWhen } from "@/lib/payments/voucher"
+import { COMPANY } from "@/lib/company"
 import { SITE, whatsappLink } from "@/lib/site"
 
 export const dynamic = "force-dynamic"
@@ -96,7 +97,8 @@ function Result({ a, order }: { a: Attempt; order: Order }) {
           <div className="bd-print-brand" aria-hidden="true">
             <img src={SITE.logoSmall} alt="" width={150} height={150} />
             <div>
-              <strong>Byd Light Solutions SpA</strong>
+              <strong>{COMPANY.legalName}</strong>
+              <span>RUT {COMPANY.rut} · {COMPANY.addressShort}</span>
               <span>{SITE.url.replace("https://", "")} · {SITE.email}</span>
               <span>Comprobante de pago · Orden {order.id}</span>
             </div>
@@ -163,6 +165,7 @@ function PayPanel({
       </div>
       <dl className="bd-sum">
         <div><dt>Concepto</dt><dd>{concept}</dd></div>
+        <div><dt>Proveedor</dt><dd>{COMPANY.legalName} · RUT {COMPANY.rut}</dd></div>
         <div><dt>Medio de pago</dt><dd>Webpay Plus</dd></div>
         <div className="total"><dt>Total a pagar</dt><dd>{clp(amount)}</dd></div>
       </dl>
@@ -268,7 +271,7 @@ export default async function OrdenPage({
             </dl>
             {q.note && <p className="bd-note left">{q.note}</p>}
             <p className="bd-note left">
-              El anticipo ({q.depositPercent}%) da inicio al proyecto; el saldo se habilita en esta página cuando corresponda según el avance.
+              Montos en pesos chilenos (CLP). El anticipo ({q.depositPercent}%) da inicio al proyecto; el saldo se habilita en esta página cuando corresponda según el avance.
             </p>
           </div>
         )}

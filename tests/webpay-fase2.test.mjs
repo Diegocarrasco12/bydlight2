@@ -59,7 +59,7 @@ beforeEach(() => {
 })
 
 const BASE = "http://localhost:3000"
-const solicitud = { planId: "emprendedor", name: "Cliente Prueba", email: "cliente@example.com", message: "Necesito una landing page de prueba", accept: true, acceptTerms: true, termsVersion: "borrador-2026-11-06" }
+const solicitud = { planId: "emprendedor", name: "Cliente Prueba", email: "cliente@example.com", message: "Necesito una landing page de prueba", accept: true, acceptTerms: true, termsVersion: "borrador-2026-11-06-r2" }
 async function newQuoted(amount = 100000) {
   const order = await svc.createOrder(svc.parseSolicitud(solicitud).data)
   const r = await admin.approveQuote(order.id, { amount, depositPercent: 50 })
@@ -251,7 +251,7 @@ test("C1. comprobante del pago aprobado: campos de Transbank, sin tokens ni tarj
   const o = await store.readOrder(id)
   const v = voucher.buildVoucher(o, o.attempts[0])
   const map = Object.fromEntries(v.rows.map((r) => [r.label, r.value]))
-  assert.equal(map["Comercio"], "Byd Light Solutions SpA")
+  assert.equal(map["Comercio"], "Bydlight Solutions SpA")
   assert.equal(map["Orden de compra"], o.attempts[0].buyOrder)
   assert.match(map["Monto pagado"], /50\.000/)
   assert.match(map["Monto pagado"], /CLP/)

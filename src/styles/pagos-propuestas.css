@@ -177,3 +177,9 @@ html:root {
 @media (max-width: 1180px) and (min-width: 901px) { html:root .nb-pay-bar .nb-pay-txt { display: none; } html:root .nb-pay-bar { padding-right: 4px; } }
 @media (max-width: 900px) and (min-width: 641px) { html:root .nb-pay-bar { margin-left: auto; } html:root .bd-header-inner:has(.nb-pay-bar) .bd-burger { margin-left: 0; } html:root .nb-pay-bar .nb-pay-txt { display: inline-flex; } }
 @media (max-width: 640px) { html:root .nb-pay-bar { display: none; } }
+
+/* Identificacion legal del proveedor en el pie de pagina (solo cuando las paginas legales son visibles) */
+html:root {
+  & .bd-footer-legal { flex-basis: 100%; font-size: 0.78rem; line-height: 1.5; color: var(--muted); }
+  & .bd-legal-id { margin-top: 18px; }
+}

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { SITE } from "@/lib/site"
 import { SERVICES } from "@/lib/services"
 import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
+import { COMPANY } from "@/lib/company"
 import { LEGAL_DOCS, legalVisible } from "@/lib/legal"
 
 export default function Footer() {
@@ -68,6 +69,7 @@ export default function Footer() {
 
         <div className="bd-footer-bottom">
           <span>© {new Date().getFullYear()} {SITE.name}. Todos los derechos reservados.</span>
+          {legalVisible() && <span className="bd-footer-legal">{COMPANY.legalName} · RUT {COMPANY.rut} · {COMPANY.address}</span>}
           <PaymentBrandShowcase variant="compact" place="footer" />
         </div>
       </div>

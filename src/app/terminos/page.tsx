@@ -1,51 +1,78 @@
 import type { Metadata } from "next"
-import LegalPage, { Pend } from "@/components/legal/LegalPage"
+import LegalPage from "@/components/legal/LegalPage"
+import { COMPANY } from "@/lib/company"
 import { requireLegalVisible } from "@/lib/legal"
 import { SITE } from "@/lib/site"
 
 export const metadata: Metadata = {
-  title: "Términos y condiciones de contratación (borrador)",
+  title: "Términos y condiciones de contratación",
   robots: { index: false, follow: false },
 }
 
+/**
+ * Texto preparado con datos oficiales de la sociedad y SOLO con reglas implementadas o remitidas a la cotizacion: no fija porcentajes,
+ * plazos, penalizaciones ni garantias que el titular no haya aprobado. Pendiente de revision legal (docs/BYDLIGHT-CIERRE-LEGAL-Y-DEPLOY.md).
+ */
 export default function TerminosPage() {
   requireLegalVisible()
   return (
-    <LegalPage path="/terminos" title="Términos y condiciones de contratación" lead="Cómo se contratan los servicios de Byd Light Solutions SpA.">
+    <LegalPage path="/terminos" title="Términos y condiciones de contratación" lead={`Cómo se contratan los servicios de ${COMPANY.legalName}.`}>
       <h2>1. Quiénes somos</h2>
       <p>
-        Byd Light Solutions SpA (en adelante, «Bydlight»), empresa chilena de ingeniería y desarrollo de software. RUT: <Pend>RUT de la sociedad</Pend>.
-        Domicilio: <Pend>dirección legal</Pend>. Contacto: {SITE.email}.
+        {COMPANY.legalName} (en adelante, «Bydlight»), {COMPANY.type}, RUT {COMPANY.rut}, giro: {COMPANY.activity.toLowerCase()}.
+        Domicilio: {COMPANY.address}. Contacto: <a href={`mailto:${SITE.email}`}>{SITE.email}</a> · WhatsApp {SITE.whatsappDisplay}.
+        Bydlight es contribuyente afecto a IVA.
       </p>
       <h2>2. Servicios</h2>
       <p>
         Desarrollo de sitios web, ecommerce, software a medida, integraciones y consultoría tecnológica, según el plan o la cotización aceptada.
-        El alcance, los entregables y los plazos se detallan por escrito en cada cotización.
+        El alcance, los entregables y los plazos de cada proyecto se detallan por escrito en su cotización.
       </p>
-      <h2>3. Cotización y contratación</h2>
+      <h2>3. Quién contrata y qué ley protege</h2>
+      <p>
+        Estos términos se aplican a toda contratación realizada en este sitio. Cuando quien contrata es un consumidor, conforme a la Ley N° 19.496 sobre
+        Protección de los Derechos de los Consumidores, rigen además sus derechos legales, que ninguna cláusula de estos términos limita ni renuncia
+        (por ejemplo, la información veraz y oportuna, la confirmación escrita del contrato y el derecho de retracto descrito en la
+        <a href="/devoluciones"> Política de cancelación y devoluciones</a>). Cuando quien contrata es una empresa para su actividad, se aplican estos
+        términos y las condiciones de su cotización.
+      </p>
+      <h2>4. Cotización y contratación</h2>
       <ul>
-        <li>Todo proyecto parte con una solicitud y una cotización emitida por Bydlight, con su vigencia indicada.</li>
-        <li>El precio se informa en pesos chilenos (CLP). Tratamiento de IVA: <Pend>confirmar régimen tributario</Pend>.</li>
+        <li>Todo proyecto parte con una solicitud y una cotización emitida por Bydlight, con su vigencia indicada. Una cotización vencida no puede pagarse en línea.</li>
+        <li>Antes de pagar se muestra el servicio, el monto total, el anticipo y el saldo pendiente, el medio de pago y la vigencia.</li>
+        <li>La contratación se perfecciona cuando el cliente acepta expresamente estos términos y paga el anticipo. Bydlight registra la versión de los términos aceptados y la fecha y hora de aceptación.</li>
         <li>Los cambios de alcance se cotizan por separado y requieren aceptación escrita.</li>
       </ul>
-      <h2>4. Precio y forma de pago</h2>
+      <h2>5. Precios, IVA, anticipo y saldo</h2>
       <ul>
-        <li>Se paga un anticipo (porcentaje indicado en la cotización) y un saldo, en las condiciones de la cotización.</li>
-        <li>Los pagos en línea se procesan mediante Webpay Plus (tarjetas de crédito y débito). Bydlight no recibe ni almacena los datos de la tarjeta.</li>
-        <li>Plazo para pagar el saldo y consecuencias del atraso: <Pend>definir</Pend>.</li>
+        <li>Los precios se informan en pesos chilenos (CLP). Los precios de los planes publicados en el sitio se expresan «más IVA». Cada cotización indica el monto total en CLP, el anticipo y el saldo.</li>
+        <li>El anticipo (su porcentaje consta en la cotización) da inicio al proyecto; el saldo se paga en las condiciones de la cotización y se habilita desde la página de la orden.</li>
+        <li>Los pagos en línea se procesan mediante Webpay Plus de Transbank. El número completo y el código de seguridad de la tarjeta se ingresan solo en el sitio de Transbank; Bydlight no los recibe ni los almacena. Bydlight conserva únicamente el resultado de la operación (estado, monto, código de autorización, últimos 4 dígitos y tipo de pago).</li>
+        <li>Comprobantes y documentos tributarios: el comprobante de pago de este sitio acredita la transacción en línea y no reemplaza el documento tributario que corresponda emitir por separado, el cual se emite conforme a la normativa del Servicio de Impuestos Internos y a la modalidad de emisión declarada por Bydlight.</li>
       </ul>
-      <h2>5. Plazos de entrega</h2>
-      <p>Los plazos se acuerdan en la cotización y dependen de la entrega oportuna de contenidos y aprobaciones por parte del cliente. <Pend>definir tratamiento de retrasos</Pend>.</p>
-      <h2>6. Propiedad intelectual</h2>
-      <p>Titularidad y licencia del código, diseños y contenidos entregados: <Pend>definir (cesión, licencia, momento de transferencia)</Pend>.</p>
-      <h2>7. Garantía y soporte posterior</h2>
-      <p>Período y alcance de garantía por errores: <Pend>definir</Pend>. Mantenimiento y soporte: ver <a href="/soporte">Soporte</a>.</p>
-      <h2>8. Cancelación y devoluciones</h2>
+      <h2>6. Plazos de ejecución</h2>
+      <p>Los plazos se acuerdan en la cotización y dependen de la entrega oportuna de contenidos, accesos y aprobaciones por parte del cliente. Si hay retrasos de cualquiera de las partes, se informará por escrito y se acordará un nuevo calendario.</p>
+      <h2>7. Obligaciones del cliente</h2>
+      <p>Entregar información veraz, contenidos y accesos oportunamente; contar con los derechos y licencias sobre los materiales que aporte; y revisar los entregables dentro de los plazos acordados. Más detalle en las <a href="/servicios-digitales">Condiciones de prestación de servicios digitales</a>.</p>
+      <h2>8. Propiedad intelectual y licencias</h2>
+      <p>
+        La titularidad o licencia del código, diseños y contenidos entregados, y el momento en que se transfieren, se establecen en la cotización o contrato del
+        proyecto. Los materiales de terceros y los componentes de código abierto conservan sus propias licencias.
+      </p>
+      <h2>9. Servicios de terceros, hosting y dominios</h2>
+      <p>Cuando un proyecto requiera servicios de terceros (hosting, dominios, correo, pasarelas de pago u otros), la cotización indica quién los contrata y paga. Bydlight no controla ni garantiza la disponibilidad de servicios de terceros.</p>
+      <h2>10. Garantías, soporte y mantenimiento</h2>
+      <p>Rigen las garantías legales que correspondan. La cotización puede establecer garantías o servicios de soporte y mantenimiento adicionales, con su alcance y duración. Ver <a href="/soporte">Contacto y soporte</a>.</p>
+      <h2>11. Cancelación, retracto y devoluciones</h2>
       <p>Ver la <a href="/devoluciones">Política de cancelación y devoluciones</a>.</p>
-      <h2>9. Datos personales</h2>
-      <p>Los datos entregados se usan para gestionar la solicitud y el proyecto. Ver la <a href="/privacidad">Política de privacidad</a> (borrador, <Pend>pendiente de revisión legal</Pend>).</p>
-      <h2>10. Ley aplicable y reclamos</h2>
-      <p>Ley chilena. Tribunales competentes y procedimiento de reclamos: <Pend>validar con asesor legal</Pend>.</p>
+      <h2>12. Datos personales</h2>
+      <p>Los datos entregados se usan para gestionar la solicitud, el proyecto y los pagos. Ver la <a href="/privacidad">Política de privacidad</a>.</p>
+      <h2>13. Ley aplicable y reclamos</h2>
+      <p>
+        Estos términos se rigen por la ley chilena. Puedes escribirnos a <a href={`mailto:${SITE.email}`}>{SITE.email}</a> con el código de tu orden para cualquier reclamo; lo
+        revisaremos y responderemos por escrito. Si eres consumidor, conservas el derecho de recurrir al Servicio Nacional del Consumidor y a los tribunales competentes
+        conforme a la ley.
+      </p>
     </LegalPage>
   )
 }

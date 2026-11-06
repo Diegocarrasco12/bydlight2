@@ -3,6 +3,8 @@ import Link from "next/link"
 import PageHero from "@/components/layout/PageHero"
 import ContactForm from "@/components/contact/ContactForm"
 import JsonLd from "@/components/seo/JsonLd"
+import { COMPANY } from "@/lib/company"
+import { legalVisible } from "@/lib/legal"
 import { SITE, absoluteUrl, whatsappLink } from "@/lib/site"
 import { breadcrumbLd, pageMetadata } from "@/lib/seo"
 
@@ -62,6 +64,11 @@ export default function ContactoPage() {
             <p className="bd-note left">
               ¿Ya sabes qué plan necesitas? <Link href="/planes" prefetch={false}>Mira los planes y precios</Link>.
             </p>
+            {legalVisible() && (
+              <p className="bd-note left bd-legal-id">
+                {COMPANY.legalName} · RUT {COMPANY.rut}<br />{COMPANY.address}
+              </p>
+            )}
           </div>
           <ContactForm />
         </div>
