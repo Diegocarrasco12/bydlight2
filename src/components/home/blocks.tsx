@@ -1,4 +1,5 @@
 import Link from "next/link"
+import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
 import ContactForm from "@/components/contact/ContactForm"
 import { ProjectFeature, ProjectGrid } from "@/components/portfolio/Portfolio"
 import { SERVICES } from "@/lib/services"
@@ -28,19 +29,27 @@ const HOME_SERVICES = [
   "arquitectura-de-software",
 ]
 
-// Ilustracion decorativa (no es codigo real): barras que pasan de "plano" a interfaz.
-function Blueprint() {
-  const rows = [78, 52, 66, 38, 58, 44]
+// Renders 3D originales (three.js, ver scripts/renders3d/): imagenes estaticas AVIF/WebP en dos anchos, con dimensiones
+// reservadas. Son ilustraciones: no muestran clientes ni resultados reales.
+const RENDERS: Record<string, { file: string; w: number; h: number; small: number; sizes: string }> = {
+  "software-a-medida": { file: "software", w: 1200, h: 1100, small: 672, sizes: "(min-width: 1001px) 560px, (min-width: 641px) 90vw, 100vw" },
+  "desarrollo-web": { file: "web", w: 1000, h: 520, small: 560, sizes: "(min-width: 1001px) 400px, (min-width: 641px) 46vw, 100vw" },
+  "aplicaciones-moviles": { file: "moviles", w: 1000, h: 520, small: 560, sizes: "(min-width: 1001px) 400px, (min-width: 641px) 46vw, 100vw" },
+  "integraciones-y-apis": { file: "integraciones", w: 1000, h: 560, small: 560, sizes: "(min-width: 1001px) 480px, (min-width: 641px) 90vw, 100vw" },
+  "automatizacion-de-procesos": { file: "automatizacion", w: 800, h: 600, small: 448, sizes: "(min-width: 1001px) 250px, (min-width: 641px) 46vw, 100vw" },
+  "arquitectura-de-software": { file: "arquitectura", w: 800, h: 600, small: 448, sizes: "(min-width: 1001px) 250px, (min-width: 641px) 46vw, 100vw" },
+}
+
+function Render({ slug, priority }: { slug: string; priority?: boolean }) {
+  const r = RENDERS[slug]
+  if (!r) return null
+  const set = (ext: string) => `/img/servicios3d/${r.file}-${r.small}.${ext} ${r.small}w, /img/servicios3d/${r.file}-${r.w}.${ext} ${r.w}w`
   return (
-    <div className="bp" aria-hidden="true">
-      <div className="bp-code">
-        {rows.map((w, i) => <i key={i} style={{ width: `${w}%` }} data-c={i % 3} />)}
-      </div>
-      <div className="bp-ui">
-        <b />
-        <span><i /><i /><i /></span>
-      </div>
-    </div>
+    <picture className="bx-media">
+      <source type="image/avif" srcSet={set("avif")} sizes={r.sizes} />
+      <source type="image/webp" srcSet={set("webp")} sizes={r.sizes} />
+      <img src={`/img/servicios3d/${r.file}-${r.w}.webp`} width={r.w} height={r.h} alt="" loading={priority ? "eager" : "lazy"} decoding="async" style={{ aspectRatio: `${r.w} / ${r.h}` }} />
+    </picture>
   )
 }
 
@@ -53,19 +62,25 @@ export function Capabilities() {
           <span className="bd-eyebrow">Capacidades</span>
           <h2 id="cap-title" className="bd-h2">Lo que construimos</h2>
         </div>
-        <div className="bento">
-          {items.map((s, i) => (
-            <Link key={s.slug} href={`/servicios/${s.slug}`} prefetch={false} className={`bento-tile t${i + 1} rv`}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                {ICONS[s.slug]}
-              </svg>
-              <h3>{s.name}</h3>
-              <p>{s.short}</p>
-              {i === 0 && <Blueprint />}
-              <span className="more" aria-hidden="true">→</span>
-            </Link>
-          ))}
+        <div className="bx-grid">
+          {items.map((s, i) => {
+            return (
+              <Link key={s.slug} href={`/servicios/${s.slug}`} prefetch={false} className={`bx bx-${i + 1}${i === 0 ? " bx-main" : ""} rv`}>
+                <span className="bx-top">
+                  <span className="bx-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONS[s.slug]}</svg>
+                  </span>
+                  <span className="bx-num" aria-hidden="true">{i === 0 ? "Servicio principal" : `0${i + 1}`}</span>
+                </span>
+                <h3>{s.name}</h3>
+                <p>{s.short}</p>
+                <span className="bx-more">Ver servicio <span aria-hidden="true">→</span></span>
+                <Render slug={s.slug} />
+              </Link>
+            )
+          })}
         </div>
+        <p className="bx-note">Imágenes ilustrativas renderizadas por Bydlight: no muestran clientes, datos ni resultados reales.</p>
       </div>
     </section>
   )
@@ -287,6 +302,7 @@ export function PlansTeaser() {
           </div>
           <Link href="/planes" prefetch={false} className="bd-btn bd-btn-ghost">Ver planes y precios</Link>
         </div>
+        <PaymentBrandShowcase />
       </div>
     </section>
   )

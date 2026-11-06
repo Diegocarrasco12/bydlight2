@@ -21,6 +21,7 @@ const admin = await import("../src/lib/payments/adminOps.ts")
 const auth = await import("../src/lib/payments/adminAuth.ts")
 const cfg = await import("../src/lib/payments/config.ts")
 const { MIGRATIONS } = await import("../src/lib/payments/migrations.mjs")
+const { TERMS_VERSION, checkTerms } = await import("../src/lib/terms.ts")
 
 const calls = { create: 0, commit: 0, status: 0 }
 let counter = 0
@@ -56,6 +57,8 @@ const solicitud = {
   email: "cliente@example.com",
   message: "Necesito una landing page de prueba",
   accept: true,
+  acceptTerms: true,
+  termsVersion: TERMS_VERSION,
 }
 async function newQuoted(amount = 149990) {
   const parsed = svc.parseSolicitud(solicitud)
@@ -392,7 +395,7 @@ test("17. solicitudes: validacion y campos de precio del cliente ignorados", () 
   assert.equal(svc.parseSolicitud({ ...solicitud, message: "corto" }).ok, false)
   const p = svc.parseSolicitud({ ...solicitud, amount: 1, quote: { amount: 1 }, stage: "COTIZADA" })
   assert.ok(p.ok)
-  assert.deepEqual(Object.keys(p.data).sort(), ["company", "email", "message", "name", "phone", "planId"])
+  assert.deepEqual(Object.keys(p.data).sort(), ["company", "email", "message", "name", "phone", "planId", "termsVersion"])
 })
 
 test("17b. solicitudes: la casilla sigue siendo obligatoria y su mensaje no habla de terminos legales", () => {
@@ -403,4 +406,39 @@ test("17b. solicitudes: la casilla sigue siendo obligatoria y su mensaje no habl
     assert.doesNotMatch(r.errors.join(" "), /condiciones de contrataci/)
   }
   for (const accept of [true, "on", "true"]) assert.equal(svc.parseSolicitud({ ...solicitud, accept }).ok, true)
+})
+
+test("T1. terminos: la solicitud exige la casilla y la version vigente, validado en servidor", () => {
+  for (const acceptTerms of [undefined, false, "", "no", 0]) {
+    const r = svc.parseSolicitud({ ...solicitud, acceptTerms })
+    assert.equal(r.ok, false)
+    assert.match(r.errors.join(" "), /aceptar los términos de contratación/)
+  }
+  const old = svc.parseSolicitud({ ...solicitud, termsVersion: "version-antigua" })
+  assert.equal(old.ok, false)
+  assert.match(old.errors.join(" "), /fueron actualizados/)
+  assert.equal(svc.parseSolicitud({ ...solicitud, termsVersion: undefined }).ok, false)
+  for (const acceptTerms of [true, "on", "true"]) assert.equal(svc.parseSolicitud({ ...solicitud, acceptTerms }).ok, true)
+  assert.equal(checkTerms(true, TERMS_VERSION), null)
+})
+
+test("T2. terminos: la version aceptada queda registrada en la orden al solicitar y al iniciar cada pago", async () => {
+  const id = await newQuoted()
+  let order = await store.readOrder(id)
+  const sol = order.events.filter((e) => e.type === "TERMINOS_ACEPTADOS")
+  assert.equal(sol.length, 1)
+  assert.equal(sol[0].detail, `version=${TERMS_VERSION};ctx=solicitud`)
+  const s = await svc.startPayment(id, "anticipo", BASE, { accepted: true })
+  assert.ok(s.ok)
+  order = await store.readOrder(id)
+  const pay = order.events.filter((e) => e.type === "TERMINOS_ACEPTADOS")
+  assert.equal(pay.length, 2)
+  assert.equal(pay[1].detail, `version=${TERMS_VERSION};ctx=pago-anticipo`)
+})
+
+test("T3. terminos: la ruta de inicio de pago rechaza sin aceptacion antes de llamar a Transbank", async () => {
+  const src = (await import("node:fs")).readFileSync(new URL("../src/app/api/pagos/iniciar/route.ts", import.meta.url), "utf8")
+  const check = src.indexOf("checkTerms(")
+  const start = src.indexOf("await startPayment(")
+  assert.ok(check > 0 && start > check, "checkTerms debe ejecutarse antes de startPayment")
 })

@@ -5,9 +5,13 @@ import "../styles/design.css"
 import "../styles/fase2.css"
 import "../styles/signature.css"
 import "../styles/refine.css"
+import "../styles/pagos.css"
+import "../styles/bento.css"
+import "../styles/perf.css"
 import Navbar from "../components/navbar/Navbar"
 import Footer from "../components/footer/Footer"
 import JsonLd from "../components/seo/JsonLd"
+import PreviewBar from "../components/payments/PreviewBar"
 import { SITE, absoluteUrl } from "../lib/site"
 
 // Tipografias de Bydlight Signature (autoalojadas por next/font; licencia SIL OFL 1.1, uso comercial permitido).
@@ -104,6 +108,7 @@ export default function RootLayout({
       <body>
         <a href="#contenido" className="bd-skip">Saltar al contenido</a>
         <JsonLd data={organization} />
+        <PreviewBar />
         <Navbar />
         <main id="contenido" className="bd-main">{children}</main>
         <Footer />

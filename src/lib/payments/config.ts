@@ -8,6 +8,7 @@ import {
   Options,
   WebpayPlus,
 } from "transbank-sdk"
+import { previewMode } from "@/lib/preview"
 
 // Solo el servidor importa este modulo ("server-only"): las credenciales nunca llegan al navegador.
 //
@@ -62,6 +63,7 @@ export function resetConfigCache() {
  * dos fuentes apaga todo.
  */
 export function paymentsEnabled(): boolean {
+  if (previewMode()) return true // vista previa local con datos de demostracion (nunca en produccion)
   const flag = process.env.PAYMENTS_ENABLED
   if (flag === "false") return false
   const fileFlag = fileConfig().enabled
@@ -73,6 +75,7 @@ export function paymentsEnabled(): boolean {
 export type TbkMode = "integration" | "production"
 
 export function tbkMode(): TbkMode {
+  if (previewMode()) return "integration" // la vista previa nunca usa produccion
   const v = process.env.TBK_ENV ?? fileConfig().env
   return v === "production" ? "production" : "integration"
 }
@@ -85,6 +88,8 @@ function tbkCredentials() {
 }
 
 export function createTransaction() {
+  // Defensa en profundidad: en vista previa no existe ninguna transaccion posible, ni de integracion.
+  if (previewMode()) throw new Error("Vista previa: los pagos estan simulados y no se comunican con Transbank")
   if (tbkMode() === "production") {
     const { code, key } = tbkCredentials()
     if (!code || !key) {

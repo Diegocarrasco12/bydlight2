@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function PrivacidadPage() {
   requireLegalVisible()
   return (
-    <LegalPage title="Política de privacidad" lead="Qué datos recogemos, para qué y con quién se comparten.">
+    <LegalPage path="/privacidad" title="Política de privacidad" lead="Qué datos recogemos, para qué y con quién se comparten.">
       <h2>1. Responsable</h2>
       <p>
         Byd Light Solutions SpA. RUT: <Pend>RUT de la sociedad</Pend>. Domicilio: <Pend>dirección legal</Pend>. Contacto: {SITE.email}.

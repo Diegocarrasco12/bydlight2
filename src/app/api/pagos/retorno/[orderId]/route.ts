@@ -2,6 +2,7 @@ import { paymentsEnabled } from "@/lib/payments/config"
 import { redirectTo } from "@/lib/payments/http"
 import { handleReturn, type ReturnParams } from "@/lib/payments/service"
 import { isValidOrderId } from "@/lib/payments/store"
+import { previewMode } from "@/lib/preview"
 
 export const dynamic = "force-dynamic"
 
@@ -11,7 +12,7 @@ const clean = (v: unknown) => (typeof v === "string" && /^[\w-]{1,100}$/.test(v)
 
 async function handle(req: Request, orderId: string, params: URLSearchParams | FormData) {
   if (!isValidOrderId(orderId)) return redirectTo("/orden")
-  if (paymentsEnabled()) {
+  if (paymentsEnabled() && !previewMode()) {
     const p: ReturnParams = {
       tokenWs: clean(params.get("token_ws")),
       tbkToken: clean(params.get("TBK_TOKEN")),

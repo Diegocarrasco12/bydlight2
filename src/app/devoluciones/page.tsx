@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function DevolucionesPage() {
   requireLegalVisible()
   return (
-    <LegalPage title="Política de cancelación y devoluciones" lead="Qué ocurre si cancelas o si un pago debe devolverse.">
+    <LegalPage path="/devoluciones" title="Política de cancelación y devoluciones" lead="Qué ocurre si cancelas o si un pago debe devolverse.">
       <h2>1. Cancelación antes de iniciar el trabajo</h2>
       <p>Plazo y porcentaje de devolución del anticipo si se cancela antes de comenzar: <Pend>definir</Pend>.</p>
       <h2>2. Cancelación con trabajo en curso</h2>

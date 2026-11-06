@@ -88,9 +88,21 @@ try {
   check("La 404 (tambien la de /orden) esta en espanol, con marca y sin mencionar pagos", nf.status === 404 && nfHtml.includes("No encontramos esa página") && !/could not be found/i.test(nfHtml) && !/webpay|transbank|pago/i.test(nfHtml.replace(/<script[\s\S]*?<\/script>/g, "")))
 
   // --- Paginas legales en borrador ---
-  for (const p of ["/terminos", "/devoluciones", "/soporte", "/servicios-digitales", "/privacidad", "/informacion-comercial"]) {
+  for (const p of ["/terminos", "/devoluciones", "/soporte", "/servicios-digitales", "/privacidad", "/informacion-comercial", "/legal"]) {
     const r = await req(p, { headers: ip() })
     check(`GET ${p} (borrador) no se publica`, r.status === 404, `HTTP ${r.status}`)
+  }
+
+  // --- Vista previa local: no existe en produccion ---
+  {
+    const r = await req("/vista-previa", { headers: ip() })
+    check("GET /vista-previa (solo desarrollo) no existe en produccion", r.status === 404, `HTTP ${r.status}`)
+  }
+  {
+    for (const f of ["webpay-plus.png", "visa.svg", "mastercard.svg"]) {
+      const r = await req(`/vista-previa/logos/${f}`, { headers: ip() })
+      check(`GET /vista-previa/logos/${f}: marcas no verificadas no se sirven en produccion`, r.status === 404, `HTTP ${r.status}`)
+    }
   }
 
   // --- Solicitudes y pagos ---

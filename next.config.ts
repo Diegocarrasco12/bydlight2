@@ -10,6 +10,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Imagen Docker minima (ver Dockerfile): genera .next/standalone con server.js.
   output: "standalone",
+  // Marcas de pago pendientes de autorizacion y fuentes de renders: nunca deben viajar en la imagen de produccion.
+  outputFileTracingExcludes: { "/*": ["./assets-pendientes/**/*", "./assets-fuente/**/*"] },
   poweredByHeader: false,
   async headers() {
     // Paginas de ordenes y API: nunca en cache, sin indexar y sin enviar el codigo de la orden como Referer a otros sitios (same-origin: el navegador si envia Origin en sus propios formularios).

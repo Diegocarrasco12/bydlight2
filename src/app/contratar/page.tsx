@@ -2,8 +2,12 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import ContractForm from "@/components/checkout/ContractForm"
+import { TERMS_VERSION } from "@/lib/terms"
+import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
 import { paymentsEnabled } from "@/lib/payments/config"
 import { storageWritable } from "@/lib/payments/store"
+import { previewMode } from "@/lib/preview"
+import { legalVisible } from "@/lib/legal"
 import { PLANS, PRICE_NOTE } from "@/lib/plans"
 import { whatsappLink } from "@/lib/site"
 
@@ -21,7 +25,7 @@ export default async function ContratarPage({ searchParams }: { searchParams: Pr
   // Sin pagos habilitados el checkout no existe: se redirige a contacto (nada de solicitudes ni ordenes).
   if (!paymentsEnabled()) redirect(`/contacto${plan && PLANS.some((p) => p.id === plan) ? `?plan=${plan}` : ""}`)
   const initial = PLANS.some((p) => p.id === plan) ? (plan as string) : "profesional"
-  const available = paymentsEnabled() && (await storageWritable())
+  const available = paymentsEnabled() && (previewMode() || (await storageWritable()))
   const options = PLANS.map((p) => ({ id: p.id, name: p.name, priceLabel: p.priceLabel, fixed: p.priceFrom !== null }))
 
   return (
@@ -32,7 +36,7 @@ export default async function ContratarPage({ searchParams }: { searchParams: Pr
             <Link href="/" prefetch={false}>Inicio</Link> / <Link href="/planes" prefetch={false}>Planes</Link> / Solicitar
           </nav>
           <h1>Solicitar un plan</h1>
-          <p className="bd-lead">Elegir plan → Solicitar → Confirmar cotización → Pagar anticipo → Recibir confirmación.</p>
+          <p className="bd-lead">Elige tu plan, solicita tu cotización y paga el anticipo de forma segura con Webpay Plus.</p>
         </div>
       </section>
 
@@ -41,12 +45,14 @@ export default async function ContratarPage({ searchParams }: { searchParams: Pr
           <ol className="bd-flow" aria-label="Pasos de la contratación">
             <li className="on">Solicitud</li>
             <li>Cotización</li>
-            <li>Anticipo</li>
+            <li>Pago</li>
             <li>Confirmación</li>
           </ol>
 
+          <PaymentBrandShowcase variant="checkout" />
+
           {available ? (
-            <ContractForm plans={options} initialPlan={initial} />
+            <ContractForm plans={options} initialPlan={initial} termsVersion={TERMS_VERSION} legalLinks={legalVisible()} />
           ) : (
             <div className="bd-panel">
               <h2>Solicitudes en línea no disponibles por ahora</h2>

@@ -1,0 +1,66 @@
+/* ==========================================================================
+   BYDLIGHT SIGNATURE · «Lo que construimos» en Bento tecnologico (2026-11-06). Se carga despues de pagos.css.
+   Clases propias (.bx-*): no depende de las reglas de lista editorial anteriores (.bento-tile).
+   ========================================================================== */
+html:root {
+  & .bx-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+  & .bx { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; gap: 12px; padding: 28px; min-height: 230px; color: var(--text);
+    border: 1px solid var(--line-2); border-radius: 20px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset; transition: border-color 0.35s, transform 0.35s, box-shadow 0.35s; }
+  /* Luz de esquina + trama tecnica */
+  & .bx::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; transition: opacity 0.4s, transform 0.6s;
+    background: radial-gradient(360px 220px at 100% 0%, rgba(255, 138, 61, 0.16), transparent 70%), linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 100% 36px;
+    -webkit-mask-image: linear-gradient(200deg, #000, transparent 75%); mask-image: linear-gradient(200deg, #000, transparent 75%); opacity: 0.55; }
+  & .bx::after { content: ""; position: absolute; left: 24px; right: 24px; top: -1px; height: 1px; background: linear-gradient(90deg, transparent, var(--orange), transparent); opacity: 0; transition: opacity 0.4s; }
+  & .bx:hover, & .bx:focus-visible { border-color: rgba(255, 171, 112, 0.5); transform: translateY(-4px); box-shadow: 0 26px 50px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 138, 61, 0.12); }
+  & .bx:hover::before { opacity: 1; transform: scale(1.06); }
+  & .bx:hover::after { opacity: 0.9; }
+  & .bx-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  & .bx-ico { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 16px; color: var(--orange-2); border: 1px solid rgba(255, 171, 112, 0.35);
+    background: linear-gradient(160deg, rgba(255, 138, 61, 0.18), rgba(255, 138, 61, 0.04)); transition: transform 0.35s, background 0.35s; }
+  & .bx-ico svg { width: 28px; height: 28px; }
+  & .bx:hover .bx-ico { transform: scale(1.07) rotate(-4deg); background: linear-gradient(160deg, rgba(255, 138, 61, 0.3), rgba(255, 138, 61, 0.08)); }
+  & .bx-num { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  & .bx-main .bx-num { color: var(--orange-2); padding: 5px 11px; border: 1px solid rgba(255, 171, 112, 0.4); border-radius: 999px; background: rgba(255, 138, 61, 0.08); }
+  & .bx h3 { font-family: var(--display); font-weight: 500; font-size: 1.3rem; letter-spacing: -0.025em; line-height: 1.15; margin: 8px 0 0; }
+  & .bx p { margin: 0; color: var(--muted); font-size: 0.95rem; line-height: 1.55; max-width: 46ch; }
+  & .bx-more { margin-top: auto; padding-top: 6px; font-size: 0.86rem; color: var(--muted); display: inline-flex; gap: 6px; transition: color 0.25s; }
+  & .bx-more span { transition: transform 0.25s; }
+  & .bx:hover .bx-more { color: var(--orange-2); }
+  & .bx:hover .bx-more span { transform: translateX(4px); }
+
+  /* Posiciones (escritorio, 12 columnas): principal grande + dos a la derecha; fila inferior 6/3/3 */
+  & .bx-1 { grid-column: span 7; grid-row: span 2; padding: 36px; }
+  & .bx-2 { grid-column: span 5; }
+  & .bx-3 { grid-column: span 5; }
+  & .bx-4 { grid-column: span 6; }
+  & .bx-5 { grid-column: span 3; }
+  & .bx-6 { grid-column: span 3; }
+  & .bx-main h3 { font-size: clamp(1.7rem, 2.6vw, 2.3rem); letter-spacing: -0.035em; max-width: 18ch; }
+  & .bx-main p { font-size: 1.02rem; max-width: 50ch; }
+
+  /* Renders 3D: imagen al pie de la tarjeta, a sangre, con fundido hacia el texto. Dimensiones reservadas (aspect-ratio). */
+  & .bx-more { margin-top: 4px; padding-top: 0; }
+  & .bx-media { display: block; margin: auto -28px -28px; flex: 1 1 auto; min-height: 0; position: relative; overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 26%); mask-image: linear-gradient(180deg, transparent 0, #000 26%); }
+  & .bx-media img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); transform-origin: 60% 60%; }
+  & .bx:hover .bx-media img { transform: scale(1.045); }
+  & .bx-1 .bx-media { margin: auto -36px -36px; }
+  & .bx-note { margin: 18px 0 0; font-size: 0.78rem; color: var(--muted); }
+}
+
+@media (max-width: 1000px) {
+  html:root .bx-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html:root .bx-1, html:root .bx-4 { grid-column: span 2; grid-row: auto; }
+  html:root .bx-2, html:root .bx-3, html:root .bx-5, html:root .bx-6 { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  html:root .bx-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  html:root .bx-1, html:root .bx-4, html:root .bx-2, html:root .bx-3, html:root .bx-5, html:root .bx-6 { grid-column: auto; }
+  html:root .bx, html:root .bx-1 { padding: 22px; min-height: 0; }
+  html:root .bx-media, html:root .bx-1 .bx-media { margin: 6px -22px -22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:root .bx, html:root .bx *, html:root .bx::before, html:root .bx::after { transition: none !important; }
+  html:root .bx:hover, html:root .bx:hover * { transform: none !important; }
+}

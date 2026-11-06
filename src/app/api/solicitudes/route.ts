@@ -2,11 +2,16 @@ import { paymentsEnabled } from "@/lib/payments/config"
 import { clientIp, json, rateLimited, sameOrigin } from "@/lib/payments/http"
 import { createOrder, parseSolicitud } from "@/lib/payments/service"
 import { storageWritable } from "@/lib/payments/store"
+import { previewMode } from "@/lib/preview"
 
 export const dynamic = "force-dynamic"
 
 export async function POST(req: Request) {
   if (!sameOrigin(req)) return json({ error: "Origen no permitido." }, 403)
+  if (previewMode()) {
+    // Vista previa: la solicitud NO se guarda ni se envia; se devuelve una orden de demostracion.
+    return json({ id: "DEMOSOLICITA" }, 201)
+  }
   if (!paymentsEnabled() || !(await storageWritable())) {
     return json({ error: "Las solicitudes en línea no están disponibles por ahora. Escríbenos por WhatsApp." }, 503)
   }

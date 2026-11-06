@@ -1,3 +1,4 @@
+import { previewMode } from "@/lib/preview"
 // Planes y precios de referencia (CLP). Fuente unica: la pagina de planes, el home,
 // los datos estructurados y el sitemap leen de aqui.
 //
@@ -254,9 +255,14 @@ export const COMPARISON_ROWS: { label: string; key: keyof Plan["limits"] }[] = [
  */
 export const ONLINE_CHECKOUT_UI = false
 
+/** La vista previa local (BD_PREVIEW=1, solo desarrollo) muestra la interfaz de contratacion; produccion solo con la bandera. */
+function checkoutUiVisible() {
+  return ONLINE_CHECKOUT_UI || previewMode()
+}
+
 /** Destino del boton «Solicitar este plan». */
 export function planHref(planId: string) {
-  return ONLINE_CHECKOUT_UI ? `/contratar?plan=${planId}` : `/contacto?plan=${planId}`
+  return checkoutUiVisible() ? `/contratar?plan=${planId}` : `/contacto?plan=${planId}`
 }
 
 export function planWhatsappMessage(plan: Plan) {

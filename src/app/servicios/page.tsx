@@ -3,6 +3,7 @@ import PageHero from "@/components/layout/PageHero"
 import { FinalCta } from "@/components/home/sections"
 import { ServicesByCategory } from "@/components/home/enterprise"
 import JsonLd from "@/components/seo/JsonLd"
+import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
 import { breadcrumbLd, pageMetadata } from "@/lib/seo"
 
 export const metadata: Metadata = pageMetadata({
@@ -23,6 +24,7 @@ export default function ServiciosPage() {
         lead="Desde un sitio con precio definido hasta ERP, plataformas SaaS y sistemas empresariales con cotización a medida."
       />
       <ServicesByCategory />
+      <div className="bd-container"><PaymentBrandShowcase variant="compact" /></div>
       <FinalCta />
     </>
   )

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function TerminosPage() {
   requireLegalVisible()
   return (
-    <LegalPage title="Términos y condiciones de contratación" lead="Cómo se contratan los servicios de Byd Light Solutions SpA.">
+    <LegalPage path="/terminos" title="Términos y condiciones de contratación" lead="Cómo se contratan los servicios de Byd Light Solutions SpA.">
       <h2>1. Quiénes somos</h2>
       <p>
         Byd Light Solutions SpA (en adelante, «Bydlight»), empresa chilena de ingeniería y desarrollo de software. RUT: <Pend>RUT de la sociedad</Pend>.

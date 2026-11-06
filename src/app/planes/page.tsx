@@ -4,6 +4,7 @@ import PageHero from "@/components/layout/PageHero"
 import { Faq, FinalCta, MaintenanceBlock, PlanComparison, PlansGrid } from "@/components/home/sections"
 import { PLANS, PLANS_FAQ } from "@/lib/plans"
 import { absoluteUrl } from "@/lib/site"
+import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
 import { WEBPAY_PLANS_NOTE, webpayAnnounced } from "@/lib/payments/availability"
 import { pageMetadata } from "@/lib/seo"
 
@@ -55,6 +56,7 @@ export default function PlanesPage() {
         lead="Cada plan indica páginas, revisiones y plazos por escrito. Para proyectos más complejos, cotización a medida."
       />
       <PlansGrid showHead={false} />
+      <div className="bd-container"><PaymentBrandShowcase /></div>
       <PlanComparison />
       {/* El mensaje de Webpay solo aparece si el checkout esta habilitado (ver lib/payments/availability.ts). */}
       <MaintenanceBlock extraRules={webpayAnnounced() ? [WEBPAY_PLANS_NOTE] : []} />

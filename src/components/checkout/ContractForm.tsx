@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 
 type PlanOption = { id: string; name: string; priceLabel: string; fixed: boolean }
 
-export default function ContractForm({ plans, initialPlan }: { plans: PlanOption[]; initialPlan: string }) {
+export default function ContractForm({ plans, initialPlan, termsVersion, legalLinks }: { plans: PlanOption[]; initialPlan: string; termsVersion: string; legalLinks: boolean }) {
   const router = useRouter()
   const [planId, setPlanId] = useState(initialPlan)
   const [busy, setBusy] = useState(false)
@@ -24,6 +24,8 @@ export default function ContractForm({ plans, initialPlan }: { plans: PlanOption
       company: f.get("company"),
       message: f.get("message"),
       accept: f.get("accept") === "on",
+      acceptTerms: f.get("acceptTerms") === "on",
+      termsVersion,
       website: f.get("website"),
     }
     try {
@@ -99,6 +101,17 @@ export default function ContractForm({ plans, initialPlan }: { plans: PlanOption
         <span>
           Entiendo que esto es una <strong>solicitud</strong>: Bydlight revisará requisitos y disponibilidad y me
           enviará una cotización. El pago del anticipo solo se habilita una vez aprobada la cotización.
+        </span>
+      </label>
+
+      <label className="bd-check">
+        <input type="checkbox" name="acceptTerms" required />
+        <span>
+          {legalLinks ? (
+            <>Acepto los <a href="/terminos" target="_blank" rel="noopener">términos de contratación</a> y la <a href="/privacidad" target="_blank" rel="noopener">política de privacidad</a>.</>
+          ) : (
+            <>Acepto los términos de contratación y la política de privacidad.</>
+          )}
         </span>
       </label>
 

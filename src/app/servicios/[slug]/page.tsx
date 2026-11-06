@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import JsonLd from "@/components/seo/JsonLd"
@@ -23,6 +24,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!s) return {}
   return pageMetadata({ title: s.metaTitle, description: s.metaDescription, path: `/servicios/${s.slug}` })
 }
+
+// Servicios con planes de precio definido (los demas se cotizan a medida y no muestran la franja de pagos).
+const PAYABLE_SLUGS = new Set(["desarrollo-web", "ecommerce", "mantenimiento-web"])
 
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -160,6 +164,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
+      {PAYABLE_SLUGS.has(s.slug) && <div className="bd-container"><PaymentBrandShowcase variant="compact" /></div>}
       <Faq items={faqs} title={`Preguntas sobre ${s.name.toLowerCase().replace(/erp/, "ERP").replace(/saas/, "SaaS")}`} />
       <FinalCta />
     </>

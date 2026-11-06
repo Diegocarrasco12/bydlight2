@@ -29,3 +29,6 @@ __pycache__/
 .claude/
 .codex/
 *.tsbuildinfo
+
+# marcas de pago pendientes de autorizacion (no versionar)
+assets-pendientes/

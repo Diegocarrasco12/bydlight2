@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function InformacionComercialPage() {
   requireLegalVisible()
   return (
-    <LegalPage title="Información comercial y medios de pago" lead="Quién vende, cómo se paga y cómo se presta el servicio.">
+    <LegalPage path="/informacion-comercial" title="Información comercial y medios de pago" lead="Quién vende, cómo se paga y cómo se presta el servicio.">
       <h2>Proveedor</h2>
       <p>
         Byd Light Solutions SpA. RUT: <Pend>RUT de la sociedad</Pend>. Domicilio: <Pend>dirección legal</Pend>. Correo: {SITE.email}. WhatsApp: {SITE.whatsappDisplay}.

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function SoportePage() {
   requireLegalVisible()
   return (
-    <LegalPage title="Contacto y soporte" lead="Cómo comunicarte con Byd Light Solutions SpA.">
+    <LegalPage path="/soporte" title="Contacto y soporte" lead="Cómo comunicarte con Byd Light Solutions SpA.">
       <h2>Canales</h2>
       <ul>
         <li>Correo: {SITE.email}</li>

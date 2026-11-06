@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function ServiciosDigitalesPage() {
   requireLegalVisible()
   return (
-    <LegalPage title="Condiciones de prestación de servicios digitales" lead="Cómo se entregan y reciben los servicios de software.">
+    <LegalPage path="/servicios-digitales" title="Condiciones de prestación de servicios digitales" lead="Cómo se entregan y reciben los servicios de software.">
       <h2>1. Entrega</h2>
       <p>Los servicios son digitales: la entrega se realiza en línea (acceso al sitio o sistema, repositorio o archivos). No hay despacho físico. Forma de entrega y aceptación: <Pend>definir</Pend>.</p>
       <h2>2. Responsabilidades del cliente</h2>

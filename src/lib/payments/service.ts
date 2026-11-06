@@ -1,5 +1,6 @@
 import "server-only"
 import { PLANS } from "@/lib/plans"
+import { TERMS_VERSION, checkTerms, termsEventDetail } from "@/lib/terms"
 import { createTransaction, tbkMode } from "./config"
 import { isValidOrderId, newOrderId, readOrder, withOrderLock, writeOrder } from "./store"
 import type { Attempt, Order, PaymentKind } from "./types"
@@ -33,6 +34,7 @@ export type SolicitudInput = {
   phone?: string
   company?: string
   message: string
+  termsVersion: string
 }
 
 const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/
@@ -47,6 +49,7 @@ export function parseSolicitud(body: Record<string, unknown>): { ok: true; data:
     phone: s("phone", 30) || undefined,
     company: s("company", 80) || undefined,
     message: s("message", 1500),
+    termsVersion: TERMS_VERSION,
   }
   if (!PLANS.some((p) => p.id === data.planId)) errors.push("Plan no válido.")
   if (data.name.length < 2) errors.push("Ingresa tu nombre.")
@@ -54,6 +57,8 @@ export function parseSolicitud(body: Record<string, unknown>): { ok: true; data:
   if (data.phone && !/^[0-9+()\-\s]{6,30}$/.test(data.phone)) errors.push("El teléfono no es válido.")
   if (data.message.length < 10) errors.push("Cuéntanos brevemente qué necesitas (mínimo 10 caracteres).")
   if (body.accept !== true && body.accept !== "on" && body.accept !== "true") errors.push("Marca la casilla para confirmar que entiendes que esto es una solicitud de cotización.")
+  const termsError = checkTerms(body.acceptTerms, body.termsVersion)
+  if (termsError) errors.push(termsError)
   return errors.length ? { ok: false, errors } : { ok: true, data }
 }
 
@@ -73,6 +78,7 @@ export async function createOrder(input: SolicitudInput): Promise<Order> {
     events: [],
   }
   addEvent(order, "SOLICITUD_CREADA", plan.id)
+  addEvent(order, "TERMINOS_ACEPTADOS", termsEventDetail("solicitud"))
   await writeOrder(order)
   log("order_created", { orderId: order.id, planId: plan.id })
   return order
@@ -95,7 +101,8 @@ export function amountDue(order: Order, kind: PaymentKind): number | null {
   return order.stage === "SALDO_HABILITADO" ? q.balanceAmount : null
 }
 
-export async function startPayment(orderId: string, kind: PaymentKind, baseUrl: string): Promise<StartResult> {
+/** `terms`: aceptacion de terminos validada por la ruta (checkTerms); se registra en la orden junto con el inicio del pago. */
+export async function startPayment(orderId: string, kind: PaymentKind, baseUrl: string, terms?: { accepted: true }): Promise<StartResult> {
   if (!isValidOrderId(orderId)) return { ok: false, reason: "Orden no encontrada.", code: "no-existe" }
   return withOrderLock(orderId, async () => {
     const order = await readOrder(orderId)
@@ -141,6 +148,7 @@ export async function startPayment(orderId: string, kind: PaymentKind, baseUrl: 
         updatedAt: now,
       }
       order.attempts.push(attempt)
+      if (terms) addEvent(order, "TERMINOS_ACEPTADOS", termsEventDetail(`pago-${kind}`))
       addEvent(order, "PAGO_INICIADO", `${kind} ${buyOrder}`)
       await writeOrder(order)
       log("payment_started", { orderId: order.id, buyOrder, kind, amount })

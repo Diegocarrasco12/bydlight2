@@ -1,0 +1,5 @@
+/* Rendimiento movil (2026-11-06): las secciones fuera de pantalla no calculan estilo ni diseno hasta acercarse
+   (content-visibility). `auto` en contain-intrinsic-size recuerda la altura real tras la primera visita y evita saltos. */
+@media (max-width: 1000px) {
+  html:root main .bd-section, html:root main .infra, html:root .bd-footer { content-visibility: auto; contain-intrinsic-size: auto 760px; }
+}

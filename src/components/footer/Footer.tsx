@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { SITE } from "@/lib/site"
 import { SERVICES } from "@/lib/services"
-import { WEBPAY_FOOTER_NOTE, webpayAnnounced } from "@/lib/payments/availability"
+import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
+import { LEGAL_DOCS, legalVisible } from "@/lib/legal"
 
 export default function Footer() {
   return (
@@ -16,7 +17,7 @@ export default function Footer() {
           </Link>
         </div>
 
-        <div className="bd-footer-grid">
+        <div className={`bd-footer-grid${legalVisible() ? " has-legal" : ""}`}>
           <div>
             <img src={SITE.logoSmall} alt={SITE.name} width={120} height={43} />
             <p>Ingeniería de software y desarrollo web para emprendedores, pymes y empresas en Chile.</p>
@@ -44,6 +45,17 @@ export default function Footer() {
             </ul>
           </div>
 
+          {legalVisible() && (
+            <div>
+              <h2>Legal</h2>
+              <ul>
+                {LEGAL_DOCS.map((d) => (
+                  <li key={d.href}><Link href={d.href} prefetch={false}>{d.title}</Link></li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div>
             <h2>Contacto</h2>
             <ul>
@@ -56,7 +68,7 @@ export default function Footer() {
 
         <div className="bd-footer-bottom">
           <span>© {new Date().getFullYear()} {SITE.name}. Todos los derechos reservados.</span>
-          {webpayAnnounced() && <span className="bd-footer-pay">{WEBPAY_FOOTER_NOTE}</span>}
+          <PaymentBrandShowcase variant="compact" />
         </div>
       </div>
     </footer>

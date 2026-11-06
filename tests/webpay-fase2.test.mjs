@@ -59,7 +59,7 @@ beforeEach(() => {
 })
 
 const BASE = "http://localhost:3000"
-const solicitud = { planId: "emprendedor", name: "Cliente Prueba", email: "cliente@example.com", message: "Necesito una landing page de prueba", accept: true }
+const solicitud = { planId: "emprendedor", name: "Cliente Prueba", email: "cliente@example.com", message: "Necesito una landing page de prueba", accept: true, acceptTerms: true, termsVersion: "borrador-2026-11-06" }
 async function newQuoted(amount = 100000) {
   const order = await svc.createOrder(svc.parseSolicitud(solicitud).data)
   const r = await admin.approveQuote(order.id, { amount, depositPercent: 50 })
