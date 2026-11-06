@@ -6,7 +6,7 @@
  * borrador la version lleva el prefijo «borrador»: al publicarlas hay que cambiarla a la fecha de publicacion
  * (ver docs/LEGAL-DATOS-PENDIENTES.md), asi cada aceptacion queda ligada al texto exacto que se mostro.
  */
-export const TERMS_VERSION = "borrador-2026-11-06-r2"
+export const TERMS_VERSION = "borrador-2026-11-06-r3"
 
 export function termsChecked(v: unknown): boolean {
   return v === true || v === "on" || v === "true"

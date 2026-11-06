@@ -1,7 +1,12 @@
 import { verifyAdminRequest } from "@/lib/payments/adminAuth"
-import { approveQuote, auditPayments, closeOrder, listOrders, reconcilePending, releaseBalance, showOrder } from "@/lib/payments/adminOps"
+import { approveQuote, auditPayments, exportCustomerData, closeOrder, listOrders, reconcilePending, releaseBalance, showOrder } from "@/lib/payments/adminOps"
 import { adminRefundsEnabled, paymentsEnabled } from "@/lib/payments/config"
 import { reconcileRefund, refundPayment } from "@/lib/payments/refunds"
+import { activeTransport } from "@/lib/mail/transport"
+import { internalTo } from "@/lib/mail/notify"
+import { alertaInterna } from "@/lib/mail/templates"
+import { dispatchDue, enqueueMail, outboxStats } from "@/lib/mail/outbox"
+import { monitorAndAlert } from "@/lib/payments/monitor"
 import { json } from "@/lib/payments/http"
 import { storageWritable } from "@/lib/payments/store"
 
@@ -70,6 +75,22 @@ export async function POST(req: Request) {
       })
       return r.ok ? json({ refund: r.data, replayed: r.replayed ?? false }) : json({ error: r.error }, 422)
     }
+    case "monitor": // auditoria de solo lectura + alerta por correo (idempotente por dia); pensada para correr cada 15-30 min
+      return json(await monitorAndAlert())
+    case "mail-status":
+      return json(outboxStats())
+    case "mail-test": {
+      // Correo de prueba SOLO al titular (nunca a clientes): verifica credenciales y entrega. Un envio por minuto como maximo.
+      if (!activeTransport()) return json({ error: "Correo no habilitado o sin credenciales (mail.json)." }, 409)
+      const r = alertaInterna("Prueba de correo transaccional", ["Si lees esto, el envío desde el servidor funciona."])
+      const key = `prueba:${Math.floor(Date.now() / 60_000)}`
+      const queued = enqueueMail({ dedupeKey: key, template: "prueba", to: internalTo(), subject: r.subject, html: r.html, text: r.text })
+      return json({ queued, ...(await dispatchDue(5)) })
+    }
+    case "mail-dispatch":
+      return json(await dispatchDue(20))
+    case "customer-data":
+      return json(await exportCustomerData(typeof b.email === "string" ? b.email : ""))
     case "reconcile":
       return json(await reconcilePending())
     default:

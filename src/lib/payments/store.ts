@@ -68,6 +68,10 @@ export async function readOrder(id: string): Promise<Order | null> {
       email: String(o.cust_email),
       ...(o.cust_phone != null && { phone: String(o.cust_phone) }),
       ...(o.cust_company != null && { company: String(o.cust_company) }),
+      type: (o.cust_type === "empresa" ? "empresa" : "persona") as "persona" | "empresa",
+      ...(o.cust_tax_id != null && { taxId: String(o.cust_tax_id) }),
+      ...(o.cust_giro != null && { giro: String(o.cust_giro) }),
+      ...(o.cust_address != null && { address: String(o.cust_address) }),
     },
     message: String(o.message),
     attempts: attempts.map((a) => ({
@@ -116,12 +120,14 @@ export async function writeOrder(order: Order): Promise<void> {
   db.exec("BEGIN IMMEDIATE")
   try {
     db.prepare(
-      `INSERT INTO orders (id, created_at, updated_at, stage, plan_id, plan_name, cust_name, cust_email, cust_phone, cust_company, message)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO orders (id, created_at, updated_at, stage, plan_id, plan_name, cust_name, cust_email, cust_phone, cust_company, message,
+         cust_type, cust_tax_id, cust_giro, cust_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET updated_at = excluded.updated_at, stage = excluded.stage`,
     ).run(
       order.id, order.createdAt, order.updatedAt, order.stage, order.planId, order.planName,
       order.customer.name, order.customer.email, order.customer.phone ?? null, order.customer.company ?? null, order.message,
+      order.customer.type ?? "persona", order.customer.taxId ?? null, order.customer.giro ?? null, order.customer.address ?? null,
     )
     if (order.quote) {
       const q = order.quote

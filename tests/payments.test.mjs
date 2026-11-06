@@ -395,7 +395,8 @@ test("17. solicitudes: validacion y campos de precio del cliente ignorados", () 
   assert.equal(svc.parseSolicitud({ ...solicitud, message: "corto" }).ok, false)
   const p = svc.parseSolicitud({ ...solicitud, amount: 1, quote: { amount: 1 }, stage: "COTIZADA" })
   assert.ok(p.ok)
-  assert.deepEqual(Object.keys(p.data).sort(), ["company", "email", "message", "name", "phone", "planId", "termsVersion"])
+  assert.deepEqual(Object.keys(p.data).sort(), ["address", "company", "customerType", "email", "giro", "message", "name", "phone", "planId", "taxId", "termsVersion"])
+  assert.equal(p.data.customerType, "persona") // el cliente no puede fijar estado, cotizacion ni montos
 })
 
 test("17b. solicitudes: la casilla sigue siendo obligatoria y su mensaje no habla de terminos legales", () => {

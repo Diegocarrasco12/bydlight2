@@ -2,13 +2,13 @@ import { previewMode } from "@/lib/preview"
 // Planes y precios de referencia (CLP). Fuente unica: la pagina de planes, el home,
 // los datos estructurados y el sitemap leen de aqui.
 //
-// IVA: los precios se muestran "Desde $X + IVA" (decision del titular). Confirmar que corresponde segun el
-// regimen tributario vigente antes de publicar; si cambia, ajustar solo IVA_LABEL y PRICE_NOTE.
+// IVA: decision del titular (2026-11-06): los precios publicados y cotizados son FINALES e INCLUYEN IVA ("Desde $X, IVA incluido").
+// Ver src/lib/tax.ts (desglose) y docs/BYDLIGHT-RELEASE-FINAL-WEBPAY.md. Ajustar solo IVA_LABEL y PRICE_NOTE si cambia.
 
-export const IVA_LABEL = "+ IVA"
+export const IVA_LABEL = "IVA incluido"
 
 export const PRICE_NOTE =
-  "Valores referenciales en pesos chilenos (CLP), más IVA. El valor final se confirma en la cotización."
+  "Valores en pesos chilenos (CLP) con IVA incluido. El valor definitivo se confirma en la cotización, que indica el total con IVA."
 
 export type Plan = {
   id: string

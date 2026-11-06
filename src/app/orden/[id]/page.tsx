@@ -14,6 +14,7 @@ import { clientIp, rateLimited } from "@/lib/payments/http"
 import { amountDue, verifyOrder } from "@/lib/payments/service"
 import { isValidOrderId, readOrder } from "@/lib/payments/store"
 import type { Attempt, Order } from "@/lib/payments/types"
+import { IVA_PERCENT, ivaBreakdown } from "@/lib/tax"
 import { buildVoucher, formatClp, formatWhen } from "@/lib/payments/voucher"
 import { COMPANY } from "@/lib/company"
 import { SITE, whatsappLink } from "@/lib/site"
@@ -263,7 +264,9 @@ export default async function OrdenPage({
             </div>
             <dl className="bd-dl">
               <dt>Plan</dt><dd>{order.planName}</dd>
-              <dt>Total del proyecto</dt><dd>{clp(q.amount)}</dd>
+              {order.customer.type === "empresa" && (<><dt>Cliente</dt><dd>{order.customer.company} · RUT {order.customer.taxId}</dd></>)}
+              <dt>Total del proyecto (IVA incluido)</dt><dd>{clp(q.amount)}</dd>
+              <dt>IVA incluido ({IVA_PERCENT} %)</dt><dd>{clp(ivaBreakdown(q.amount).iva)}</dd>
               <dt>Anticipo ({q.depositPercent}%)</dt><dd>{clp(q.depositAmount)}</dd>
               <dt>Saldo</dt><dd>{clp(q.balanceAmount)}</dd>
               <dt>Cotización válida hasta</dt><dd>{when(q.validUntil)}</dd>
@@ -271,7 +274,7 @@ export default async function OrdenPage({
             </dl>
             {q.note && <p className="bd-note left">{q.note}</p>}
             <p className="bd-note left">
-              Montos en pesos chilenos (CLP). El anticipo ({q.depositPercent}%) da inicio al proyecto; el saldo se habilita en esta página cuando corresponda según el avance.
+              Montos en pesos chilenos (CLP), con IVA incluido; el IVA se desglosa solo a modo informativo. El anticipo ({q.depositPercent}%) da inicio al proyecto; el saldo se habilita en esta página cuando corresponda según el avance.
             </p>
           </div>
         )}

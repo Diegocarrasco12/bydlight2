@@ -5,6 +5,8 @@
 //   approve-test <ID>      cotizacion de PRUEBA PRODUCTIVA: $100, anticipo 50 % ($50), saldo $50, vigencia 1 dia, nota rotulada
 //   pilot-link [--minutes 10] [--hours 2]   enlace de un solo uso que abre el checkout en modo piloto (no llama al servidor)
 //   release-balance <ID> | close <ID> | reconcile
+//   monitor (auditoria de solo lectura + alerta por correo) | mail-status | mail-dispatch | mail-test (correo de prueba al titular) | customer-data --email <correo> (acceso/portabilidad)
+//   NOTA: el monto de `approve` es el TOTAL FINAL CON IVA incluido (no se suma IVA).
 // El secreto solo se usa para firmar; nunca se envia ni se imprime. Origen del secreto (en este orden):
 //   1. --config-file <payments.json>   lee `adminSecret` del archivo privado del servidor (recomendado: corre en el servidor
 //                                      dentro de un contenedor efimero con el volumen montado de solo lectura; nadie lo ve ni lo copia)
@@ -96,6 +98,7 @@ if (action === "approve") {
 }
 if (action === "approve-test") Object.assign(body, TEST)
 if (action === "list" && opt("q")) body.q = opt("q")
+if (action === "customer-data") body.email = opt("email")
 if (action === "refund") {
   // Devolucion: exige --amount y una clave de idempotencia (se genera si no se indica; guardala para reintentar la MISMA operacion).
   body.amount = Number(opt("amount"))
@@ -105,8 +108,8 @@ if (action === "refund") {
   console.error(`idempotencyKey: ${body.idempotencyKey}`)
 }
 if (action === "reconcile-refund") body.refundId = opt("refund")
-if (!["list", "audit", "show", "approve", "approve-test", "release-balance", "close", "reconcile", "refund", "reconcile-refund"].includes(action ?? "")) {
-  die("Acciones: list [--q texto] | audit | show <ID> | approve <ID> --amount N | approve-test <ID> | pilot-link | release-balance <ID> | close <ID> | reconcile | refund <ID> --amount N [--key K] [--attempt A] [--reason T] | reconcile-refund <ID> --refund RF...")
+if (!["list", "audit", "show", "approve", "approve-test", "release-balance", "close", "reconcile", "refund", "reconcile-refund", "monitor", "mail-status", "mail-dispatch", "mail-test", "customer-data"].includes(action ?? "")) {
+  die("Acciones: list [--q texto] | audit | show <ID> | approve <ID> --amount N | approve-test <ID> | pilot-link | release-balance <ID> | close <ID> | reconcile | monitor | mail-status | mail-dispatch | mail-test | customer-data --email X | refund <ID> --amount N [--key K] [--attempt A] [--reason T] | reconcile-refund <ID> --refund RF...")
 }
 
 const raw = JSON.stringify(body)

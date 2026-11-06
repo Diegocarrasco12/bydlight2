@@ -28,7 +28,7 @@ export default function InformacionComercialPage() {
       <p>Forma y plazo de entrega según la cotización aceptada (ver <a href="/servicios-digitales">servicios digitales</a>).</p>
       <h2>Precios, IVA y documentos tributarios</h2>
       <p>
-        Precios en CLP. Los precios de los planes publicados se expresan más IVA; Bydlight es contribuyente afecto a IVA. Cada cotización indica el monto total, el anticipo y el saldo.
+        Precios en CLP. Todos los precios publicados y cotizados son finales e incluyen IVA; Bydlight es contribuyente afecto a IVA. Cada cotización indica el monto total con IVA, el anticipo y el saldo.
         El comprobante de pago del sitio no reemplaza el documento tributario que corresponda emitir por separado, conforme a la normativa del Servicio de Impuestos Internos.
       </p>
       <h2>Más información</h2>

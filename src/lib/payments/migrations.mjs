@@ -139,4 +139,35 @@ CREATE INDEX refunds_by_order ON refunds(order_id);
 CREATE UNIQUE INDEX refunds_one_open ON refunds(attempt_id) WHERE status IN ('SOLICITADA','INCIERTA');
 `,
   },
+  {
+    version: 4,
+    name: "tipo-de-cliente-y-cola-de-correos",
+    sql: `
+-- Persona natural o empresa (datos tributarios solo para empresas). Las ordenes existentes quedan como 'persona' sin alterar nada mas.
+ALTER TABLE orders ADD COLUMN cust_type TEXT NOT NULL DEFAULT 'persona' CHECK (cust_type IN ('persona','empresa'));
+ALTER TABLE orders ADD COLUMN cust_tax_id TEXT;
+ALTER TABLE orders ADD COLUMN cust_giro TEXT;
+ALTER TABLE orders ADD COLUMN cust_address TEXT;
+
+-- Cola persistente de correos transaccionales. dedupe_key UNIQUE = idempotencia (un correo por hecho, aunque se repita el callback).
+-- Al enviarse, el cuerpo se vacia (se conserva solo el registro del envio) para no guardar datos personales de mas.
+CREATE TABLE mail_outbox (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  dedupe_key      TEXT NOT NULL UNIQUE,
+  order_id        TEXT,
+  template        TEXT NOT NULL,
+  to_addr         TEXT NOT NULL,
+  subject         TEXT NOT NULL,
+  body_html       TEXT NOT NULL,
+  body_text       TEXT NOT NULL,
+  status          TEXT NOT NULL CHECK (status IN ('PENDIENTE','ENVIANDO','ENVIADO','FALLIDO')),
+  attempts        INTEGER NOT NULL DEFAULT 0,
+  next_attempt_at TEXT NOT NULL,
+  last_error      TEXT,
+  created_at      TEXT NOT NULL,
+  sent_at         TEXT
+) STRICT;
+CREATE INDEX mail_outbox_due ON mail_outbox(status, next_attempt_at);
+`,
+  },
 ]

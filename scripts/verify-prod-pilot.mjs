@@ -62,7 +62,7 @@ const newLink = () => {
   const r = client(["pilot-link", "--minutes", "5", "--hours", "1"])
   return r.status === 0 ? new URL(r.stdout.trim()) : null
 }
-const solBody = JSON.stringify({ planId: "emprendedor", name: "Titular Prueba", email: "titular@example.com", message: "Prueba productiva controlada", accept: true, acceptTerms: true, termsVersion: "borrador-2026-11-06-r2" })
+const solBody = JSON.stringify({ planId: "emprendedor", name: "Titular Prueba", email: "titular@example.com", message: "Prueba productiva controlada", accept: true, acceptTerms: true, termsVersion: "borrador-2026-11-06-r3" })
 
 try {
   if (!(await waitUp())) {
@@ -78,7 +78,7 @@ try {
   const forged = { cookie: "bd_piloto=v1.9999999999." + "a".repeat(64) }
   const s1 = await req("/api/solicitudes", { method: "POST", headers: { "content-type": "application/json", ...ORIGIN, ...forged, ...ip() }, body: solBody })
   check("Cookie falsificada: tampoco crea ordenes (503)", s1.status === 503, `HTTP ${s1.status}`)
-  const fd = () => { const f = new FormData(); f.set("orderId", "ABCDEFGHJKMN"); f.set("kind", "anticipo"); f.set("acceptTerms", "on"); f.set("termsVersion", "borrador-2026-11-06-r2"); return f }
+  const fd = () => { const f = new FormData(); f.set("orderId", "ABCDEFGHJKMN"); f.set("kind", "anticipo"); f.set("acceptTerms", "on"); f.set("termsVersion", "borrador-2026-11-06-r3"); return f }
   const i0 = await req("/api/pagos/iniciar", { method: "POST", headers: { ...ORIGIN, ...ip() }, body: fd() })
   check("Sin enlace: POST /api/pagos/iniciar no inicia cobros", i0.status === 303 && (i0.headers.get("location") ?? "").includes("aviso=error"), `HTTP ${i0.status} ${i0.headers.get("location")}`)
   check("Sin enlace: no se creo la base de datos (nada se escribio)", !fs.existsSync(dbPath))
@@ -150,7 +150,7 @@ try {
   const noTerms = new FormData(); noTerms.set("orderId", id); noTerms.set("kind", "anticipo")
   const nt = await req("/api/pagos/iniciar", { method: "POST", headers: { ...ORIGIN, ...ck, ...ip() }, body: noTerms })
   check("Aun con la cookie, sin aceptar terminos no se inicia el pago", nt.status === 303 && (nt.headers.get("location") ?? "").includes("aviso=terminos"), `HTTP ${nt.status} ${nt.headers.get("location")}`)
-  const noCk = new FormData(); noCk.set("orderId", id); noCk.set("kind", "anticipo"); noCk.set("acceptTerms", "on"); noCk.set("termsVersion", "borrador-2026-11-06-r2")
+  const noCk = new FormData(); noCk.set("orderId", id); noCk.set("kind", "anticipo"); noCk.set("acceptTerms", "on"); noCk.set("termsVersion", "borrador-2026-11-06-r3")
   const nc = await req("/api/pagos/iniciar", { method: "POST", headers: { ...ORIGIN, ...ip() }, body: noCk })
   check("Un tercero con el codigo de la orden NO puede iniciar el cobro (sin cookie)", nc.status === 303 && (nc.headers.get("location") ?? "").includes("aviso=error"), `HTTP ${nc.status} ${nc.headers.get("location")}`)
 

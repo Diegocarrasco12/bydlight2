@@ -56,7 +56,7 @@ test("G6. aceptacion de terminos: casilla sin premarcar y version nueva del text
   const form = read("src/components/checkout/ContractForm.tsx")
   assert.ok(!/name="acceptTerms"[^>]*(defaultChecked|checked)/.test(form))
   assert.ok(!/name="acceptTerms"[^>]*(defaultChecked|checked)/.test(read("src/app/orden/[id]/page.tsx")))
-  assert.match(read("src/lib/terms.ts"), /borrador-2026-11-06-r2/)
+  assert.match(read("src/lib/terms.ts"), /borrador-2026-11-06-r3/)
 })
 
 test("G7. el cierre legal no activo nada: banderas y pagos siguen cerrados", () => {

@@ -27,7 +27,8 @@ export default function PrivacidadPage() {
         <li>Formulario de contacto: nombre, correo, teléfono (si lo informas), empresa (si la informas) y mensaje.</li>
         <li>Solicitud de contratación: los datos anteriores, el plan elegido, la cotización, el estado de la orden y un registro de eventos (por ejemplo, la aceptación de términos con su versión y fecha).</li>
         <li>Pagos con Webpay Plus: el número completo y el código de seguridad de la tarjeta se ingresan solo en el formulario de Transbank; Bydlight no los recibe ni los almacena. Bydlight conserva datos limitados de la transacción informados por Transbank: estado, monto, orden de compra, código de autorización, fecha, últimos 4 dígitos de la tarjeta, tipo de pago y cuotas.</li>
-        <li>Comunicaciones: los correos y mensajes que intercambiamos contigo.</li>
+        <li>Comunicaciones: los correos y mensajes que intercambiamos contigo, incluidos los correos automáticos de confirmación que te enviamos (se registra si fueron enviados).</li>
+        <li>Si contratas como empresa: razón social, RUT, y, si los informas, giro y dirección tributaria, que usamos solo para emitir el documento tributario correspondiente.</li>
         <li>Datos técnicos: la infraestructura del sitio registra datos de conexión (como la dirección IP y la fecha de acceso) con fines de seguridad y funcionamiento.</li>
       </ul>
       <h2>3. Para qué los usamos</h2>
@@ -36,6 +37,7 @@ export default function PrivacidadPage() {
       <ul>
         <li>Transbank S.A.: procesa los pagos con tarjeta mediante Webpay Plus.</li>
         <li>EmailJS: servicio que transporta los mensajes del formulario de contacto hacia nuestro correo.</li>
+        <li>Google (Gmail): servicio de correo desde el cual enviamos los correos de confirmación de tu solicitud, cotización y pagos.</li>
         <li>Cloudflare: opera la red de entrega y seguridad del sitio y, por ello, procesa datos técnicos de conexión.</li>
         <li>Autoridades, cuando una ley lo exija.</li>
       </ul>
@@ -54,7 +56,7 @@ export default function PrivacidadPage() {
       <h2>7. Tus derechos</h2>
       <p>
         Puedes solicitar acceso, rectificación, cancelación o supresión, oposición y bloqueo de tus datos, y, desde la entrada en vigencia de la Ley N° 21.719 (prevista para el
-        1 de diciembre de 2026), los demás derechos que esa ley reconozca, como la portabilidad. Escríbenos a <a href={`mailto:${SITE.email}`}>{SITE.email}</a> indicando qué derecho
+        1 de diciembre de 2026, fecha que podría postergarse si se publica la ley en tramitación), los demás derechos que esa ley reconozca, como la portabilidad. Escríbenos a <a href={`mailto:${SITE.email}`}>{SITE.email}</a> indicando qué derecho
         ejerces y un medio para responderte; podremos pedirte datos para verificar tu identidad. Responderemos por escrito dentro de los plazos que fije la ley. También podrás
         reclamar ante la autoridad de protección de datos que la ley establezca.
       </p>

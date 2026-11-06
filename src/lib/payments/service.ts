@@ -1,9 +1,11 @@
 import "server-only"
 import { PLANS } from "@/lib/plans"
+import { normalizeRut } from "@/lib/rut"
+import { notifyChanges, snapshotOf } from "@/lib/mail/notify"
 import { TERMS_VERSION, checkTerms, termsEventDetail } from "@/lib/terms"
 import { createTransaction, tbkMode } from "./config"
 import { isValidOrderId, newOrderId, readOrder, withOrderLock, writeOrder } from "./store"
-import type { Attempt, Order, PaymentKind } from "./types"
+import type { Attempt, CustomerType, Order, PaymentKind } from "./types"
 
 /**
  * Vigencia de un intento abandonado. El token de Webpay vive 5 min y el formulario dura 4 min en produccion y
@@ -33,6 +35,10 @@ export type SolicitudInput = {
   email: string
   phone?: string
   company?: string
+  customerType: CustomerType
+  taxId?: string
+  giro?: string
+  address?: string
   message: string
   termsVersion: string
 }
@@ -48,6 +54,10 @@ export function parseSolicitud(body: Record<string, unknown>): { ok: true; data:
     email: s("email", 120).toLowerCase(),
     phone: s("phone", 30) || undefined,
     company: s("company", 80) || undefined,
+    customerType: body.customerType === "empresa" ? "empresa" : "persona",
+    taxId: s("taxId", 20) || undefined,
+    giro: s("giro", 80) || undefined,
+    address: s("address", 120) || undefined,
     message: s("message", 1500),
     termsVersion: TERMS_VERSION,
   }
@@ -55,6 +65,19 @@ export function parseSolicitud(body: Record<string, unknown>): { ok: true; data:
   if (data.name.length < 2) errors.push("Ingresa tu nombre.")
   if (!EMAIL_RE.test(data.email)) errors.push("Ingresa un correo válido.")
   if (data.phone && !/^[0-9+()\-\s]{6,30}$/.test(data.phone)) errors.push("El teléfono no es válido.")
+  if (data.customerType === "empresa") {
+    // Datos tributarios solo para empresas: razon social y RUT. Giro y direccion son opcionales (se piden despues si hacen falta).
+    if (!data.company || data.company.length < 2) errors.push("Ingresa la razón social de la empresa.")
+    const rut = data.taxId ? normalizeRut(data.taxId) : null
+    if (!rut) errors.push("Ingresa un RUT de empresa válido (por ejemplo 76.123.456-7).")
+    else data.taxId = rut
+  } else {
+    // Persona natural: no se guardan datos de empresa ni RUT (no son necesarios para cotizar ni para pagar).
+    data.company = undefined
+    data.taxId = undefined
+    data.giro = undefined
+    data.address = undefined
+  }
   if (data.message.length < 10) errors.push("Cuéntanos brevemente qué necesitas (mínimo 10 caracteres).")
   if (body.accept !== true && body.accept !== "on" && body.accept !== "true") errors.push("Marca la casilla para confirmar que entiendes que esto es una solicitud de cotización.")
   const termsError = checkTerms(body.acceptTerms, body.termsVersion)
@@ -72,7 +95,16 @@ export async function createOrder(input: SolicitudInput, opts: { pilot?: boolean
     stage: "SOLICITADA",
     planId: plan.id,
     planName: plan.name,
-    customer: { name: input.name, email: input.email, phone: input.phone, company: input.company },
+    customer: {
+      name: input.name,
+      email: input.email,
+      phone: input.phone,
+      company: input.company,
+      type: input.customerType,
+      taxId: input.taxId,
+      giro: input.giro,
+      address: input.address,
+    },
     message: input.message,
     attempts: [],
     events: [],
@@ -81,6 +113,7 @@ export async function createOrder(input: SolicitudInput, opts: { pilot?: boolean
   addEvent(order, "TERMINOS_ACEPTADOS", termsEventDetail("solicitud"))
   if (opts.pilot) addEvent(order, "ACCESO_PILOTO", "prueba productiva controlada")
   await writeOrder(order)
+  await notifyChanges(null, order)
   log("order_created", { orderId: order.id, planId: plan.id })
   return order
 }
@@ -108,9 +141,13 @@ export async function startPayment(orderId: string, kind: PaymentKind, baseUrl: 
   return withOrderLock(orderId, async () => {
     const order = await readOrder(orderId)
     if (!order) return { ok: false, reason: "Orden no encontrada.", code: "no-existe" }
+    const snap = snapshotOf(order)
 
     // Antes de bloquear: los intentos vencidos se resuelven con el estado real de Transbank (nunca por suposicion).
-    if (await settleStale(order)) await writeOrder(order)
+    if (await settleStale(order)) {
+      await writeOrder(order)
+      await notifyChanges(snap, order)
+    }
     // El monto sale SIEMPRE de la cotizacion guardada en el servidor, nunca del navegador.
     const amount = amountDue(order, kind)
     if (!order.quote || amount === null || !Number.isInteger(amount) || amount < 50) {
@@ -152,6 +189,7 @@ export async function startPayment(orderId: string, kind: PaymentKind, baseUrl: 
       if (terms) addEvent(order, "TERMINOS_ACEPTADOS", termsEventDetail(`pago-${kind}`))
       addEvent(order, "PAGO_INICIADO", `${kind} ${buyOrder}`)
       await writeOrder(order)
+      await notifyChanges(snap, order)
       log("payment_started", { orderId: order.id, buyOrder, kind, amount })
       return { ok: true, url: res.url as string, token: res.token as string }
     } catch (e) {
@@ -291,6 +329,7 @@ export async function handleReturn(orderId: string, p: ReturnParams): Promise<vo
   await withOrderLock(orderId, async () => {
     const order = await readOrder(orderId)
     if (!order) return
+    const snap = snapshotOf(order)
     const tx = createTransaction()
     const now = new Date().toISOString()
 
@@ -304,6 +343,7 @@ export async function handleReturn(orderId: string, p: ReturnParams): Promise<vo
           attempt.updatedAt = now
           addEvent(order, `PAGO_${attempt.status}`, attempt.buyOrder)
           await writeOrder(order)
+          await notifyChanges(snap, order)
         }
         return log("return_replayed_pending", { orderId, buyOrder: attempt.buyOrder, status: attempt.status })
       }
@@ -326,6 +366,7 @@ export async function handleReturn(orderId: string, p: ReturnParams): Promise<vo
       attempt.updatedAt = now
       addEvent(order, `PAGO_${attempt.status}`, attempt.buyOrder)
       await writeOrder(order)
+      await notifyChanges(snap, order)
       return log("payment_result", { orderId, buyOrder: attempt.buyOrder, status: attempt.status })
     }
 
@@ -337,6 +378,7 @@ export async function handleReturn(orderId: string, p: ReturnParams): Promise<vo
         attempt.updatedAt = now
         addEvent(order, "PAGO_CANCELADO", attempt.buyOrder)
         await writeOrder(order)
+        await notifyChanges(snap, order)
         log("payment_cancelled", { orderId, buyOrder: attempt.buyOrder })
       }
       return
@@ -351,6 +393,7 @@ export async function handleReturn(orderId: string, p: ReturnParams): Promise<vo
         attempt.updatedAt = now
         addEvent(order, "RETORNO_INVALIDO", attempt.buyOrder)
         await writeOrder(order)
+        await notifyChanges(snap, order)
         log("payment_invalid_return", { orderId, buyOrder: attempt.buyOrder })
       }
       return
@@ -364,6 +407,7 @@ export async function handleReturn(orderId: string, p: ReturnParams): Promise<vo
         attempt.updatedAt = now
         addEvent(order, "PAGO_EXPIRADO", attempt.buyOrder)
         await writeOrder(order)
+        await notifyChanges(snap, order)
         log("payment_expired", { orderId, buyOrder: attempt.buyOrder })
       }
     }
@@ -377,6 +421,10 @@ export async function verifyOrder(orderId: string): Promise<void> {
   await withOrderLock(orderId, async () => {
     const order = await readOrder(orderId)
     if (!order) return
-    if (await settleStale(order, true)) await writeOrder(order) // consulta explicita: tambien adelanta pagos recientes
+    const snap = snapshotOf(order)
+    if (await settleStale(order, true)) {
+      await writeOrder(order) // consulta explicita: tambien adelanta pagos recientes
+      await notifyChanges(snap, order)
+    }
   })
 }

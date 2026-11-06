@@ -11,7 +11,7 @@ import { pageMetadata } from "@/lib/seo"
 export const metadata: Metadata = pageMetadata({
   title: "Planes y precios de páginas web",
   description:
-    "Planes de desarrollo web en Chile: Emprendedor desde $149.990, Profesional $299.990, Empresa $499.990 y Ecommerce $699.990, más IVA. Software a medida a cotizar.",
+    "Planes de desarrollo web en Chile: Emprendedor desde $149.990, Profesional $299.990, Empresa $499.990 y Ecommerce $699.990, con IVA incluido. Software a medida a cotizar.",
   path: "/planes",
 })
 

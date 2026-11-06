@@ -8,6 +8,7 @@ type PlanOption = { id: string; name: string; priceLabel: string; fixed: boolean
 export default function ContractForm({ plans, initialPlan, termsVersion, legalLinks }: { plans: PlanOption[]; initialPlan: string; termsVersion: string; legalLinks: boolean }) {
   const router = useRouter()
   const [planId, setPlanId] = useState(initialPlan)
+  const [customerType, setCustomerType] = useState<"persona" | "empresa">("persona")
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
 
@@ -21,7 +22,11 @@ export default function ContractForm({ plans, initialPlan, termsVersion, legalLi
       name: f.get("name"),
       email: f.get("email"),
       phone: f.get("phone"),
-      company: f.get("company"),
+      customerType,
+      company: customerType === "empresa" ? f.get("company") : "",
+      taxId: customerType === "empresa" ? f.get("taxId") : "",
+      giro: customerType === "empresa" ? f.get("giro") : "",
+      address: customerType === "empresa" ? f.get("address") : "",
       message: f.get("message"),
       accept: f.get("accept") === "on",
       acceptTerms: f.get("acceptTerms") === "on",
@@ -56,7 +61,7 @@ export default function ContractForm({ plans, initialPlan, termsVersion, legalLi
         <select id="plan" value={planId} onChange={(e) => setPlanId(e.target.value)}>
           {plans.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.name} — {p.fixed ? `desde ${p.priceLabel} + IVA` : p.priceLabel}
+              {p.name} — {p.fixed ? `desde ${p.priceLabel}, IVA incluido` : p.priceLabel}
             </option>
           ))}
         </select>
@@ -74,16 +79,48 @@ export default function ContractForm({ plans, initialPlan, termsVersion, legalLi
         </div>
       </div>
 
-      <div className="bd-field-row">
-        <div className="bd-field">
-          <label htmlFor="phone">Teléfono (opcional)</label>
-          <input id="phone" name="phone" type="tel" autoComplete="tel" maxLength={30} />
-        </div>
-        <div className="bd-field">
-          <label htmlFor="company">Empresa (opcional)</label>
-          <input id="company" name="company" autoComplete="organization" maxLength={80} />
-        </div>
+      <fieldset className="bd-field bd-type">
+        <legend>Contratas como</legend>
+        <label className="bd-check">
+          <input type="radio" name="customerType" value="persona" checked={customerType === "persona"} onChange={() => setCustomerType("persona")} />
+          <span>Persona natural</span>
+        </label>
+        <label className="bd-check">
+          <input type="radio" name="customerType" value="empresa" checked={customerType === "empresa"} onChange={() => setCustomerType("empresa")} />
+          <span>Empresa</span>
+        </label>
+      </fieldset>
+
+      <div className="bd-field">
+        <label htmlFor="phone">Teléfono (opcional)</label>
+        <input id="phone" name="phone" type="tel" autoComplete="tel" maxLength={30} />
       </div>
+
+      {customerType === "empresa" && (
+        <>
+          <div className="bd-field-row">
+            <div className="bd-field">
+              <label htmlFor="company">Razón social</label>
+              <input id="company" name="company" autoComplete="organization" required maxLength={80} />
+            </div>
+            <div className="bd-field">
+              <label htmlFor="taxId">RUT de la empresa</label>
+              <input id="taxId" name="taxId" inputMode="text" placeholder="76.123.456-7" required maxLength={20} />
+            </div>
+          </div>
+          <div className="bd-field-row">
+            <div className="bd-field">
+              <label htmlFor="giro">Giro (opcional)</label>
+              <input id="giro" name="giro" maxLength={80} />
+            </div>
+            <div className="bd-field">
+              <label htmlFor="address">Dirección tributaria (opcional)</label>
+              <input id="address" name="address" autoComplete="street-address" maxLength={120} />
+            </div>
+          </div>
+          <small>Usaremos estos datos solo para emitir el documento tributario que corresponda. Si algo falta, te lo pediremos después.</small>
+        </>
+      )}
 
       <div className="bd-field">
         <label htmlFor="message">Cuéntanos qué necesitas</label>

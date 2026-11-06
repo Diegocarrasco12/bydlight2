@@ -69,6 +69,20 @@ export type Quote = {
   note?: string
 }
 
+export type CustomerType = "persona" | "empresa"
+
+/** Persona natural o empresa. `company` = razon social; `taxId` (RUT), `giro` y `address` solo aplican a empresas. */
+export type CustomerData = {
+  name: string
+  email: string
+  phone?: string
+  company?: string
+  type?: CustomerType // ausente = persona (ordenes anteriores a la migracion 4)
+  taxId?: string
+  giro?: string
+  address?: string
+}
+
 export type Order = {
   id: string
   createdAt: string
@@ -76,7 +90,7 @@ export type Order = {
   stage: Stage
   planId: string
   planName: string
-  customer: { name: string; email: string; phone?: string; company?: string }
+  customer: CustomerData
   message: string
   quote?: Quote
   attempts: Attempt[]

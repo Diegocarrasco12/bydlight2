@@ -2,6 +2,8 @@ import "server-only"
 import { readOrder, withOrderLock, writeOrder, isValidOrderId } from "./store"
 import { openDb } from "./db"
 import { verifyOrder } from "./service"
+import { notifyChanges, snapshotOf } from "@/lib/mail/notify"
+import { splitDeposit } from "@/lib/tax"
 import type { Order } from "./types"
 
 // Operaciones administrativas. Solo las invoca la API firmada (adminAuth) o las pruebas.
@@ -29,17 +31,18 @@ export async function approveQuote(
   return withOrderLock(orderId, async () => {
     const order = await readOrder(orderId)
     if (!order) return fail("Orden no encontrada.")
+    const snap = snapshotOf(order)
     if (order.stage !== "SOLICITADA" && order.stage !== "COTIZADA") return fail(`No se puede cotizar una orden en estado ${order.stage}.`)
     if (order.attempts.some((a) => a.status === "AUTORIZADO" || a.status === "INICIADO")) {
       return fail("La orden tiene un pago autorizado o en curso; no se puede cambiar la cotizacion.")
     }
-    const deposit = Math.round((p.amount * pct) / 100)
+    const { deposit, balance } = splitDeposit(p.amount, pct)
     const now = new Date()
     order.quote = {
       amount: p.amount,
       depositPercent: pct,
       depositAmount: deposit,
-      balanceAmount: p.amount - deposit,
+      balanceAmount: balance,
       approvedAt: now.toISOString(),
       validUntil: new Date(now.getTime() + days * 86_400_000).toISOString(),
       note: p.note,
@@ -47,7 +50,8 @@ export async function approveQuote(
     order.stage = "COTIZADA"
     ev(order, "COTIZACION_APROBADA", `${p.amount} / anticipo ${deposit}`)
     await writeOrder(order)
-    return { ok: true, data: { amount: p.amount, deposit, balance: p.amount - deposit } }
+    await notifyChanges(snap, order)
+    return { ok: true, data: { amount: p.amount, deposit, balance } }
   })
 }
 
@@ -56,10 +60,12 @@ export async function releaseBalance(orderId: string): Promise<AdminResult<null>
   return withOrderLock(orderId, async () => {
     const order = await readOrder(orderId)
     if (!order) return fail("Orden no encontrada.")
+    const snap = snapshotOf(order)
     if (order.stage !== "ANTICIPO_PAGADO") return fail(`Solo se habilita el saldo tras el anticipo (estado actual: ${order.stage}).`)
     order.stage = "SALDO_HABILITADO"
     ev(order, "SALDO_HABILITADO")
     await writeOrder(order)
+    await notifyChanges(snap, order)
     return { ok: true, data: null }
   })
 }
@@ -124,6 +130,12 @@ export async function auditPayments(limit = 5000): Promise<{ checkedOrders: numb
     if (!o) continue
     const q = o.quote
     if (q && (q.depositAmount + q.balanceAmount !== q.amount || q.depositAmount > q.amount)) add(id, "alta", "COTIZACION_INCOHERENTE", "anticipo + saldo no suman el total de la cotización")
+    if (q && q.depositAmount !== splitDeposit(q.amount, q.depositPercent).deposit) {
+      add(id, "media", "COTIZACION_REDONDEO", `el anticipo ${q.depositAmount} difiere del calculo estandar sobre ${q.amount} (${q.depositPercent} %)`)
+    }
+    // Reintentos anomalos: muchos intentos en la orden o varios en poco tiempo (posible abuso o fallo repetido).
+    const recent = o.attempts.filter((a) => Date.now() - new Date(a.createdAt).getTime() < 3_600_000).length
+    if (o.attempts.length > 5 || recent > 3) add(id, "media", "REINTENTOS_ANOMALOS", `${o.attempts.length} intentos en total, ${recent} en la ultima hora`)
     for (const kind of ["anticipo", "saldo"] as const) {
       const ok = o.attempts.filter((a) => a.kind === kind && a.status === "AUTORIZADO")
       if (ok.length > 1) add(id, "alta", "PAGO_DUPLICADO", `${ok.length} pagos autorizados de ${kind}: ${ok.map((a) => a.buyOrder).join(", ")}`)
@@ -145,7 +157,26 @@ export async function auditPayments(limit = 5000): Promise<{ checkedOrders: numb
     }
     for (const r of o.refunds ?? []) if (r.status === "INCIERTA") add(id, "alta", "DEVOLUCION_INCIERTA", `${r.id} requiere conciliación`)
   }
+  // Cola de correos: envios fallidos o atascados (no afectan a los pagos, pero el cliente podria no haber recibido su aviso).
+  const mail = db.prepare("SELECT status, COUNT(*) AS n, MIN(created_at) AS oldest FROM mail_outbox WHERE status IN ('FALLIDO','PENDIENTE','ENVIANDO') GROUP BY status").all() as { status: string; n: number; oldest: string }[]
+  for (const m of mail) {
+    const ageMin = Math.round((Date.now() - new Date(m.oldest).getTime()) / 60_000)
+    if (m.status === "FALLIDO") add("-", "alta", "CORREOS_FALLIDOS", `${m.n} correo(s) sin enviar tras los reintentos: ejecutar mail-status`)
+    else if (ageMin > 60) add("-", "media", "CORREOS_ATASCADOS", `${m.n} correo(s) ${m.status} desde hace ${ageMin} min`)
+  }
   return { checkedOrders: ids.length, findings }
+}
+
+/** Exportacion de los datos de un titular por correo (derecho de acceso/portabilidad). SOLO LECTURA; sin tokens. */
+export async function exportCustomerData(email: string) {
+  const db = openDb()
+  const e = email.trim().toLowerCase().slice(0, 120)
+  if (!e.includes("@")) return { orders: [], mail: [] }
+  const ids = db.prepare("SELECT id FROM orders WHERE cust_email = ? ORDER BY created_at").all(e) as { id: string }[]
+  const orders = []
+  for (const { id } of ids) orders.push(await showOrder(id))
+  const mail = db.prepare("SELECT template, status, attempts, created_at AS createdAt, sent_at AS sentAt FROM mail_outbox WHERE to_addr = ? ORDER BY id").all(e)
+  return { orders, mail }
 }
 
 export async function showOrder(orderId: string) {

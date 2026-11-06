@@ -77,7 +77,7 @@ export function buildVoucher(order: Order, a: Attempt): Voucher | null {
   // Cotizacion asociada y saldo pendiente (calculados con los pagos autorizados de la orden; las devoluciones no alteran el saldo del contrato).
   if (order.quote) {
     const paid = order.attempts.filter((x) => x.status === "AUTORIZADO").reduce((n, x) => n + x.amount, 0)
-    rows.push({ label: "Total de la cotización", value: `${formatClp(order.quote.amount)} (anticipo ${order.quote.depositPercent} %)` })
+    rows.push({ label: "Total de la cotización", value: `${formatClp(order.quote.amount)}, IVA incluido (anticipo ${order.quote.depositPercent} %)` })
     rows.push({ label: "Saldo pendiente", value: formatClp(Math.max(0, order.quote.amount - paid)) })
   }
   const back = refundedAmount(order, a)
