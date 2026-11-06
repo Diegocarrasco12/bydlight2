@@ -77,16 +77,75 @@ export async function closeOrder(orderId: string): Promise<AdminResult<null>> {
   })
 }
 
-/** Resumen sin tokens ni mensajes del cliente. */
-export function listOrders(limit = 50) {
+/**
+ * Resumen sin tokens ni mensajes del cliente. `q` (opcional) busca por codigo de orden, orden de compra (buyOrder), correo o nombre.
+ * Incluye monto de la cotizacion, anticipo, saldo y lo efectivamente cobrado (intentos AUTORIZADO).
+ */
+export function listOrders(limit = 50, q?: string) {
   const db = openDb()
+  const term = (q ?? "").trim().slice(0, 80)
+  const like = `%${term.replace(/[!%_]/g, (c) => "!" + c)}%`
   return db
     .prepare(
       `SELECT o.id, o.stage, o.plan_name AS plan, o.cust_name AS name, o.created_at AS createdAt,
+              qt.amount AS quoteAmount, qt.deposit_amount AS depositAmount, qt.balance_amount AS balanceAmount,
+              (SELECT COALESCE(SUM(a.amount), 0) FROM attempts a WHERE a.order_id = o.id AND a.status = 'AUTORIZADO') AS paid,
               (SELECT COUNT(*) FROM attempts a WHERE a.order_id = o.id AND a.status = 'INICIADO') AS pending
-         FROM orders o ORDER BY o.created_at DESC LIMIT ?`,
+         FROM orders o LEFT JOIN quotes qt ON qt.order_id = o.id
+        WHERE (? = '' OR o.id LIKE ? ESCAPE '!' OR o.cust_email LIKE ? ESCAPE '!' OR o.cust_name LIKE ? ESCAPE '!'
+               OR EXISTS (SELECT 1 FROM attempts a WHERE a.order_id = o.id AND a.buy_order LIKE ? ESCAPE '!'))
+        ORDER BY o.created_at DESC LIMIT ?`,
     )
-    .all(Math.min(Math.max(1, limit), 200))
+    .all(term, like, like, like, like, Math.min(Math.max(1, limit), 200))
+}
+
+export type AuditFinding = {
+  orderId: string
+  severity: "alta" | "media" | "info"
+  type: string
+  detail: string
+}
+
+const PENDING_ALERT_MIN = 30 // un intento sin resolver pasados 30 min merece revision (la ventana normal de abandono es de 6)
+
+/**
+ * AUDITORIA de consistencia financiera. SOLO LECTURA: no modifica ordenes ni intentos, no llama a Transbank y no crea cobros.
+ * Detecta: pago autorizado no reflejado en la etapa de la orden, monto autorizado distinto del esperado, pago duplicado,
+ * intentos pendientes demasiado tiempo (retorno interrumpido), intentos en ERROR (revision manual) y cotizaciones incoherentes.
+ * La correccion siempre es una decision humana (o la conciliacion contra Transbank: `reconcile`).
+ */
+export async function auditPayments(limit = 5000): Promise<{ checkedOrders: number; findings: AuditFinding[] }> {
+  const db = openDb()
+  const ids = db.prepare("SELECT id FROM orders ORDER BY created_at DESC LIMIT ?").all(Math.min(Math.max(1, limit), 5000)) as { id: string }[]
+  const findings: AuditFinding[] = []
+  const add = (orderId: string, severity: AuditFinding["severity"], type: string, detail: string) => findings.push({ orderId, severity, type, detail })
+  for (const { id } of ids) {
+    const o = await readOrder(id)
+    if (!o) continue
+    const q = o.quote
+    if (q && (q.depositAmount + q.balanceAmount !== q.amount || q.depositAmount > q.amount)) add(id, "alta", "COTIZACION_INCOHERENTE", "anticipo + saldo no suman el total de la cotización")
+    for (const kind of ["anticipo", "saldo"] as const) {
+      const ok = o.attempts.filter((a) => a.kind === kind && a.status === "AUTORIZADO")
+      if (ok.length > 1) add(id, "alta", "PAGO_DUPLICADO", `${ok.length} pagos autorizados de ${kind}: ${ok.map((a) => a.buyOrder).join(", ")}`)
+      for (const a of ok) {
+        const expected = q ? (kind === "anticipo" ? q.depositAmount : q.balanceAmount) : undefined
+        if (expected === undefined) add(id, "alta", "PAGO_SIN_COTIZACION", `${a.buyOrder} autorizado sin cotización registrada`)
+        else if (a.amount !== expected) add(id, "alta", "MONTO_DISTINTO", `${a.buyOrder}: autorizado ${a.amount}, esperado ${expected}`)
+        const reflected = kind === "anticipo" ? ["ANTICIPO_PAGADO", "SALDO_HABILITADO", "PAGADA", "CERRADA"] : ["PAGADA", "CERRADA"]
+        if (!reflected.includes(o.stage)) add(id, "alta", "AUTORIZADO_NO_REFLEJADO", `${a.buyOrder} autorizado pero la orden está en ${o.stage}`)
+        if (!a.authorizationCode) add(id, "info", "SIN_CODIGO_AUTORIZACION", `${a.buyOrder} sin código de autorización guardado`)
+      }
+    }
+    for (const a of o.attempts) {
+      if (a.status === "ERROR") add(id, "alta", "REVISION_MANUAL", `${a.buyOrder}: ${a.note ?? "intento en ERROR"}`)
+      if (a.status === "INICIADO" || a.status === "PENDIENTE") {
+        const min = Math.round((Date.now() - new Date(a.createdAt).getTime()) / 60_000)
+        if (min > PENDING_ALERT_MIN) add(id, a.status === "PENDIENTE" ? "alta" : "media", "PENDIENTE_LARGO", `${a.buyOrder} ${a.status} hace ${min} min: ejecutar reconcile`)
+      }
+    }
+    for (const r of o.refunds ?? []) if (r.status === "INCIERTA") add(id, "alta", "DEVOLUCION_INCIERTA", `${r.id} requiere conciliación`)
+  }
+  return { checkedOrders: ids.length, findings }
 }
 
 export async function showOrder(orderId: string) {

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { SITE, whatsappLink } from "@/lib/site"
+type PayLogo = { src: string; srcSet?: string; width: number; height: number }
 import { SERVICES, SERVICE_GROUPS } from "@/lib/services"
 
 const LINKS = [
@@ -14,10 +15,27 @@ const LINKS = [
   { href: "/contacto", label: "Contacto" },
 ]
 
-export default function Navbar() {
+/** Insignia informativa de pago seguro (logo oficial Webpay Plus, version positivo sobre placa blanca). Solo enlaza a la seccion de la portada. */
+function PayBadge({ l, onClick, variant }: { l: PayLogo; onClick?: (e: React.MouseEvent) => void; variant: "bar" | "sheet" }) {
+  return (
+    <Link href="/#pagos-seguros" prefetch={false} className={`nb-pay nb-pay-${variant}`} onClick={onClick} aria-label="Pago seguro con Webpay Plus de Transbank: ver cómo se paga">
+      <span className="nb-pay-plate">
+        <img src={l.src} srcSet={l.srcSet} sizes="96px" alt="" width={l.width} height={l.height} decoding="async" />
+      </span>
+      <span className="nb-pay-txt">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg>
+        Pago seguro
+      </span>
+    </Link>
+  )
+}
+
+/** payLogo: logo oficial Webpay Plus (positivo) que entrega el layout solo cuando Webpay se anuncia; sin el, no hay insignia. */
+export default function Navbar({ payLogo = null }: { payLogo?: PayLogo | null }) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -36,6 +54,23 @@ export default function Navbar() {
       document.documentElement.classList.remove("bd-lock")
     }
   }, [open])
+
+  // Ancla a la seccion de pagos. Se cierra el menu (bloquea el scroll del fondo) y luego se salta a la seccion; como las secciones usan
+  // content-visibility (alturas estimadas), se reajusta la posicion varias veces mientras el contenido de arriba termina de calcularse.
+  const goPay = (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    setOpen(false)
+    const align = () => document.getElementById("pagos-seguros")?.scrollIntoView({ behavior: "instant", block: "start" })
+    const settle = () => { align(); [250, 600, 1100].forEach((ms) => window.setTimeout(align, ms)) }
+    window.setTimeout(() => {
+      if (pathname === "/") { settle(); window.history.replaceState(null, "", "/#pagos-seguros") }
+      else {
+        router.push("/#pagos-seguros", { scroll: false })
+        let n = 0
+        const t = window.setInterval(() => { if (document.getElementById("pagos-seguros") || ++n > 40) { window.clearInterval(t); settle() } }, 50)
+      }
+    }, 150)
+  }
 
   const current = (href: string) => pathname === href || pathname.startsWith(href + "/")
 
@@ -77,6 +112,8 @@ export default function Navbar() {
             )}
           </nav>
 
+          {payLogo && <PayBadge l={payLogo} variant="bar" onClick={goPay} />}
+
           <Link href="/contacto" prefetch={false} className="bd-btn bd-btn-primary bd-header-cta">
             Cotizar proyecto
           </Link>
@@ -115,6 +152,7 @@ export default function Navbar() {
             </div>
           ))}
         </nav>
+        {payLogo && <div className="bd-sheet-pay"><PayBadge l={payLogo} variant="sheet" onClick={goPay} /></div>}
         <p className="bd-sheet-foot">{SITE.email}</p>
       </div>
 

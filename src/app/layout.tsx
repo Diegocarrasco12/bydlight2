@@ -6,6 +6,7 @@ import "../styles/fase2.css"
 import "../styles/signature.css"
 import "../styles/refine.css"
 import "../styles/pagos.css"
+import "../styles/pagos-propuestas.css"
 import "../styles/bento.css"
 import "../styles/perf.css"
 import Navbar from "../components/navbar/Navbar"
@@ -13,6 +14,7 @@ import Footer from "../components/footer/Footer"
 import JsonLd from "../components/seo/JsonLd"
 import PreviewBar from "../components/payments/PreviewBar"
 import { SITE, absoluteUrl } from "../lib/site"
+import { PAYMENT_LOGOS_LIGHT, webpayAnnounced } from "../lib/payments/availability"
 
 // Tipografias de Bydlight Signature (autoalojadas por next/font; licencia SIL OFL 1.1, uso comercial permitido).
 // Titulos: Space Grotesk (pesos 400-600). Texto: Inter (variable). Rotulos y cifras: IBM Plex Mono (solo detalles tecnicos).
@@ -109,7 +111,7 @@ export default function RootLayout({
         <a href="#contenido" className="bd-skip">Saltar al contenido</a>
         <JsonLd data={organization} />
         <PreviewBar />
-        <Navbar />
+        <Navbar payLogo={webpayAnnounced() ? PAYMENT_LOGOS_LIGHT.webpay : null} />
         <main id="contenido" className="bd-main">{children}</main>
         <Footer />
       </body>

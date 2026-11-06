@@ -1,0 +1,179 @@
+/* ==========================================================================
+   PROPUESTAS VISUALES de «pagos seguros» (A minimalista · B confianza tecnologica · C Signature Payments).
+   SOLO VISTA PREVIA LOCAL: PaymentTrust solo se renderiza con previewMode(); en produccion este CSS no tiene elementos que afectar.
+   Selector: html[data-pay="a|b|c"] (PayVariantSwitch). Sin atributo = C (propuesta elegida para el pie de pagina). Los logotipos no se recolorean ni llevan sombra/filtro.
+   ========================================================================== */
+html:root {
+  & .pt-var { display: none; }
+  &[data-pay="a"] .pt-var[data-v="a"],
+  &[data-pay="b"] .pt-var[data-v="b"],
+  &:not([data-pay="a"]):not([data-pay="b"]) .pt-var[data-v="c"] { display: block; }
+  & .pt-fixed-footer { margin-top: 14px; }
+  & .pt-var[data-place="footer"] { margin-top: 14px; }
+  & .pt-var[data-place="checkout"] { margin: 4px 0 0; }
+
+  & .pt { position: relative; margin-top: 44px; color: var(--text); }
+  & .pt img { display: block; max-width: 100%; }
+  & .pt-title { font-family: var(--display); font-weight: 500; letter-spacing: -0.03em; line-height: 1.1; margin: 0; font-size: clamp(1.5rem, 2.6vw, 2.15rem); }
+  & .pt-text { margin: 12px 0 0; color: var(--muted); font-size: 1rem; line-height: 1.6; max-width: 58ch; }
+  & .pt-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-2); margin-bottom: 12px; }
+  & .pt-cap { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  & .pt-sep { width: 1px; align-self: stretch; min-height: 20px; background: var(--line-2); }
+  & .pt-fine { font-size: 0.8rem; line-height: 1.5; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+  & .pt-cta { margin-top: 22px; }
+  & .pt-points { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
+  & .pt-points li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.9rem; line-height: 1.45; color: var(--muted); }
+  & .pt-points svg { flex: none; color: var(--ok); margin-top: 1px; }
+  & .pt-steps { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 14px; }
+  & .pt-steps li { display: flex; gap: 14px; align-items: flex-start; }
+  & .pt-steps strong { display: block; font-weight: 500; font-size: 0.95rem; }
+  & .pt-steps small { display: block; color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+  & .pt-n { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: 0.75rem; color: var(--orange-2); border: 1px solid rgba(255, 138, 61, 0.5); }
+
+  /* ======================= A · PREMIUM MINIMALISTA ======================= */
+  & .pt-a { border-block: 1px solid var(--line); padding: 34px 0; }
+  & .pt-a.pt-home { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 32px 56px; align-items: center; }
+  & .pt-a-logos { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; padding: 22px 28px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--panel); justify-content: center; }
+  & .pt-a.pt-plans { display: flex; align-items: center; justify-content: space-between; gap: 18px 32px; flex-wrap: wrap; padding: 18px 0; margin-top: 28px; }
+  & .pt-a.pt-plans p { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 60ch; }
+  & .pt-a.pt-plans .pt-a-logos { padding: 10px 16px; gap: 14px; }
+  & .pt-a.pt-checkout { margin: 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); display: grid; gap: 10px; }
+  & .pt-a.pt-checkout .pt-a-logos { border: 0; background: none; padding: 0; justify-content: flex-start; gap: 16px; }
+  & .pt-a.pt-footer { border: 0; padding: 0; margin: 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  /* ======================= B · CONFIANZA TECNOLOGICA ======================= */
+  & .pt-b { border: 1px solid var(--line-2); border-radius: 18px; padding: 34px; overflow: hidden; isolation: isolate;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)); }
+  & .pt-b::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px), radial-gradient(520px 260px at 0% 0%, rgba(91, 140, 255, 0.16), transparent 70%);
+    background-size: 36px 36px, 36px 36px, auto; -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 100%); mask-image: linear-gradient(180deg, #000 20%, transparent 100%); }
+  & .pt-b::after { content: ""; position: absolute; left: 34px; right: 34px; top: -1px; height: 1px; background: linear-gradient(90deg, var(--orange), transparent 60%); }
+  & .pt-b-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 26px; }
+  & .pt-b-card { border: 1px solid var(--line-2); border-radius: var(--radius); padding: 22px; background: rgba(8, 9, 11, 0.55); display: grid; align-content: start; gap: 12px; }
+  & .pt-b-logos { justify-items: start; }
+  & .pt-b-card .pt-points { margin-top: 4px; }
+  & .pt-b-card .pt-cta { margin-top: 10px; justify-self: start; }
+  & .pt-b.pt-plans { padding: 16px 20px; margin-top: 28px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px 22px; align-items: center; border-radius: var(--radius); }
+  & .pt-b.pt-plans .pt-eyebrow { margin: 0; }
+  & .pt-b.pt-plans p { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+  & .pt-b-chips { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  & .pt-b.pt-checkout { margin: 0; padding: 16px; border-radius: var(--radius-sm); display: grid; gap: 12px; }
+  & .pt-b.pt-checkout::before, & .pt-b.pt-checkout::after { display: none; }
+  & .pt-b.pt-checkout .pt-eyebrow { margin: 0; }
+  & .pt-b.pt-checkout .pt-points { margin: 0; }
+  & .pt-b.pt-footer { border: 0; padding: 0; margin: 0; background: none; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-radius: 0; }
+  & .pt-b.pt-footer::before, & .pt-b.pt-footer::after { display: none; }
+
+  /* ======================= C · BYDLIGHT SIGNATURE PAYMENTS ======================= */
+  & .pt-c.pt-home { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr); gap: 40px 64px; align-items: center; padding: 48px; border-radius: 22px; border: 1px solid var(--line-2); overflow: hidden; isolation: isolate;
+    background: radial-gradient(700px 360px at 100% 0%, rgba(255, 138, 61, 0.2), transparent 65%), linear-gradient(180deg, #0f1013, #0a0b0d); }
+  & .pt-c .pt-title { font-size: clamp(1.9rem, 3.6vw, 3rem); letter-spacing: -0.04em; }
+  & .pt-c .pt-title em { font-style: normal; color: var(--orange); }
+  & .pt-c .pt-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line-2); }
+  & .pt-c .pt-steps li { flex-direction: column; gap: 10px; }
+  & .pt-c-plate { display: grid; gap: 16px; }
+  & .pt-c-card { background: #fff; border-radius: 18px; padding: 30px 32px; display: grid; justify-items: start; gap: 14px; box-shadow: 0 30px 60px -34px rgba(0, 0, 0, 0.9); }
+  & .pt-c-card hr { width: 100%; border: 0; height: 1px; background: #e4e6eb; margin: 2px 0; }
+  & .pt-by { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; color: #6b7080; }
+  & .pt-c-note { margin: 0; display: flex; gap: 10px; align-items: flex-start; font-size: 0.86rem; line-height: 1.5; color: var(--muted); }
+  & .pt-c-note svg { flex: none; color: var(--ok); margin-top: 1px; }
+  & .pt-c-chip { background: #fff; border-radius: 12px; padding: 8px 14px; display: inline-flex; align-items: center; }
+  & .pt-c.pt-plans { margin-top: 28px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px 24px; align-items: center; padding: 16px 20px; border: 1px solid var(--line-2); border-radius: var(--radius);
+    background: linear-gradient(90deg, rgba(255, 138, 61, 0.1), rgba(255, 255, 255, 0.02) 55%); border-left: 3px solid var(--orange); }
+  & .pt-c-plans-copy strong { display: block; font-weight: 500; font-size: 0.98rem; }
+  & .pt-c-plans-copy span { display: block; color: var(--muted); font-size: 0.84rem; margin-top: 2px; }
+  & .pt-mini-steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; counter-reset: s; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  & .pt-mini-steps li { counter-increment: s; padding: 5px 10px; border: 1px solid var(--line-2); border-radius: 999px; white-space: nowrap; }
+  & .pt-mini-steps li::before { content: counter(s) "· "; color: var(--orange-2); }
+  & .pt-c.pt-checkout { margin: 0; display: grid; gap: 12px; }
+  & .pt-c-card-row { grid-template-columns: auto 1fr auto; align-items: center; justify-items: start; padding: 14px 18px; border-radius: 14px; gap: 14px; box-shadow: none; }
+  & .pt-c-card-row .pt-by { justify-self: end; }
+  & .pt-c.pt-footer { margin: 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+}
+
+@media (max-width: 900px) {
+  html:root .pt-a.pt-home, html:root .pt-b-grid, html:root .pt-c.pt-home { grid-template-columns: minmax(0, 1fr); }
+  html:root .pt-c.pt-home { padding: 32px 24px; }
+  html:root .pt-b { padding: 24px 20px; }
+  html:root .pt-b.pt-plans, html:root .pt-c.pt-plans { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+}
+@media (max-width: 640px) {
+  html:root .pt-c .pt-steps { grid-template-columns: minmax(0, 1fr); }
+  html:root .pt-c .pt-steps li { flex-direction: row; }
+  html:root .pt-mini-steps { flex-wrap: wrap; }
+  html:root .pt-a-logos { padding: 16px 18px; }
+  html:root .pt-c-card { padding: 22px; }
+  html:root .pt-c-card-row { grid-template-columns: minmax(0, 1fr); }
+  html:root .pt-c-card-row .pt-by { justify-self: start; }
+  html:root .pt-cta { width: 100%; justify-content: center; }
+}
+
+/* Selector local A/B/C (dentro de la franja de la vista previa) */
+html:root {
+  & .pv-pay { display: inline-flex; align-items: center; gap: 4px; }
+  & .pv-pay-l { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; margin-right: 4px; }
+  & .pv-pay button { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--line-2); background: transparent; color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
+  & .pv-pay button:hover { border-color: var(--orange-2); }
+  & .pv-pay button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  & .pv-pay button[aria-pressed="true"] { background: var(--orange); border-color: var(--orange); color: #111; }
+}
+
+/* ======================= Seccion «pago seguro» de la portada (SecurePaySection) y senal junto a CTA ======================= */
+html:root {
+  & .sp { position: relative; isolation: isolate; margin-top: 56px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 40px 64px; align-items: center;
+    padding: 52px; border-radius: 22px; border: 1px solid var(--line-2); overflow: hidden;
+    background: linear-gradient(180deg, #0f1013, #0a0b0d); box-shadow: 0 30px 70px -40px #000; }
+  & .sp::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(640px 340px at 100% 0%, rgba(255, 138, 61, 0.2), transparent 65%), radial-gradient(420px 260px at 0% 100%, rgba(91, 140, 255, 0.1), transparent 70%); animation: sp-glow 9s ease-in-out infinite alternate; }
+  & .sp::after { content: ""; position: absolute; left: 52px; right: 52px; top: -1px; height: 1px; background: linear-gradient(90deg, var(--orange), transparent 65%); }
+  & .sp-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-2); margin-bottom: 14px; }
+  & .sp-title { font-family: var(--display); font-weight: 500; font-size: clamp(1.9rem, 3.6vw, 3rem); letter-spacing: -0.04em; line-height: 1.06; margin: 0; }
+  & .sp-title em { font-style: normal; color: var(--orange); }
+  & .sp-lead { margin: 16px 0 0; color: var(--muted); font-size: 1.02rem; line-height: 1.6; max-width: 54ch; }
+  & .sp-steps { list-style: none; margin: 26px 0 0; padding: 18px 0 0; border-top: 1px solid var(--line-2); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  & .sp-steps li { display: flex; flex-direction: column; gap: 10px; font-size: 0.92rem; line-height: 1.35; }
+  & .sp-steps span { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: 0.75rem; color: var(--orange-2); border: 1px solid rgba(255, 138, 61, 0.5); }
+  & .sp-cta { margin-top: 26px; }
+  & .sp-plate { display: grid; gap: 16px; }
+  & .sp-card { background: #fff; border-radius: 20px; padding: 32px 34px; display: grid; justify-items: start; gap: 14px; box-shadow: 0 30px 60px -34px rgba(0, 0, 0, 0.9); transition: transform 0.4s ease; }
+  & .sp-card:hover { transform: translateY(-3px); }
+  & .sp-card img { display: block; height: auto; max-width: 100%; }
+  & .sp-card img:first-child { width: min(300px, 100%); }
+  & .sp-card .sp-tb { width: 130px; }
+  & .sp-card hr { width: 100%; border: 0; height: 1px; background: #e4e6eb; margin: 2px 0; }
+  & .sp-by { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; color: #6b7080; }
+  & .sp-note { margin: 0; display: flex; gap: 10px; align-items: flex-start; font-size: 0.86rem; line-height: 1.55; color: var(--muted); }
+  & .sp-note svg { flex: none; color: var(--ok); margin-top: 2px; }
+  & .cta-trust { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; font-size: 0.8rem; line-height: 1.45; color: var(--muted); }
+  & .cta-trust svg { flex: none; color: var(--ok); }
+  & .bd-cta .cta-trust { justify-content: center; text-align: center; margin: 16px auto 0; width: fit-content; max-width: 100%; }
+  & .sp .cta-trust { margin-top: 12px; }
+}
+@keyframes sp-glow { from { opacity: 0.75; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { html:root .sp::before { animation: none; } html:root .sp-card { transition: none; } }
+@media (max-width: 900px) {
+  html:root .sp { grid-template-columns: minmax(0, 1fr); padding: 34px 24px; margin-top: 40px; }
+  html:root .sp::after { left: 24px; right: 24px; }
+}
+@media (max-width: 640px) {
+  html:root .sp-steps { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  html:root .sp-steps li { flex-direction: row; align-items: center; gap: 12px; }
+  html:root .sp-card { padding: 24px 22px; }
+  html:root .sp-cta { width: 100%; justify-content: center; }
+}
+
+/* ======================= Insignia de pago seguro en el navbar (mismo lenguaje que el pie C: placa blanca + logo oficial positivo) ======================= */
+html:root {
+  & .nb-pay { pointer-events: auto; display: inline-flex; align-items: center; gap: 10px; flex: none; padding: 4px 12px 4px 4px; border: 1px solid var(--line-2); border-radius: 12px; color: var(--muted); font-size: 0.78rem; line-height: 1; white-space: nowrap; transition: border-color 0.25s, color 0.25s; }
+  & .nb-pay:hover { border-color: rgba(255, 138, 61, 0.55); color: var(--text); }
+  & .nb-pay:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+  & .nb-pay-plate { background: #fff; border-radius: 9px; padding: 5px 9px; display: inline-flex; align-items: center; }
+  & .nb-pay-plate img { display: block; height: 20px; width: auto; }
+  & .nb-pay-txt { display: inline-flex; align-items: center; gap: 6px; }
+  & .nb-pay-txt svg { color: var(--ok); }
+  & .bd-sheet-pay { margin: 22px 0 16px; }
+  & .nb-pay-sheet { padding: 6px 16px 6px 6px; font-size: 0.86rem; }
+  & .nb-pay-sheet .nb-pay-plate img { height: 26px; }
+}
+@media (max-width: 1180px) and (min-width: 901px) { html:root .nb-pay-bar .nb-pay-txt { display: none; } html:root .nb-pay-bar { padding-right: 4px; } }
+@media (max-width: 900px) and (min-width: 641px) { html:root .nb-pay-bar { margin-left: auto; } html:root .bd-header-inner:has(.nb-pay-bar) .bd-burger { margin-left: 0; } html:root .nb-pay-bar .nb-pay-txt { display: inline-flex; } }
+@media (max-width: 640px) { html:root .nb-pay-bar { display: none; } }

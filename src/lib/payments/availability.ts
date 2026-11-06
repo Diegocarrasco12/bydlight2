@@ -62,3 +62,39 @@ export const PAYMENT_LOGOS: { webpay: BrandLogo | null; transbank: BrandLogo | n
   },
   cards: [],
 }
+
+/**
+ * Version «positivo full color» (para superficies CLARAS) de los mismos logotipos oficiales, tambien sin modificar.
+ * Solo la usa la propuesta C de la vista previa (placa blanca); el resto del sitio usa «negativo» sobre fondo oscuro.
+ */
+export const PAYMENT_LOGOS_LIGHT: { webpay: BrandLogo; transbank: BrandLogo } = {
+  webpay: {
+    src: "/img/pagos/webpay-plus-positivo-800.png",
+    srcSet: "/img/pagos/webpay-plus-positivo-300.png 301w, /img/pagos/webpay-plus-positivo-800.png 800w",
+    alt: "Webpay Plus de Transbank",
+    width: 800,
+    height: 198,
+  },
+  transbank: {
+    src: "/img/pagos/transbank-positivo-800.png",
+    srcSet: "/img/pagos/transbank-positivo-300.png 300w, /img/pagos/transbank-positivo-800.png 800w",
+    alt: "Transbank",
+    width: 800,
+    height: 250,
+  },
+}
+
+/** Textos de las propuestas visuales de «pagos seguros» (mismo contenido en las tres variantes). */
+export const TRUST_TITLE = "Paga con confianza. Tu proyecto, más cerca."
+export const TRUST_TEXT =
+  "En Bydlight Solutions puedes pagar tus proyectos mediante Webpay Plus de Transbank, utilizando los medios de pago disponibles en la plataforma. Tus datos bancarios se ingresan directamente en el entorno seguro de Webpay."
+export const TRUST_POINTS = [
+  "Tus datos bancarios se ingresan solo en el entorno seguro de Webpay.",
+  "Bydlight no ve ni guarda los datos de tu tarjeta.",
+  "Pagas el anticipo de una cotización ya aprobada.",
+]
+export const TRUST_STEPS = [
+  { t: "Solicitas tu cotización", d: "Cuéntanos el proyecto." },
+  { t: "La revisamos y aprobamos", d: "Alcance, plazos y anticipo por escrito." },
+  { t: "Pagas el anticipo en Webpay", d: "Desde el enlace de tu cotización." },
+]

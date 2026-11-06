@@ -2,6 +2,7 @@ import { PAY_HEADLINE, PAY_SUBTITLE, PAY_TRUST, webpayAnnounced } from "@/lib/pa
 import { resolveBrands, transbankLogo, type ResolvedBrand } from "@/lib/payments/brand-assets"
 import { paymentsEnabled } from "@/lib/payments/config"
 import { previewMode } from "@/lib/preview"
+import PaymentTrust, { FooterC, type TrustPlace } from "./PaymentTrust"
 
 /**
  * Banda de medios de pago (Webpay Plus). Las variantes publicas (hero, compact) solo se renderizan con el anuncio publico
@@ -80,8 +81,14 @@ function Brands({ size }: { size: "lg" | "md" }) {
   )
 }
 
-export default function PaymentBrandShowcase({ variant = "hero", id }: { variant?: ShowcaseVariant; id?: string }) {
+export default function PaymentBrandShowcase({ variant = "hero", id, place }: { variant?: ShowcaseVariant; id?: string; place?: TrustPlace }) {
   if (variant === "checkout" ? !paymentsEnabled() && !webpayAnnounced() : !webpayAnnounced()) return null
+
+  // Pie de pagina: diseno C definitivo (aprobado), en vista previa y en el sitio publicado una vez anunciado Webpay.
+  if (place === "footer") return <FooterC />
+
+  // VISTA PREVIA local: tres propuestas visuales (A/B/C) con selector. En produccion previewMode() es false y se usa el diseno vigente.
+  if (previewMode()) return <PaymentTrust place={place ?? (variant === "checkout" ? "checkout" : variant === "compact" ? "plans" : "home")} />
 
   if (variant === "compact") {
     return (

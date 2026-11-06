@@ -50,6 +50,7 @@ export function buildVoucher(order: Order, a: Attempt): Voucher | null {
   if (a.status !== "AUTORIZADO") return null
   const rows: VoucherRow[] = [
     { label: "Comercio", value: COMMERCE_NAME },
+    { label: "Orden Bydlight", value: order.id },
     { label: "Orden de compra", value: a.buyOrder },
     { label: "Descripción", value: `${order.planName} — ${a.kind === "anticipo" ? "anticipo" : "saldo"}` },
     { label: "Monto pagado", value: `${formatClp(a.amount)} (CLP)` },
@@ -70,6 +71,12 @@ export function buildVoucher(order: Order, a: Attempt): Voucher | null {
     }
   }
   if (a.cardLast4) rows.push({ label: "Tarjeta", value: `•••• ${a.cardLast4}` })
+  // Cotizacion asociada y saldo pendiente (calculados con los pagos autorizados de la orden; las devoluciones no alteran el saldo del contrato).
+  if (order.quote) {
+    const paid = order.attempts.filter((x) => x.status === "AUTORIZADO").reduce((n, x) => n + x.amount, 0)
+    rows.push({ label: "Total de la cotización", value: `${formatClp(order.quote.amount)} (anticipo ${order.quote.depositPercent} %)` })
+    rows.push({ label: "Saldo pendiente", value: formatClp(Math.max(0, order.quote.amount - paid)) })
+  }
   const back = refundedAmount(order, a)
   if (back > 0) rows.push({ label: "Monto devuelto", value: formatClp(back) })
   return { title: "Comprobante de pago", rows }

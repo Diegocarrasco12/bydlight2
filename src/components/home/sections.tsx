@@ -9,6 +9,7 @@ import {
   planHref,
   planWhatsappMessage,
 } from "@/lib/plans"
+import CtaTrust from "@/components/payments/CtaTrust"
 import { SERVICES } from "@/lib/services"
 import { whatsappLink } from "@/lib/site"
 
@@ -237,6 +238,7 @@ export function FinalCta({ title = "¿Tienes un proyecto en mente?" }: { title?:
               Escribir por WhatsApp
             </a>
           </div>
+          <CtaTrust />
         </div>
       </div>
     </section>

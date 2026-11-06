@@ -1,5 +1,5 @@
 import { verifyAdminRequest } from "@/lib/payments/adminAuth"
-import { approveQuote, closeOrder, listOrders, reconcilePending, releaseBalance, showOrder } from "@/lib/payments/adminOps"
+import { approveQuote, auditPayments, closeOrder, listOrders, reconcilePending, releaseBalance, showOrder } from "@/lib/payments/adminOps"
 import { adminRefundsEnabled, paymentsEnabled } from "@/lib/payments/config"
 import { reconcileRefund, refundPayment } from "@/lib/payments/refunds"
 import { json } from "@/lib/payments/http"
@@ -28,7 +28,9 @@ export async function POST(req: Request) {
   const n = (v: unknown) => (typeof v === "number" ? v : NaN)
   switch (b.action) {
     case "list":
-      return json({ orders: listOrders(typeof b.limit === "number" ? b.limit : 50) })
+      return json({ orders: listOrders(typeof b.limit === "number" ? b.limit : 50, typeof b.q === "string" ? b.q : undefined) })
+    case "audit":
+      return json(await auditPayments())
     case "show": {
       const o = await showOrder(id)
       return o ? json({ order: o }) : json({ error: "Orden no encontrada." }, 404)

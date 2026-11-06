@@ -109,6 +109,7 @@ function Result({ a, order }: { a: Attempt; order: Order }) {
               <div key={row.label} className="bd-dl-row"><dt>{row.label}</dt><dd>{row.value}</dd></div>
             ))}
           </dl>
+          <p className="bd-note left">Este comprobante acredita el pago en línea con Webpay Plus. No reemplaza el documento tributario que corresponda emitir por separado.</p>
           {refunded.length > 0 && <p className="bd-note">Se registró una devolución sobre este pago. Si tienes dudas, escríbenos con el código de la orden.</p>}
           <div className="bd-voucher-brand">
             <span>Pago procesado por Webpay Plus de Transbank</span>
@@ -166,7 +167,7 @@ function PayPanel({
         <div className="total"><dt>Total a pagar</dt><dd>{clp(amount)}</dd></div>
       </dl>
       <PaymentBrandShowcase variant="checkout" />
-      <p className="bd-note left">Al pagar serás redirigido al sitio de Transbank para completar la operación.</p>
+      <p className="bd-note left">Al pagar serás redirigido al sitio de Transbank para completar la operación. Luego volverás a esta página, donde verás el resultado y tu comprobante.</p>
       {sandbox && !preview && <p className="bd-note left">Ambiente de pruebas de Transbank: no se realizan cobros reales.</p>}
       <input type="hidden" name="orderId" value={orderId} />
       <input type="hidden" name="kind" value={kind} />

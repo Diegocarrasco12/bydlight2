@@ -1,5 +1,5 @@
 import Link from "next/link"
-import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
+import SecurePaySection from "@/components/payments/SecurePaySection"
 import ContactForm from "@/components/contact/ContactForm"
 import { ProjectFeature, ProjectGrid } from "@/components/portfolio/Portfolio"
 import { SERVICES } from "@/lib/services"
@@ -302,7 +302,7 @@ export function PlansTeaser() {
           </div>
           <Link href="/planes" prefetch={false} className="bd-btn bd-btn-ghost">Ver planes y precios</Link>
         </div>
-        <PaymentBrandShowcase />
+        <SecurePaySection />
       </div>
     </section>
   )

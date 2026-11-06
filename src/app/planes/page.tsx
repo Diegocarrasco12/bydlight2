@@ -56,7 +56,7 @@ export default function PlanesPage() {
         lead="Cada plan indica páginas, revisiones y plazos por escrito. Para proyectos más complejos, cotización a medida."
       />
       <PlansGrid showHead={false} />
-      <div className="bd-container"><PaymentBrandShowcase /></div>
+      <div className="bd-container"><PaymentBrandShowcase place="plans" /></div>
       <PlanComparison />
       {/* El mensaje de Webpay solo aparece si el checkout esta habilitado (ver lib/payments/availability.ts). */}
       <MaintenanceBlock extraRules={webpayAnnounced() ? [WEBPAY_PLANS_NOTE] : []} />

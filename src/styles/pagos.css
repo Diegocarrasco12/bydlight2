@@ -164,5 +164,5 @@ html:root {
   html:root .bd-footer-grid.has-legal { grid-template-columns: 1fr; }
   html:root .pv-grid { grid-template-columns: 1fr; }
   html:root .pv-bar { bottom: 84px; right: 12px; left: 12px; justify-content: space-between; border-radius: 14px; }
-  html:root .pv-bar span { display: none; }
+  html:root .pv-bar > span:not(.pv-pay) { display: none; }
 }

@@ -68,7 +68,7 @@ export default function Footer() {
 
         <div className="bd-footer-bottom">
           <span>© {new Date().getFullYear()} {SITE.name}. Todos los derechos reservados.</span>
-          <PaymentBrandShowcase variant="compact" />
+          <PaymentBrandShowcase variant="compact" place="footer" />
         </div>
       </div>
     </footer>
