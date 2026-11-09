@@ -21,8 +21,10 @@ export default function DevolucionesPage() {
       <p>
         Si contratas como consumidor por medios electrónicos, la Ley N° 19.496 (artículo 3 bis) te permite poner término unilateral al contrato dentro de
         10 días contados desde la contratación del servicio. Si Bydlight no te envía la confirmación escrita del contrato
-        (artículo 12 A), ese plazo se extiende a 90 días. La ley permite al proveedor disponer expresamente lo contrario; Bydlight no lo ha dispuesto: no excluye en forma general este derecho
-        en sus servicios de desarrollo contratados por medios electrónicos. Bydlight te envía la confirmación escrita por correo una vez pagado el anticipo.
+        (artículo 12 A), ese plazo se extiende a 90 días. En los contratos de prestación de servicios, la ley (artículo 3 bis letra b y su reglamento) permite al proveedor excluir el
+        retracto si lo informa de forma clara e inequívoca antes de contratar y pagar, y entiende que el derecho se ejerce antes de que comience la prestación. Bydlight no hace uso de esa
+        facultad: no excluye en forma general este derecho en sus servicios de desarrollo contratados por medios electrónicos y no considera que el inicio del proyecto lo extinga. Esta opción, la más
+        favorable para ti, es la que se aplica mientras el titular no resuelva otra cosa y la informe antes de contratar. Bydlight te envía la confirmación escrita por correo una vez pagado el anticipo.
       </p>
       <p>
         Para ejercerlo, escribe a <a href={`mailto:${SITE.email}`}>{SITE.email}</a> indicando el código de tu orden y que deseas retractarte. En servicios, la devolución comprende

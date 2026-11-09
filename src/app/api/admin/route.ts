@@ -10,6 +10,7 @@ import { monitorAndAlert } from "@/lib/payments/monitor"
 import { json } from "@/lib/payments/http"
 import { listTaxDocuments, markTaxDocumentIssued, pendingTaxDocuments, registerTaxDocument, voidTaxDocument } from "@/lib/payments/taxDocs"
 import { storageWritable } from "@/lib/payments/store"
+import { eraseOrder, rectifyCustomer, retentionRun } from "@/lib/payments/privacy"
 
 export const dynamic = "force-dynamic"
 
@@ -127,6 +128,22 @@ export async function POST(req: Request) {
     }
     case "mail-dispatch":
       return json(await dispatchDue(20))
+    // Privacidad: SIMULACION salvo `execute: true`. Solo anonimiza solicitudes sin contratacion ni pago (ver privacy.ts).
+    case "privacy-scan":
+      return json(retentionRun({ execute: b.execute === true, limit: typeof b.limit === "number" ? b.limit : undefined, months: typeof b.months === "number" ? b.months : undefined }))
+    case "privacy-erase": {
+      const r = eraseOrder(id, { execute: b.execute === true })
+      return r.ok ? json(r) : json(r, 422)
+    }
+    case "privacy-rectify": {
+      const r = rectifyCustomer(id, {
+        name: typeof b.name === "string" ? b.name : undefined,
+        email: typeof b.email === "string" ? b.email : undefined,
+        phone: typeof b.phone === "string" ? b.phone : undefined,
+        company: typeof b.company === "string" ? b.company : undefined,
+      })
+      return r.ok ? json(r) : json(r, 422)
+    }
     case "customer-data":
       return json(await exportCustomerData(typeof b.email === "string" ? b.email : ""))
     case "reconcile":

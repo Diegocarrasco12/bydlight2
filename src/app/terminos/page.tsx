@@ -71,7 +71,7 @@ export default function TerminosPage() {
       <h2>10. Garantías, soporte y mantenimiento</h2>
       <p>Rigen las garantías legales que correspondan, que estos términos no limitan. Los defectos de funcionamiento respecto de lo cotizado se corrigen conforme a la garantía indicada en la cotización. El soporte posterior a la entrega y el mantenimiento no están incluidos salvo que la cotización o el plan los incluyan; el mantenimiento mensual es un servicio aparte, con su alcance y duración. Ver <a href="/soporte">Contacto y soporte</a>.</p>
       <h2>11. Cancelación, retracto y devoluciones</h2>
-      <p>Ver la <a href="/devoluciones">Política de cancelación y devoluciones</a>.</p>
+      <p>Si contratas como consumidor puedes retractarte dentro de 10 días desde la contratación (90 días si no recibes la confirmación escrita). Bydlight no excluye este derecho, no aplica penalizaciones y el inicio del proyecto no lo extingue; si ya se prestó parte del servicio, solo se descuenta lo efectivamente prestado. Ver la <a href="/devoluciones">Política de cancelación y devoluciones</a>.</p>
       <h2>12. Datos personales</h2>
       <p>Los datos entregados se usan para gestionar la solicitud, el proyecto y los pagos. Ver la <a href="/privacidad">Política de privacidad</a>.</p>
       <h2>13. Ley aplicable y reclamos</h2>

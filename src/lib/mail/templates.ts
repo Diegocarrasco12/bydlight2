@@ -1,6 +1,6 @@
 import { COMPANY } from "@/lib/company"
 import { SITE } from "@/lib/site"
-import { LEGAL_PAGES_PUBLISHED, TAX_NOTE } from "@/lib/legal"
+import { LEGAL_PAGES_PUBLISHED, RETRACTO_NOTICE, TAX_NOTE } from "@/lib/legal"
 import { IVA_PERCENT, ivaBreakdown } from "@/lib/tax"
 import { quoteConditionRows } from "@/lib/plans"
 import { buildVoucher, formatClp, formatWhen } from "@/lib/payments/voucher"
@@ -157,7 +157,7 @@ export function contratacionConfirmada(o: Order, termsVersion: string, termsAt?:
     {
       small: [
         "El alcance, entregables, plazos y condiciones específicas de tu proyecto constan en la cotización aceptada y en los términos de contratación indicados.",
-        `Si contrataste como consumidor a través de este sitio, puedes ejercer el derecho de retracto que contempla la Ley N° 19.496 en los términos y plazos legales, escribiéndonos a ${SITE.email} con el código de tu orden. Conserva este correo como respaldo.`,
+        `${RETRACTO_NOTICE} Para ejercerlo, escríbenos a ${SITE.email} con el código de tu orden. Este correo es la confirmación escrita del contrato; consérvalo como respaldo.`,
         ...legalLinks(),
         NO_TAX_DOC,
       ],

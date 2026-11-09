@@ -114,7 +114,7 @@ test("LG11. clausulas comerciales propuestas: sin aprobacion por silencio, antic
 test("LG12. ronda r4: retracto sin restricciones, servicios prestados documentados, privacidad con conservacion y transferencias, sin fecha tributaria asumida", () => {
   const d = text(page("devoluciones"))
   assert.doesNotMatch(d, /antes de que el servicio se preste/)
-  assert.match(d, /Bydlight no lo ha dispuesto/)
+  assert.match(d, /Bydlight no hace uso de esa facultad/)
   assert.match(d, /informa por escrito qué trabajo se prestó efectivamente/)
   assert.match(d, /puedes\s+objetarla por escrito/)
   const p = text(page("privacidad"))
@@ -132,9 +132,11 @@ test("QC1. la cotizacion informa plazo, revisiones, soporte/correccion de defect
   const { quoteConditionRows, PLANS } = await import("../src/lib/plans.ts")
   for (const p of PLANS.filter((x) => x.modality === "directa")) {
     const keys = quoteConditionRows(p.id, 50).map((r) => r[0])
-    for (const k of ["Plazo de entrega (referencial)", "Revisiones incluidas", "Soporte y corrección de defectos", "Condiciones de pago"]) assert.ok(keys.includes(k), `${p.id} ${k}`)
+    for (const k of ["Entregables y alcance", "Plazo de entrega (referencial)", "Revisiones incluidas", "Soporte y corrección de defectos", "Garantías", "Mantenimiento", "Condiciones de pago", "Propiedad intelectual, licencias y código fuente"]) assert.ok(keys.includes(k), `${p.id} ${k}`)
     assert.equal(quoteConditionRows(p.id, 50).find((r) => r[0] === "Plazo de entrega (referencial)")[1], p.limits.delivery)
   }
+  const ip = quoteConditionRows("profesional", 50).find((r) => r[0].startsWith("Propiedad intelectual"))[1]
+  assert.match(ip, /no se entiende incluida la entrega del código fuente ni la cesión de derechos/) // no promete lo no acordado
   assert.match(read("src/lib/mail/templates.ts"), /quoteConditionRows\(o\.planId, q\.depositPercent\)/)
   assert.match(read("src/app/orden/[id]/page.tsx"), /quoteConditionRows\(order\.planId, q\.depositPercent\)/)
 })
@@ -155,4 +157,28 @@ test("EM1. datos de la sociedad y proveedores del texto coinciden con el codigo 
   const MAILCFG = read("src/lib/mail/config.ts")
   assert.match(MAILCFG, /notificaciones@bydlightsolutions\.com/)
   assert.match(MAILCFG, /contacto@bydlightsolutions\.com/)
+})
+
+test("QC2. valores habituales de la cotizacion: vigencia 7 dias y anticipo 50 % por defecto", () => {
+  const src = read("src/lib/payments/adminOps.ts")
+  assert.match(src, /p\.validDays \?\? 7/)
+  assert.match(src, /depositPercent \?\? 50/)
+})
+
+test("LG13. retracto coherente en terminos, devoluciones, checkout (solicitud y pago) y correo de confirmacion; sin exclusion ni penalizacion", async () => {
+  const n = legal.RETRACTO_NOTICE
+  assert.match(n, /10 días/)
+  assert.match(n, /90 días/)
+  assert.match(n, /no excluye este derecho ni cobra penalización/)
+  assert.match(n, /el inicio del proyecto no lo extingue/)
+  assert.match(n, /solo se descuenta lo efectivamente prestado/)
+  assert.match(read("src/components/checkout/ContractForm.tsx"), /\{RETRACTO_NOTICE\}/)
+  assert.match(read("src/app/orden/[id]/page.tsx"), /\{RETRACTO_NOTICE\}/)
+  assert.match(read("src/lib/mail/templates.ts"), /\$\{RETRACTO_NOTICE\}/)
+  const d = text(page("devoluciones")), t = text(page("terminos"))
+  for (const x of [d, t]) { assert.match(x, /10 días/); assert.match(x, /90 días/); assert.match(x, /no lo extingue|no considera que el inicio del proyecto lo extinga/) }
+  assert.match(d, /facultad de excluir|permite al proveedor excluir el retracto/)
+  assert.match(d, /Bydlight no hace uso de esa facultad/)
+  assert.match(d, /45 días/)
+  assert.doesNotMatch(d + t, /pierde(s)? el derecho|no (podrás|podrá) retractarte|anticipo (es )?no reembolsable|irreembolsable(s)? (desde|una vez)/i)
 })

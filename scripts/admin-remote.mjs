@@ -100,6 +100,13 @@ if (action === "approve") {
 if (action === "approve-test") Object.assign(body, TEST)
 if (action === "list" && opt("q")) body.q = opt("q")
 if (action === "customer-data") body.email = opt("email")
+if (action?.startsWith("privacy-")) {
+  // Privacidad: SIMULACION por defecto; solo `--execute` modifica. Ver docs/PRIVACIDAD-PROCEDIMIENTO.md.
+  if (process.argv.includes("--execute")) body.execute = true
+  if (opt("limit")) body.limit = Number(opt("limit"))
+  if (opt("months")) body.months = Number(opt("months"))
+  for (const k of ["name", "email", "phone", "company"]) if (opt(k) !== undefined) body[k] = opt(k)
+}
 if (action === "refund") {
   // Devolucion: exige --amount y una clave de idempotencia (se genera si no se indica; guardala para reintentar la MISMA operacion).
   body.amount = Number(opt("amount"))
@@ -116,8 +123,8 @@ if (action?.startsWith("taxdoc-")) {
   if (opt("total")) body.totalAmount = Number(opt("total"))
 }
 if (action === "reconcile-refund") body.refundId = opt("refund")
-if (!["list", "audit", "show", "approve", "approve-test", "release-balance", "close", "reconcile", "refund", "reconcile-refund", "monitor", "mail-status", "mail-dispatch", "mail-test", "customer-data", "taxdoc-register", "taxdoc-issue", "taxdoc-void", "taxdoc-list", "taxdoc-pending"].includes(action ?? "")) {
-  die("Acciones: list [--q texto] | audit | show <ID> | approve <ID> --amount N | approve-test <ID> | pilot-link | release-balance <ID> | close <ID> | reconcile | monitor | mail-status | mail-dispatch | mail-test | customer-data --email X | taxdoc-register|taxdoc-issue|taxdoc-void|taxdoc-list <ID> | taxdoc-pending | refund <ID> --amount N [--key K] [--attempt A] [--reason T] | reconcile-refund <ID> --refund RF...")
+if (!["list", "audit", "show", "approve", "approve-test", "release-balance", "close", "reconcile", "refund", "reconcile-refund", "monitor", "mail-status", "mail-dispatch", "mail-test", "customer-data", "privacy-scan", "privacy-erase", "privacy-rectify", "taxdoc-register", "taxdoc-issue", "taxdoc-void", "taxdoc-list", "taxdoc-pending"].includes(action ?? "")) {
+  die("Acciones: list [--q texto] | audit | show <ID> | approve <ID> --amount N | approve-test <ID> | pilot-link | release-balance <ID> | close <ID> | reconcile | monitor | mail-status | mail-dispatch | mail-test | customer-data --email X | privacy-scan [--execute] [--limit N] [--months M] | privacy-erase <ID> [--execute] | privacy-rectify <ID> [--name N] [--email E] [--phone T] [--company C] | taxdoc-register|taxdoc-issue|taxdoc-void|taxdoc-list <ID> | taxdoc-pending | refund <ID> --amount N [--key K] [--attempt A] [--reason T] | reconcile-refund <ID> --refund RF...")
 }
 
 const raw = JSON.stringify(body)

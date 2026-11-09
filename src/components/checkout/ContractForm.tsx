@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { RETRACTO_NOTICE } from "@/lib/legal"
 
 type PlanOption = { id: string; name: string; priceLabel: string; fixed: boolean }
 
@@ -141,6 +142,7 @@ export default function ContractForm({ plans, initialPlan, termsVersion, legalLi
         </span>
       </label>
 
+      <p className="bd-note left" id="retracto-aviso">{RETRACTO_NOTICE} <a href="/devoluciones" target="_blank" rel="noopener">Ver cómo ejercerlo</a>.</p>
       <label className="bd-check">
         <input type="checkbox" name="acceptTerms" required />
         <span>

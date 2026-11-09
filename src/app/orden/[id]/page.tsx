@@ -8,7 +8,7 @@ import { TERMS_VERSION } from "@/lib/terms"
 import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
 import { checkoutMode, paymentsEnabled } from "@/lib/payments/config"
 import { webpaySandbox } from "@/lib/payments/availability"
-import { legalVisible, TAX_NOTE } from "@/lib/legal"
+import { legalVisible, RETRACTO_NOTICE, TAX_NOTE } from "@/lib/legal"
 import { previewMode } from "@/lib/preview"
 import { previewOrder } from "@/lib/payments/preview-data"
 import { clientIp, rateLimited } from "@/lib/payments/http"
@@ -178,6 +178,7 @@ function PayPanel({
       <input type="hidden" name="orderId" value={orderId} />
       <input type="hidden" name="kind" value={kind} />
       <input type="hidden" name="termsVersion" value={TERMS_VERSION} />
+      <p className="bd-note left" id="retracto-aviso">{RETRACTO_NOTICE} <Link href="/devoluciones" prefetch={false} target="_blank">Ver cómo ejercerlo</Link>.</p>
       <label className="bd-check">
         <input type="checkbox" name="acceptTerms" required />
         <span>

@@ -23,6 +23,13 @@ export function requireLegalVisible() {
  * Nota tributaria unica para comprobantes de la orden y correos. No afirma que el comprobante sea boleta ni factura, no promete
  * facturacion automatica y no fija fechas ni plazos. El detalle esta en /informacion-comercial#documentos-tributarios.
  */
+/**
+ * Aviso de retracto que se muestra ANTES de contratar y de pagar (Ley 19.496, art. 3 bis b: informacion inequivoca, accesible y previa al
+ * contrato y al pago). Opcion adoptada provisionalmente por ser la mas favorable al consumidor; pendiente de aprobacion del titular.
+ */
+export const RETRACTO_NOTICE =
+  "Derecho de retracto: si contratas como consumidor, puedes poner término al contrato dentro de 10 días desde la contratación (90 días si no recibes la confirmación escrita). Bydlight no excluye este derecho ni cobra penalización por ejercerlo, y el inicio del proyecto no lo extingue; si ya se prestó parte del servicio, solo se descuenta lo efectivamente prestado."
+
 export const TAX_NOTE =
   "Este comprobante es informativo: no es una boleta ni una factura de Bydlight. El comprobante electrónico del medio de pago puede tener validez tributaria según la normativa del SII y el modelo de emisión que Bydlight tenga vigente; si necesitas factura, indícalo antes de contratar (la factura no se emite de forma automática)."
 

@@ -284,11 +284,15 @@ export function quoteConditionRows(planId: string, depositPercent: number): [str
   const p = PLANS.find((x) => x.id === planId)
   const rows: [string, string][] = []
   if (p) {
+    rows.push(["Entregables y alcance", `Los publicados para el plan ${p.name} en la página de planes, salvo lo indicado en la nota de la cotización`])
     rows.push(["Plazo de entrega (referencial)", p.limits.delivery])
     rows.push(["Revisiones incluidas", p.limits.revisions])
     rows.push(["Soporte y corrección de defectos", p.limits.support])
+    rows.push(["Garantías", "Rigen las garantías legales; los defectos respecto de lo cotizado se corrigen en el período de corrección indicado"])
+    rows.push(["Mantenimiento", "No incluido: es un servicio mensual opcional, aparte"])
   }
   rows.push(["Condiciones de pago", `Anticipo ${depositPercent} % para iniciar; saldo ${100 - depositPercent} % según las condiciones de entrega de la cotización`])
+  rows.push(["Propiedad intelectual, licencias y código fuente", "Si la nota de la cotización no lo indica expresamente, no se entiende incluida la entrega del código fuente ni la cesión de derechos: se acuerdan por escrito antes de iniciar. Los componentes preexistentes y reutilizables son de Bydlight, con licencia de uso para operar el entregable"])
   return rows
 }
 

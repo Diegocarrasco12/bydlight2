@@ -1,6 +1,6 @@
-# Textos legales finales para aprobación (Bydlight Solutions SpA) — edición `2026-11-09-r4`
+# Textos legales finales para aprobación (Bydlight Solutions SpA) — edición `2026-11-09-r5`
 
-> **Estado: NO APROBADOS.** Texto preparado para revisión del titular y de un abogado (p. ej. vía ChatGPT como primera lectura y luego un profesional). No es asesoría jurídica. La etiqueta `2026-11-09-r4` identifica la edición del texto; no es una fecha de aprobación. Los textos íntegros están en la Parte 3, tal como se publican en el código (rutas indicadas).
+> **Estado: NO APROBADOS.** Texto preparado para revisión del titular y de un abogado (p. ej. vía ChatGPT como primera lectura y luego un profesional). No es asesoría jurídica. La etiqueta `2026-11-09-r5` identifica la edición del texto; no es una fecha de aprobación. Los textos íntegros están en la Parte 3, tal como se publican en el código (rutas indicadas).
 
 ## Parte 1. Observaciones concretas sobre cláusulas de riesgo
 
@@ -20,6 +20,9 @@
 | 13 | Privacidad (ronda r4) | Conservación (6 años tributario; consultas sin contratación hasta 24 meses; **plazos propuestos, sin purga automática**), derechos, WhatsApp como destinatario, transferencias internacionales por proveedor (sin afirmar países). La postergación de la Ley 21.719 no se presenta como aprobada. | Aplicado; el titular debe aprobar los plazos y operar la eliminación manualmente. |
 | 14 | Términos §8 (ronda r4) | Cada cotización informa entrega, acceso al código fuente, licencias y restricciones; lo no incluido expresamente no se entiende entregado (**decisión comercial a aprobar**), sin perjuicio de derechos legales. | Aplicado. |
 | 15 | Cotización (ronda r4) | La cotización y su correo muestran plazo referencial, revisiones, soporte/corrección de defectos y condiciones de pago del plan, salvo lo que indique la nota. | Aplicado (prueba QC1). |
+| 16 | **Retracto (ronda r5, decisión D10)** | Verificado contra la transcripción del art. 3 bis (iura.cl) y alertas de Carey y de la Cámara de Comercio de Santiago sobre la Ley 21.398 y el Decreto N° 52/2024 (D.O. 2024-08-27; vigencia 2025-02-28 según la CCS). **Hallazgos:** (a) 10 días desde la contratación del servicio; 90 si no se envió la confirmación del art. 12 A; (b) devolución solo de lo no correspondiente a servicios ya prestados, sin retención de gastos, antes de 45 días desde la comunicación; (c) **en servicios el proveedor puede excluir el retracto si lo informa de forma clara e inequívoca antes de contratar y pagar (Ley 21.398 / reglamento)**, y el reglamento entiende que el derecho se ejerce *antes del inicio de la prestación*, salvo que se haya excluido. | Se adoptó la opción **más favorable al consumidor**: no se excluye, no se penaliza y el inicio del proyecto no extingue el derecho; se informa antes de contratar (formulario) y antes de pagar (panel de pago) y en el correo de confirmación. **Debe aprobarla el titular**; si prefiere excluirlo en algún servicio, debe decidirlo con un abogado y comunicarlo conforme al reglamento *antes* de abrir. Fuentes no oficiales (secundarias); el texto del Diario Oficial no pudo descargarse automáticamente: verificar en bcn.cl y diariooficial.interior.gob.cl. |
+| 17 | Privacidad (ronda r5) | El texto ahora describe el mecanismo real: anonimización de solicitudes sin contratación ni pago a los 24 meses mediante procedimiento controlado (simulación previa, registro sin datos personales); formulario de contacto: eliminación manual en la casilla; respaldos: caducan (90 días propuestos); derechos: acceso (exportación), rectificación y supresión (no procede sobre datos con conservación legal). Ver `docs/PRIVACIDAD-PROCEDIMIENTO.md`. | Aprobar plazos (D11). |
+| 18 | Cotización (ronda r5) | La cotización y el correo muestran: entregables y alcance (del plan), plazo referencial, revisiones, soporte y corrección de defectos, garantías legales, mantenimiento (no incluido), condiciones de pago, vigencia, y propiedad intelectual/licencias/código fuente («si la nota no lo indica expresamente, no se entiende incluido»). | Aprobar (D12); el titular debe escribir en la nota de cada cotización lo realmente acordado. |
 | 11 | Plazos de reclamo | No se fija plazo de respuesta. | Se dice «por escrito» sin plazo (no se inventó). |
 
 ## Parte 2. Tabla B — Cláusulas que requieren aprobación humana
@@ -37,11 +40,12 @@
 | Tratamiento tributario | Comprobantes informativos; voucher con posible validez tributaria; factura no automática y sujeta a habilitación SII. |
 | Privacidad y proveedores | Transbank, EmailJS, Brevo, Zoho Mail, Cloudflare; sin cookies de analítica ni publicidad; texto prudente sobre Ley 21.719. |
 | Datos de la sociedad | Domicilio de la Declaración de Inicio de Actividades, correo contacto@bydlightsolutions.com, WhatsApp publicado. |
-| Etiqueta de versión | `2026-11-09-r4` = edición; si desea que coincida con su fecha de aprobación, cambiar `src/lib/terms.ts`. |
+| Etiqueta de versión | `2026-11-09-r5` = edición; si desea que coincida con su fecha de aprobación, cambiar `src/lib/terms.ts`. |
 
 ## Fuentes oficiales y de apoyo (consultadas el 2026-11-09; confirmar el texto vigente en bcn.cl, que no cargó en la consulta)
 - Ley 19.496, art. 3 bis b (retracto) y art. 12 A (confirmación escrita): bcn.cl/leychile; transcripción: https://iura.cl/19496/3-bis
 - SERNAC, derecho de retracto: https://www.sernac.cl/portal/604/w3-article-85820.html (10 días); reglamento publicado el 2024-08-27 sobre exclusiones (bienes).
+- Ley 21.398 (Pro-Consumidor) y Decreto N° 52/2024 del Ministerio de Economía (reglamento de exclusiones al retracto, D.O. 2024-08-27): https://www.diariooficial.interior.gob.cl/publicaciones/2024/08/27/43935/01/2535265.pdf (no descargable automáticamente); resúmenes: Carey (https://www.carey.cl/api/archivo/publican-reglamento-que-establece-exclusiones-al-derecho-de-retracto?lang=es) y Cámara de Comercio de Santiago (guía 2024-09).
 - Decreto 6/2021, Reglamento de Comercio Electrónico (vigente desde 2022-03-24): bcn.cl/leychile.
 - SII, voucher como boleta electrónica: https://www.sii.cl/destacados/boleta_electronica_voucher/ (modelo declarado en el sitio del SII; no cubre facturas ni pagos entre empresas; Resolución SII N° 176 de 2020-12-31).
 - Ley 21.719 y Boletín 18.623-07: https://www.cuatrecasas.com/es/latam/art/proyecto-que-modifica-ley-proteccion-datos-personales ; https://www.cariola.cl/app/uploads/2026/09/Alerta-legal_-2septiembre.pdf
@@ -127,7 +131,7 @@ Rigen las garantías legales que correspondan, que estos términos no limitan. L
 
 ## 11. Cancelación, retracto y devoluciones
 
-Ver la Política de cancelación y devoluciones.
+Si contratas como consumidor puedes retractarte dentro de 10 días desde la contratación (90 días si no recibes la confirmación escrita). Bydlight no excluye este derecho, no aplica penalizaciones y el inicio del proyecto no lo extingue; si ya se prestó parte del servicio, solo se descuenta lo efectivamente prestado. Ver la Política de cancelación y devoluciones.
 
 ## 12. Datos personales
 
@@ -204,8 +208,10 @@ Términos · Cancelación, retracto y devoluciones · Privacidad · Soporte
 
 Si contratas como consumidor por medios electrónicos, la Ley N° 19.496 (artículo 3 bis) te permite poner término unilateral al contrato dentro de
 10 días contados desde la contratación del servicio. Si Bydlight no te envía la confirmación escrita del contrato
-(artículo 12 A), ese plazo se extiende a 90 días. La ley permite al proveedor disponer expresamente lo contrario; Bydlight no lo ha dispuesto: no excluye en forma general este derecho
-en sus servicios de desarrollo contratados por medios electrónicos. Bydlight te envía la confirmación escrita por correo una vez pagado el anticipo.
+(artículo 12 A), ese plazo se extiende a 90 días. En los contratos de prestación de servicios, la ley (artículo 3 bis letra b y su reglamento) permite al proveedor excluir el
+retracto si lo informa de forma clara e inequívoca antes de contratar y pagar, y entiende que el derecho se ejerce antes de que comience la prestación. Bydlight no hace uso de esa
+facultad: no excluye en forma general este derecho en sus servicios de desarrollo contratados por medios electrónicos y no considera que el inicio del proyecto lo extinga. Esta opción, la más
+favorable para ti, es la que se aplica mientras el titular no resuelva otra cosa y la informe antes de contratar. Bydlight te envía la confirmación escrita por correo una vez pagado el anticipo.
 
 Para ejercerlo, escribe a contacto@bydlightsolutions.com indicando el código de tu orden y que deseas retractarte. En servicios, la devolución comprende
 las sumas abonadas que no correspondan a servicios ya prestados al momento del retracto, sin retención de gastos, a la mayor brevedad y, en todo caso, antes de
@@ -319,12 +325,12 @@ Si en el futuro se incorporan herramientas de analítica o publicidad, se inform
 
 ## 6. Conservación
 
-Conservamos los datos solo mientras sean necesarios para las finalidades descritas y para cumplir obligaciones legales. Los antecedentes de órdenes, cotizaciones, pagos, devoluciones y documentos tributarios se conservan por el plazo que exige la normativa tributaria (en general, 6 años) para respaldar la operación. Las consultas y solicitudes sin contratación ni pago se conservan hasta 24 meses desde la última comunicación. Vencidos los plazos, o cuando lo solicites y la ley lo permita, se eliminan o anonimizan; lo que debamos conservar por ley se limita a esa finalidad. Los respaldos siguen la misma regla.
+Conservamos los datos solo mientras sean necesarios para las finalidades descritas y para cumplir obligaciones legales. Los antecedentes de órdenes, cotizaciones, pagos, devoluciones y documentos tributarios se conservan por el plazo que exige la normativa tributaria (en general, 6 años) para respaldar la operación. Las solicitudes de contratación sin cotización vigente, pago ni documento tributario se conservan hasta 24 meses desde la última comunicación; después se anonimizan (se reemplazan tus datos personales conservando solo registros sin identificarte). Las consultas recibidas por el formulario de contacto llegan a nuestra casilla de correo y se eliminan de ella en el mismo plazo. Estas depuraciones no son automáticas: las ejecuta el titular mediante un procedimiento controlado, que primero simula el resultado y deja un registro sin datos personales. Cuando lo solicites y la ley lo permita, anonimizamos antes tus datos; si hay pagos o documentos tributarios, esos datos se conservan solo para cumplir esa obligación. Los respaldos de la base no se reescriben: se eliminan al cumplir su plazo de caducidad (90 días como máximo), por lo que una supresión se refleja en ellos a más tardar en ese plazo.
 
 ## 7. Tus derechos
 
 Puedes solicitar acceso, rectificación, cancelación o supresión, oposición y bloqueo de tus datos. La Ley N° 21.719, publicada el 13 de diciembre de 2024, establece su entrada en vigencia general el 1 de diciembre de 2026 y reconoce además otros derechos, como la portabilidad. Existe un proyecto de ley en tramitación que propone postergar esa fecha; mientras no esté promulgado y publicado, no se considera modificada la fecha de la ley publicada. Si la fecha cambia, lo informaremos aquí. Escríbenos a contacto@bydlightsolutions.com indicando qué derecho
-ejerces y un medio para responderte; podremos pedirte datos para verificar tu identidad. Responderemos por escrito dentro de los plazos que fije la ley. También podrás
+ejerces, el código de tu orden si lo tienes y un medio para responderte; podremos pedirte datos para verificar tu identidad. El acceso se entrega como una exportación de tus datos en formato legible; la rectificación y la supresión se aplican sobre tu solicitud o orden (la supresión no procede sobre los datos que la ley nos obliga a conservar, y te lo informaremos por escrito). Responderemos por escrito dentro de los plazos que fije la ley. También podrás
 reclamar ante la autoridad de protección de datos que la ley establezca.
 
 ## 8. Cambios
