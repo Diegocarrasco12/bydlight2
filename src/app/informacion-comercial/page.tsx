@@ -46,7 +46,7 @@ export default function InformacionComercialPage() {
       <h2 id="documentos-tributarios">Documentos tributarios</h2>
       <ul>
         <li>Los comprobantes que muestra este sitio y los correos de confirmación son informativos: <strong>no son una boleta ni una factura</strong> de Bydlight.</li>
-        <li>El comprobante electrónico del medio de pago (voucher de Webpay) puede tener validez tributaria cuando así lo reconoce la normativa del Servicio de Impuestos Internos (SII). En ese caso no se emite una boleta adicional.</li>
+        <li>El comprobante electrónico del medio de pago (voucher de Webpay) puede tener validez tributaria cuando así lo reconoce la normativa del Servicio de Impuestos Internos (SII) y según el modelo de emisión que Bydlight tenga efectivamente vigente ante el SII. Solo cuando ese modelo lo permite no se emite una boleta adicional; en caso contrario se emite la boleta electrónica correspondiente.</li>
         <li>Cuando la normativa exija otro documento, este se emite como boleta electrónica o factura electrónica, según corresponda.</li>
         <li>La factura no se emite de forma automática ni por el solo hecho de pagar. Si necesitas factura, indícalo antes de contratar y entrega los datos de tu empresa (razón social y RUT). Se emite cuando corresponda según la normativa y la habilitación vigente de Bydlight ante el SII; si tienes dudas sobre su disponibilidad, consúltalo por los canales de contacto antes de pagar.</li>
         <li>Si un documento ya emitido debe corregirse o anularse (por ejemplo, por una devolución), se hace con la nota de crédito que corresponda.</li>

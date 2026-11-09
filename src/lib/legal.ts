@@ -24,7 +24,7 @@ export function requireLegalVisible() {
  * facturacion automatica y no fija fechas ni plazos. El detalle esta en /informacion-comercial#documentos-tributarios.
  */
 export const TAX_NOTE =
-  "Este comprobante es informativo: no es una boleta ni una factura de Bydlight. El comprobante electrónico del medio de pago puede tener validez tributaria según la normativa del SII; si necesitas factura, indícalo antes de contratar (la factura no se emite de forma automática)."
+  "Este comprobante es informativo: no es una boleta ni una factura de Bydlight. El comprobante electrónico del medio de pago puede tener validez tributaria según la normativa del SII y el modelo de emisión que Bydlight tenga vigente; si necesitas factura, indícalo antes de contratar (la factura no se emite de forma automática)."
 
 /** Documentos legales: fuente unica para el menu lateral, el indice y el pie de pagina. */
 export const LEGAL_DOCS = [

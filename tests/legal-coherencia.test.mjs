@@ -110,3 +110,49 @@ test("LG11. clausulas comerciales propuestas: sin aprobacion por silencio, antic
   assert.match(t, /definen expresamente en la cotización o contrato/)
   assert.match(t, /Preferentemente, los dominios y cuentas del proyecto se registran a nombre del cliente/)
 })
+
+test("LG12. ronda r4: retracto sin restricciones, servicios prestados documentados, privacidad con conservacion y transferencias, sin fecha tributaria asumida", () => {
+  const d = text(page("devoluciones"))
+  assert.doesNotMatch(d, /antes de que el servicio se preste/)
+  assert.match(d, /Bydlight no lo ha dispuesto/)
+  assert.match(d, /informa por escrito qué trabajo se prestó efectivamente/)
+  assert.match(d, /puedes\s+objetarla por escrito/)
+  const p = text(page("privacidad"))
+  assert.match(p, /Transferencias internacionales/)
+  assert.match(p, /6 años/)
+  assert.match(p, /WhatsApp \(Meta\)/)
+  assert.match(p, /mientras no esté promulgado y publicado/)
+  assert.doesNotMatch(p, /fue postergada|se posterg[óo]|queda postergada/i)
+  assert.match(text(page("terminos")), /si el cliente podrá acceder al código fuente/)
+  assert.match(text(page("informacion-comercial")), /modelo de emisión que Bydlight tenga efectivamente vigente ante el SII/)
+  assert.doesNotMatch(DOCS.map((x) => text(page(x))).join(" "), /1 de diciembre de 2026[^.]*boleta|boleta[^.]*1 de diciembre de 2026/)
+})
+
+test("QC1. la cotizacion informa plazo, revisiones, soporte/correccion de defectos y condiciones de pago (pagina y correo)", async () => {
+  const { quoteConditionRows, PLANS } = await import("../src/lib/plans.ts")
+  for (const p of PLANS.filter((x) => x.modality === "directa")) {
+    const keys = quoteConditionRows(p.id, 50).map((r) => r[0])
+    for (const k of ["Plazo de entrega (referencial)", "Revisiones incluidas", "Soporte y corrección de defectos", "Condiciones de pago"]) assert.ok(keys.includes(k), `${p.id} ${k}`)
+    assert.equal(quoteConditionRows(p.id, 50).find((r) => r[0] === "Plazo de entrega (referencial)")[1], p.limits.delivery)
+  }
+  assert.match(read("src/lib/mail/templates.ts"), /quoteConditionRows\(o\.planId, q\.depositPercent\)/)
+  assert.match(read("src/app/orden/[id]/page.tsx"), /quoteConditionRows\(order\.planId, q\.depositPercent\)/)
+})
+
+test("EM1. datos de la sociedad y proveedores del texto coinciden con el codigo (RUT, domicilio, correo, WhatsApp, hosts externos)", async () => {
+  const { COMPANY } = await import("../src/lib/company.ts")
+  const { SITE } = await import("../src/lib/site.ts")
+  assert.equal(COMPANY.rut, "78.161.844-6")
+  const all = DOCS.map((x) => text(page(x))).join(" ")
+  for (const x of DOCS.filter((d) => d !== "servicios-digitales")) assert.ok(page(x).includes("SITE.email") || text(page(x)).includes(SITE.email), x)
+  assert.ok(!/gmail\.com/.test(all))
+  const info = text(page("informacion-comercial"))
+  assert.ok(page("informacion-comercial").includes("COMPANY") && page("soporte").includes("COMPANY.address") && page("soporte").includes("SITE.whatsappDisplay"))
+  void info
+  assert.match(read("src/components/contact/ContactForm.tsx"), /emailjs/)
+  assert.match(read("src/lib/mail/transport.ts"), /api\.brevo\.com/)
+  assert.match(read("src/components/footer/Footer.tsx") + read("src/lib/site.ts"), /wa\.me/)
+  const MAILCFG = read("src/lib/mail/config.ts")
+  assert.match(MAILCFG, /notificaciones@bydlightsolutions\.com/)
+  assert.match(MAILCFG, /contacto@bydlightsolutions\.com/)
+})

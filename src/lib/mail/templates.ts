@@ -2,6 +2,7 @@ import { COMPANY } from "@/lib/company"
 import { SITE } from "@/lib/site"
 import { LEGAL_PAGES_PUBLISHED, TAX_NOTE } from "@/lib/legal"
 import { IVA_PERCENT, ivaBreakdown } from "@/lib/tax"
+import { quoteConditionRows } from "@/lib/plans"
 import { buildVoucher, formatClp, formatWhen } from "@/lib/payments/voucher"
 import type { Attempt, Order } from "@/lib/payments/types"
 
@@ -125,11 +126,12 @@ export function cotizacionAprobada(o: Order): Rendered | null {
         [`Anticipo (${q.depositPercent} %)`, formatClp(q.depositAmount)],
         ["Saldo", formatClp(q.balanceAmount)],
         ["Válida hasta", formatWhen(q.validUntil)],
+        ...quoteConditionRows(o.planId, q.depositPercent),
       ],
       cta: { label: "Ver la cotización y pagar el anticipo", href: orderUrl(o) },
       para: q.note ? [`Nota: ${q.note}`] : [],
     },
-    { small: ["Montos en pesos chilenos (CLP). El pago se realiza con Webpay Plus de Transbank; los datos de tu tarjeta se ingresan solo en el sitio de Transbank.", NO_TAX_DOC] },
+    { small: ["El plazo, las revisiones y el soporte son los del plan elegido, salvo lo que la nota de la cotización indique distinto. Montos en pesos chilenos (CLP). El pago se realiza con Webpay Plus de Transbank; los datos de tu tarjeta se ingresan solo en el sitio de Transbank.", NO_TAX_DOC] },
   ])
   return { subject: `Tu cotización ${o.id} · ${formatClp(q.amount)} (IVA incluido)`, html, text }
 }

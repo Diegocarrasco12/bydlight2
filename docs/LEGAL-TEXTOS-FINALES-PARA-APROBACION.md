@@ -1,6 +1,6 @@
-# Textos legales finales para aprobación (Bydlight Solutions SpA) — edición `2026-11-09-r3`
+# Textos legales finales para aprobación (Bydlight Solutions SpA) — edición `2026-11-09-r4`
 
-> **Estado: NO APROBADOS.** Texto preparado para revisión del titular y de un abogado (p. ej. vía ChatGPT como primera lectura y luego un profesional). No es asesoría jurídica. La etiqueta `2026-11-09-r3` identifica la edición del texto; no es una fecha de aprobación. Los textos íntegros están en la Parte 3, tal como se publican en el código (rutas indicadas).
+> **Estado: NO APROBADOS.** Texto preparado para revisión del titular y de un abogado (p. ej. vía ChatGPT como primera lectura y luego un profesional). No es asesoría jurídica. La etiqueta `2026-11-09-r4` identifica la edición del texto; no es una fecha de aprobación. Los textos íntegros están en la Parte 3, tal como se publican en el código (rutas indicadas).
 
 ## Parte 1. Observaciones concretas sobre cláusulas de riesgo
 
@@ -13,9 +13,13 @@
 | 5 | Términos §9 dominios y cuentas | «Siempre que sea posible». | Propuesta: preferentemente a nombre del cliente; si quedan a nombre de Bydlight, la cotización lo indica y se acuerda el traspaso. |
 | 6 | Devoluciones §1 retracto | Reproduce los 10 días (90 si no se envió la confirmación escrita) y la devolución en 45 días. **No se inventaron exclusiones.** Riesgo: excluir el retracto sin informarlo de forma inequívoca antes del pago es ineficaz. | Sin exclusión general; ningún anticipo se declara irreembolsable. |
 | 7 | Devoluciones §2 trabajo ya ejecutado | En servicios ya prestados la ley limita la devolución a lo no correspondiente a servicios prestados; la forma de valorar el trabajo ejecutado debe ser razonable y verificable. | Texto remite a evaluación del trabajo ejecutado, sin fórmula inventada. Un abogado puede definir criterios. |
-| 8 | Informacion comercial: documentos tributarios | Un voucher de Webpay no es boleta automáticamente en toda circunstancia (SII: validez según el modelo de emisión declarado; no cubre facturas ni pagos entre empresas). | Los comprobantes del sitio son informativos; el voucher «puede» tener validez tributaria; la factura no es automática. Modelo declarado el 09-11-2026 con efecto desde el 01-12-2026: **antes de esa fecha, cada cobro debe documentarse manualmente.** |
+| 8 | Informacion comercial: documentos tributarios | Un voucher de Webpay no es boleta automáticamente en toda circunstancia (SII: validez según el modelo de emisión declarado; no cubre facturas ni pagos entre empresas). | Los comprobantes del sitio son informativos; el voucher «puede» tener validez tributaria; la factura no es automática. El titular declaró el modelo de emisión el 09-11-2026; **la fecha desde la que rige no está verificada** y los textos no la afirman. Hasta confirmarla, cada cobro debe documentarse manualmente. |
 | 9 | Privacidad: Ley 19.628 / 21.719 | La 21.719 entra en vigencia el 01-12-2026 salvo que prospere el proyecto de postergación (Boletín 18.623-07; sin confirmar). | El texto no afirma una fecha firme. Revisar el boletín antes del 01-12-2026. |
 | 10 | Reglamento de Comercio Electrónico (Decreto 6/2021) | Exige informar identidad, costo total, condiciones y confirmación del contrato. | El sitio informa razón social, RUT, domicilio, contacto, precio con IVA, anticipo/saldo y vigencia, y envía confirmación escrita (correo). Un abogado debe confirmar que no falta ningún dato. |
+| 12 | Devoluciones §1 (ronda r4) | Se quitó «antes de que el servicio se preste» (restringía el derecho); se aclara que la ley permite al proveedor disponer lo contrario y Bydlight no lo hizo; se agregó el tratamiento documentado de servicios ya prestados (informe escrito, valoración razonable y verificable, derecho a objetar). | Aplicado. Requiere su aprobación y la de un abogado. |
+| 13 | Privacidad (ronda r4) | Conservación (6 años tributario; consultas sin contratación hasta 24 meses; **plazos propuestos, sin purga automática**), derechos, WhatsApp como destinatario, transferencias internacionales por proveedor (sin afirmar países). La postergación de la Ley 21.719 no se presenta como aprobada. | Aplicado; el titular debe aprobar los plazos y operar la eliminación manualmente. |
+| 14 | Términos §8 (ronda r4) | Cada cotización informa entrega, acceso al código fuente, licencias y restricciones; lo no incluido expresamente no se entiende entregado (**decisión comercial a aprobar**), sin perjuicio de derechos legales. | Aplicado. |
+| 15 | Cotización (ronda r4) | La cotización y su correo muestran plazo referencial, revisiones, soporte/corrección de defectos y condiciones de pago del plan, salvo lo que indique la nota. | Aplicado (prueba QC1). |
 | 11 | Plazos de reclamo | No se fija plazo de respuesta. | Se dice «por escrito» sin plazo (no se inventó). |
 
 ## Parte 2. Tabla B — Cláusulas que requieren aprobación humana
@@ -33,7 +37,7 @@
 | Tratamiento tributario | Comprobantes informativos; voucher con posible validez tributaria; factura no automática y sujeta a habilitación SII. |
 | Privacidad y proveedores | Transbank, EmailJS, Brevo, Zoho Mail, Cloudflare; sin cookies de analítica ni publicidad; texto prudente sobre Ley 21.719. |
 | Datos de la sociedad | Domicilio de la Declaración de Inicio de Actividades, correo contacto@bydlightsolutions.com, WhatsApp publicado. |
-| Etiqueta de versión | `2026-11-09-r3` = edición; si desea que coincida con su fecha de aprobación, cambiar `src/lib/terms.ts`. |
+| Etiqueta de versión | `2026-11-09-r4` = edición; si desea que coincida con su fecha de aprobación, cambiar `src/lib/terms.ts`. |
 
 ## Fuentes oficiales y de apoyo (consultadas el 2026-11-09; confirmar el texto vigente en bcn.cl, que no cargó en la consulta)
 - Ley 19.496, art. 3 bis b (retracto) y art. 12 A (confirmación escrita): bcn.cl/leychile; transcripción: https://iura.cl/19496/3-bis
@@ -110,7 +114,7 @@ Entregar información veraz, contenidos y accesos oportunamente; contar con los 
 
 Los derechos sobre cada entregable específico se definen expresamente en la cotización o contrato (cesión o licencia de uso), y se activan una vez pagado el precio
 acordado. Los componentes preexistentes y reutilizables de Bydlight (herramientas, bibliotecas, plantillas y código propio anterior al proyecto) son de propiedad de
-Bydlight, que otorga al cliente las licencias de uso necesarias para operar su entregable. El cliente conserva la titularidad de los contenidos y materiales que aporta. Los materiales de terceros y los componentes de código abierto conservan sus propias licencias. Bydlight
+Bydlight, que otorga al cliente las licencias de uso necesarias para operar su entregable. El cliente conserva la titularidad de los contenidos y materiales que aporta. Cada cotización informa, para ese proyecto, qué se entrega (por ejemplo, sitio publicado, archivos, repositorio o código fuente), si el cliente podrá acceder al código fuente y en qué formato, qué componentes se licencian y con qué alcance (uso, modificación, plazo), y si hay restricciones; lo que la cotización no incluya expresamente no se entiende entregado, sin perjuicio de los derechos que la ley reconoce. Los materiales de terceros y los componentes de código abierto conservan sus propias licencias. Bydlight
 solo menciona un proyecto como referencia con autorización del cliente.
 
 ## 9. Servicios de terceros, hosting y dominios
@@ -181,7 +185,7 @@ Precios en CLP. Todos los precios publicados y cotizados son finales e incluyen 
 
 - Los comprobantes que muestra este sitio y los correos de confirmación son informativos: **no son una boleta ni una factura** de Bydlight.
 
-- El comprobante electrónico del medio de pago (voucher de Webpay) puede tener validez tributaria cuando así lo reconoce la normativa del Servicio de Impuestos Internos (SII). En ese caso no se emite una boleta adicional.
+- El comprobante electrónico del medio de pago (voucher de Webpay) puede tener validez tributaria cuando así lo reconoce la normativa del Servicio de Impuestos Internos (SII) y según el modelo de emisión que Bydlight tenga efectivamente vigente ante el SII. Solo cuando ese modelo lo permite no se emite una boleta adicional; en caso contrario se emite la boleta electrónica correspondiente.
 
 - Cuando la normativa exija otro documento, este se emite como boleta electrónica o factura electrónica, según corresponda.
 
@@ -199,18 +203,22 @@ Términos · Cancelación, retracto y devoluciones · Privacidad · Soporte
 ## 1. Derecho de retracto (consumidores)
 
 Si contratas como consumidor por medios electrónicos, la Ley N° 19.496 (artículo 3 bis) te permite poner término unilateral al contrato dentro de
-10 días contados desde la contratación del servicio y antes de que el servicio se preste. Si Bydlight no te envía la confirmación escrita del contrato
-(artículo 12 A), ese plazo se extiende a 90 días. Bydlight no excluye en forma general este derecho en servicios de desarrollo; cada caso se evalúa
-conforme a la ley.
+10 días contados desde la contratación del servicio. Si Bydlight no te envía la confirmación escrita del contrato
+(artículo 12 A), ese plazo se extiende a 90 días. La ley permite al proveedor disponer expresamente lo contrario; Bydlight no lo ha dispuesto: no excluye en forma general este derecho
+en sus servicios de desarrollo contratados por medios electrónicos. Bydlight te envía la confirmación escrita por correo una vez pagado el anticipo.
 
 Para ejercerlo, escribe a contacto@bydlightsolutions.com indicando el código de tu orden y que deseas retractarte. En servicios, la devolución comprende
 las sumas abonadas que no correspondan a servicios ya prestados al momento del retracto, sin retención de gastos, a la mayor brevedad y, en todo caso, antes de
 45 días desde que comunicas el retracto.
 
+**Servicios ya prestados.** Si al comunicar el retracto ya se había comenzado a ejecutar el servicio, Bydlight te informa por escrito qué trabajo se prestó efectivamente a esa fecha
+(los entregables o etapas realizados, según la cotización) y a qué monto corresponde, y devuelve el resto de lo abonado. Esa valoración debe ser razonable y verificable, y puedes
+objetarla por escrito o reclamar ante el SERNAC o los tribunales. Bydlight no retiene gastos ni aplica penalizaciones por ejercer el retracto.
+
 ## 2. Cancelación fuera del plazo de retracto, y contratos entre empresas
 
-Bydlight no considera irreembolsables todos los anticipos. Si deseas cancelar un proyecto, se evalúa el trabajo efectivamente ejecutado a la fecha y se
-determina lo que corresponda devolver legal o contractualmente. Las condiciones específicas de cancelación de cada proyecto, incluidas las de contratos entre
+Bydlight no considera irreembolsables todos los anticipos. Si deseas cancelar un proyecto, se evalúa el trabajo efectivamente ejecutado a la fecha, se te informa por escrito el detalle de lo ejecutado y
+se determina lo que corresponda devolver legal o contractualmente, sin que esto limite los derechos que la ley te reconoce. Las condiciones específicas de cancelación de cada proyecto, incluidas las de contratos entre
 empresas, constan en su cotización o contrato.
 
 ## 3. Cómo solicitarlo
@@ -275,6 +283,8 @@ Bydlight Solutions SpA, RUT 78.161.844-6, domicilio S Guerra 326, Buin, Región 
 
 - Comunicaciones: los correos y mensajes que intercambiamos contigo, incluidos los correos automáticos de confirmación que te enviamos (se registra si fueron enviados).
 
+- Si nos escribes por WhatsApp, tu número y tus mensajes son tratados también por WhatsApp (Meta) según sus propias condiciones.
+
 - Si contratas como empresa: razón social, RUT, y, si los informas, giro y dirección tributaria, que usamos solo para emitir el documento tributario correspondiente.
 
 - Datos técnicos: la infraestructura del sitio registra datos de conexión (como la dirección IP y la fecha de acceso) con fines de seguridad y funcionamiento.
@@ -293,11 +303,13 @@ Responder tu consulta; preparar, gestionar y ejecutar cotizaciones y proyectos; 
 
 - Zoho Mail: servicio de correo donde recibimos tus mensajes y tus respuestas a nuestros correos.
 
+- WhatsApp (Meta): solo si decides escribirnos por ese medio, mediante el enlace publicado en el sitio.
+
 - Cloudflare: opera la red de entrega y seguridad del sitio y, por ello, procesa datos técnicos de conexión.
 
 - Autoridades, cuando una ley lo exija.
 
-No vendemos tus datos. Algunos de estos proveedores pueden tratar datos en servidores fuera de Chile; la ubicación depende de cada proveedor.
+No vendemos tus datos. **Transferencias internacionales:** los servicios de EmailJS, Brevo, Zoho Mail, Cloudflare y WhatsApp pueden tratar datos en servidores fuera de Chile; el país exacto depende de cada proveedor y de sus condiciones, y Bydlight no lo controla. Transbank opera en Chile. Solo enviamos a cada proveedor lo necesario para su función y tienes derecho a consultarnos qué datos se envían a cada uno.
 
 ## 5. Cookies y tecnologías de seguimiento
 
@@ -307,13 +319,11 @@ Si en el futuro se incorporan herramientas de analítica o publicidad, se inform
 
 ## 6. Conservación
 
-Conservamos los datos mientras sean necesarios para las finalidades descritas y para cumplir obligaciones legales, incluidas las tributarias y la acreditación de las
-transacciones. Cuando ya no sean necesarios, se eliminan o anonimizan.
+Conservamos los datos solo mientras sean necesarios para las finalidades descritas y para cumplir obligaciones legales. Los antecedentes de órdenes, cotizaciones, pagos, devoluciones y documentos tributarios se conservan por el plazo que exige la normativa tributaria (en general, 6 años) para respaldar la operación. Las consultas y solicitudes sin contratación ni pago se conservan hasta 24 meses desde la última comunicación. Vencidos los plazos, o cuando lo solicites y la ley lo permita, se eliminan o anonimizan; lo que debamos conservar por ley se limita a esa finalidad. Los respaldos siguen la misma regla.
 
 ## 7. Tus derechos
 
-Puedes solicitar acceso, rectificación, cancelación o supresión, oposición y bloqueo de tus datos, y, desde la entrada en vigencia de la Ley N° 21.719 (prevista para el
-1 de diciembre de 2026; existe un proyecto de ley en tramitación que propone postergar esa fecha, por lo que podría cambiar), los demás derechos que esa ley reconozca, como la portabilidad. Escríbenos a contacto@bydlightsolutions.com indicando qué derecho
+Puedes solicitar acceso, rectificación, cancelación o supresión, oposición y bloqueo de tus datos. La Ley N° 21.719, publicada el 13 de diciembre de 2024, establece su entrada en vigencia general el 1 de diciembre de 2026 y reconoce además otros derechos, como la portabilidad. Existe un proyecto de ley en tramitación que propone postergar esa fecha; mientras no esté promulgado y publicado, no se considera modificada la fecha de la ley publicada. Si la fecha cambia, lo informaremos aquí. Escríbenos a contacto@bydlightsolutions.com indicando qué derecho
 ejerces y un medio para responderte; podremos pedirte datos para verificar tu identidad. Responderemos por escrito dentro de los plazos que fije la ley. También podrás
 reclamar ante la autoridad de protección de datos que la ley establezca.
 

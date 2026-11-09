@@ -7,14 +7,14 @@ Preparado el 2026-11-09 en la rama local `etapa-b/checkout-publico` (sin push). 
 |---|---|---|
 | `src/lib/plans.ts` | `ONLINE_CHECKOUT_UI = true` | Los botones de plan llevan a `/contratar`; se anuncia Webpay Plus (llave 1 de código). |
 | `src/lib/legal.ts` | `LEGAL_PAGES_PUBLISHED = true` | Se publican las 6 páginas legales + `/legal`; correos incluyen enlaces; pie con datos de la sociedad (llave 2). Si quedara un marcador de dato pendiente, `next build` falla. |
-| `src/lib/terms.ts` | `TERMS_VERSION = "2026-11-09-r3"` | Versión definitiva (sin «borrador»); cada aceptación queda ligada a ese texto. **Ajustar a la fecha de aprobación real** si difiere (una línea + recompilar). |
+| `src/lib/terms.ts` | `TERMS_VERSION = "2026-11-09-r4"` | Versión definitiva (sin «borrador»); cada aceptación queda ligada a ese texto. **Ajustar a la fecha de aprobación real** si difiere (una línea + recompilar). |
 
 **Tres llaves, abrir en orden y cerrar en cualquier momento:** (1) código con las dos constantes (despliegue), (2) `payments.json` con `enabled=true` y `access=public` (efecto en ≤ 5 s, sin redeploy), (3) cada cotización la aprueba el titular a mano (`approve`): nadie paga sin cotización aprobada. Con `access=pilot` o `enabled=false` el checkout se cierra al público al instante, aunque el código ya esté desplegado.
 
 Pruebas y verificaciones adaptadas al nuevo estado (L3, G6/G7, P1/P8, H12 y las 5 pruebas que fijaban la versión «borrador»; `verify:prod` y `verify:pilot`) y una verificación nueva `npm run verify:public` (28 comprobaciones sobre el artefacto de producción: formulario público, términos obligatorios, origen ajeno, límite por IP, monto no manipulable, devoluciones apagadas, interruptores `access=pilot` y `enabled=false`). Prueba nueva `tests/migracion4-datos.test.mjs` (migración sobre una base v3 con datos).
 
 ### 1a. Textos legales (2026-11-09)
-Seis documentos coherentes y listos para su aprobación (**no aprobados**; no es asesoría jurídica): modalidades, estados de pago, tratamiento tributario sin afirmaciones incorrectas, privacidad y cookies. `TERMS_VERSION = "2026-11-09-r3"` (etiqueta de edición). Revisión, contraste con la ley y decisiones humanas: `docs/LEGAL-REVISION-ETAPA-B.md`; pruebas `tests/legal-coherencia.test.mjs` (LG1 a LG11).
+Seis documentos coherentes y listos para su aprobación (**no aprobados**; no es asesoría jurídica): modalidades, estados de pago, tratamiento tributario sin afirmaciones incorrectas, privacidad y cookies. `TERMS_VERSION = "2026-11-09-r4"` (etiqueta de edición). Revisión, contraste con la ley y decisiones humanas: `docs/LEGAL-REVISION-ETAPA-B.md`; pruebas `tests/legal-coherencia.test.mjs` (LG1 a LG12).
 
 ### 1b. Consolidación comercial (2026-11-09, además de las 3 constantes)
 | Tema | Cambio | Prueba |
@@ -26,7 +26,7 @@ Seis documentos coherentes y listos para su aprobación (**no aprobados**; no es
 | Documentos tributarios | **Migración 5** (aditiva, tabla `tax_documents`): registra boleta, factura nacional, factura de exportación y nota de crédito por pago. **Solo registra; no emite ni habla con el SII.** Importe tomado del pago; un solo documento vigente por pago y folio único por tipo, impuestos por la base; acciones `taxdoc-*` en `admin-remote.mjs`. Detalle: `docs/DOCUMENTOS-TRIBUTARIOS.md`. | E8 a E13 |
 
 ## 2. Resultado de las pruebas locales (rama `etapa-b/checkout-publico`)
-`npm test` **144/144** (105 previas + 14 de Brevo + 14 de consolidación + 10 de coherencia legal: `tests/brevo.test.mjs`, `consolidacion.test.mjs`, `legal-coherencia.test.mjs`) · `tsc` y `eslint src scripts tests` limpios · build correcto · `verify:prod` 36/36 · `verify:pilot` 33/33 · `verify:public` 28/28. Sin transacciones reales ni correos reales (Brevo se probó con `fetch` falso).
+`npm test` **147/147** (105 previas + 14 de Brevo + 14 de consolidación + 10 de coherencia legal: `tests/brevo.test.mjs`, `consolidacion.test.mjs`, `legal-coherencia.test.mjs`) · `tsc` y `eslint src scripts tests` limpios · build correcto · `verify:prod` 36/36 · `verify:pilot` 33/33 · `verify:public` 28/28. Sin transacciones reales ni correos reales (Brevo se probó con `fetch` falso).
 
 ## 3. Estado por tema (lo implementado frente a lo pendiente)
 **Textos legales.** Los 6 textos están completos y sin marcadores (términos, devoluciones/retracto, privacidad, información comercial, servicios digitales, soporte) con los datos oficiales de la sociedad. Basados en la Ley 19.496 (arts. 3 bis y 12 A) sin plazos ni porcentajes inventados. **Son redacción técnica, no asesoría jurídica**; requieren su aprobación expresa (decisión D1). Cláusulas redactadas por Claude que debe aprobar: aprobaciones por vencimiento del plazo de revisión, propiedad intelectual (uso de entregables tras el pago, Bydlight conserva sus componentes), dominios y cuentas a nombre del cliente, soporte/mantenimiento no incluidos, retracto y evaluación del trabajo ejecutado (devuelve lo abonado no correspondiente a servicios prestados; no declara irreembolsables los anticipos).
@@ -49,7 +49,7 @@ Seis documentos coherentes y listos para su aprobación (**no aprobados**; no es
 | D3 | Modelo tributario con el contador (boleta/factura, anticipo, voucher) y registro de los abonos que Transbank deposita en una cuenta personal siendo ingresos de la SpA | Obtener respuesta escrita; mientras tanto emitir documento manual por cada pago | Riesgo tributario del titular; no lo bloquea el código |
 | D4 | Correo por Brevo: preparar la clave (Paso 1) e instalarla y probar el envío tras desplegar (Paso 6b) antes de abrir | Sí: confirmación escrita del contrato y comprobante dependen de él | Requisito de apertura |
 | D5 | Anticipo por defecto (50 %) y vigencia de cotización (7 días) | Mantener los valores actuales | No |
-| D6 | Etiqueta de versión de términos (`2026-11-09-r3`) = fecha de aprobación | Cambiarla a la fecha real si no es hoy | No |
+| D6 | Etiqueta de versión de términos (`2026-11-09-r4`) = fecha de aprobación | Cambiarla a la fecha real si no es hoy | No |
 | D7 | Verificar la Ley 21.719 (vigente el 01-12-2026 salvo postergación) y reconfirmar la política de privacidad | Confirmar con el abogado | No (riesgo normativo) |
 | D8 | EmailJS (formulario de contacto): confirmar en su panel que el destino es `contacto@bydlightsolutions.com` (el sitio ya publica ese correo) | Revisar el panel | No |
 | D9 | Autorización para subir la Etapa B a `main` (fast-forward desde `13aaf17`, sin force) | Autorizar cuando D1 esté resuelta | Sí (el ejecutor solo descarga `main`) |

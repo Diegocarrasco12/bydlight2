@@ -28,6 +28,7 @@ export default function PrivacidadPage() {
         <li>Solicitud de contratación: los datos anteriores, el plan elegido, la cotización, el estado de la orden y un registro de eventos (por ejemplo, la aceptación de términos con su versión y fecha).</li>
         <li>Pagos con Webpay Plus: el número completo y el código de seguridad de la tarjeta se ingresan solo en el formulario de Transbank; Bydlight no los recibe ni los almacena. Bydlight conserva datos limitados de la transacción informados por Transbank: estado, monto, orden de compra, código de autorización, fecha, últimos 4 dígitos de la tarjeta, tipo de pago y cuotas.</li>
         <li>Comunicaciones: los correos y mensajes que intercambiamos contigo, incluidos los correos automáticos de confirmación que te enviamos (se registra si fueron enviados).</li>
+        <li>Si nos escribes por WhatsApp, tu número y tus mensajes son tratados también por WhatsApp (Meta) según sus propias condiciones.</li>
         <li>Si contratas como empresa: razón social, RUT, y, si los informas, giro y dirección tributaria, que usamos solo para emitir el documento tributario correspondiente.</li>
         <li>Datos técnicos: la infraestructura del sitio registra datos de conexión (como la dirección IP y la fecha de acceso) con fines de seguridad y funcionamiento.</li>
       </ul>
@@ -39,10 +40,11 @@ export default function PrivacidadPage() {
         <li>EmailJS: servicio que transporta los mensajes del formulario de contacto hacia nuestro correo.</li>
         <li>Brevo: servicio de envío de correos transaccionales desde el cual enviamos la confirmación de tu solicitud, la cotización y los comprobantes de pago.</li>
         <li>Zoho Mail: servicio de correo donde recibimos tus mensajes y tus respuestas a nuestros correos.</li>
+        <li>WhatsApp (Meta): solo si decides escribirnos por ese medio, mediante el enlace publicado en el sitio.</li>
         <li>Cloudflare: opera la red de entrega y seguridad del sitio y, por ello, procesa datos técnicos de conexión.</li>
         <li>Autoridades, cuando una ley lo exija.</li>
       </ul>
-      <p>No vendemos tus datos. Algunos de estos proveedores pueden tratar datos en servidores fuera de Chile; la ubicación depende de cada proveedor.</p>
+      <p>No vendemos tus datos. <strong>Transferencias internacionales:</strong> los servicios de EmailJS, Brevo, Zoho Mail, Cloudflare y WhatsApp pueden tratar datos en servidores fuera de Chile; el país exacto depende de cada proveedor y de sus condiciones, y Bydlight no lo controla. Transbank opera en Chile. Solo enviamos a cada proveedor lo necesario para su función y tienes derecho a consultarnos qué datos se envían a cada uno.</p>
       <h2 id="cookies">5. Cookies y tecnologías de seguimiento</h2>
       <p>
         El sitio no usa cookies de analítica, publicidad ni seguimiento, ni almacena identificadores de navegación en tu dispositivo con esos fines. Las tipografías se sirven
@@ -51,13 +53,11 @@ export default function PrivacidadPage() {
       </p>
       <h2>6. Conservación</h2>
       <p>
-        Conservamos los datos mientras sean necesarios para las finalidades descritas y para cumplir obligaciones legales, incluidas las tributarias y la acreditación de las
-        transacciones. Cuando ya no sean necesarios, se eliminan o anonimizan.
+        Conservamos los datos solo mientras sean necesarios para las finalidades descritas y para cumplir obligaciones legales. Los antecedentes de órdenes, cotizaciones, pagos, devoluciones y documentos tributarios se conservan por el plazo que exige la normativa tributaria (en general, 6 años) para respaldar la operación. Las consultas y solicitudes sin contratación ni pago se conservan hasta 24 meses desde la última comunicación. Vencidos los plazos, o cuando lo solicites y la ley lo permita, se eliminan o anonimizan; lo que debamos conservar por ley se limita a esa finalidad. Los respaldos siguen la misma regla.
       </p>
       <h2>7. Tus derechos</h2>
       <p>
-        Puedes solicitar acceso, rectificación, cancelación o supresión, oposición y bloqueo de tus datos, y, desde la entrada en vigencia de la Ley N° 21.719 (prevista para el
-        1 de diciembre de 2026; existe un proyecto de ley en tramitación que propone postergar esa fecha, por lo que podría cambiar), los demás derechos que esa ley reconozca, como la portabilidad. Escríbenos a <a href={`mailto:${SITE.email}`}>{SITE.email}</a> indicando qué derecho
+        Puedes solicitar acceso, rectificación, cancelación o supresión, oposición y bloqueo de tus datos. La Ley N° 21.719, publicada el 13 de diciembre de 2024, establece su entrada en vigencia general el 1 de diciembre de 2026 y reconoce además otros derechos, como la portabilidad. Existe un proyecto de ley en tramitación que propone postergar esa fecha; mientras no esté promulgado y publicado, no se considera modificada la fecha de la ley publicada. Si la fecha cambia, lo informaremos aquí. Escríbenos a <a href={`mailto:${SITE.email}`}>{SITE.email}</a> indicando qué derecho
         ejerces y un medio para responderte; podremos pedirte datos para verificar tu identidad. Responderemos por escrito dentro de los plazos que fije la ley. También podrás
         reclamar ante la autoridad de protección de datos que la ley establezca.
       </p>

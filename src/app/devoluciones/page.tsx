@@ -20,19 +20,24 @@ export default function DevolucionesPage() {
       <h2>1. Derecho de retracto (consumidores)</h2>
       <p>
         Si contratas como consumidor por medios electrónicos, la Ley N° 19.496 (artículo 3 bis) te permite poner término unilateral al contrato dentro de
-        10 días contados desde la contratación del servicio y antes de que el servicio se preste. Si Bydlight no te envía la confirmación escrita del contrato
-        (artículo 12 A), ese plazo se extiende a 90 días. Bydlight no excluye en forma general este derecho en servicios de desarrollo; cada caso se evalúa
-        conforme a la ley.
+        10 días contados desde la contratación del servicio. Si Bydlight no te envía la confirmación escrita del contrato
+        (artículo 12 A), ese plazo se extiende a 90 días. La ley permite al proveedor disponer expresamente lo contrario; Bydlight no lo ha dispuesto: no excluye en forma general este derecho
+        en sus servicios de desarrollo contratados por medios electrónicos. Bydlight te envía la confirmación escrita por correo una vez pagado el anticipo.
       </p>
       <p>
         Para ejercerlo, escribe a <a href={`mailto:${SITE.email}`}>{SITE.email}</a> indicando el código de tu orden y que deseas retractarte. En servicios, la devolución comprende
         las sumas abonadas que no correspondan a servicios ya prestados al momento del retracto, sin retención de gastos, a la mayor brevedad y, en todo caso, antes de
         45 días desde que comunicas el retracto.
       </p>
+      <p>
+        <strong>Servicios ya prestados.</strong> Si al comunicar el retracto ya se había comenzado a ejecutar el servicio, Bydlight te informa por escrito qué trabajo se prestó efectivamente a esa fecha
+        (los entregables o etapas realizados, según la cotización) y a qué monto corresponde, y devuelve el resto de lo abonado. Esa valoración debe ser razonable y verificable, y puedes
+        objetarla por escrito o reclamar ante el SERNAC o los tribunales. Bydlight no retiene gastos ni aplica penalizaciones por ejercer el retracto.
+      </p>
       <h2>2. Cancelación fuera del plazo de retracto, y contratos entre empresas</h2>
       <p>
-        Bydlight no considera irreembolsables todos los anticipos. Si deseas cancelar un proyecto, se evalúa el trabajo efectivamente ejecutado a la fecha y se
-        determina lo que corresponda devolver legal o contractualmente. Las condiciones específicas de cancelación de cada proyecto, incluidas las de contratos entre
+        Bydlight no considera irreembolsables todos los anticipos. Si deseas cancelar un proyecto, se evalúa el trabajo efectivamente ejecutado a la fecha, se te informa por escrito el detalle de lo ejecutado y
+        se determina lo que corresponda devolver legal o contractualmente, sin que esto limite los derechos que la ley te reconoce. Las condiciones específicas de cancelación de cada proyecto, incluidas las de contratos entre
         empresas, constan en su cotización o contrato.
       </p>
       <h2>3. Cómo solicitarlo</h2>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Fragment } from "react"
 import Link from "next/link"
 import { headers } from "next/headers"
 import { notFound } from "next/navigation"
@@ -15,6 +16,7 @@ import { amountDue, verifyOrder } from "@/lib/payments/service"
 import { isValidOrderId, readOrder } from "@/lib/payments/store"
 import type { Attempt, Order } from "@/lib/payments/types"
 import { IVA_PERCENT, ivaBreakdown } from "@/lib/tax"
+import { quoteConditionRows } from "@/lib/plans"
 import { buildVoucher, formatClp, formatWhen } from "@/lib/payments/voucher"
 import { COMPANY } from "@/lib/company"
 import { SITE, whatsappLink } from "@/lib/site"
@@ -270,6 +272,7 @@ export default async function OrdenPage({
               <dt>Anticipo ({q.depositPercent}%)</dt><dd>{clp(q.depositAmount)}</dd>
               <dt>Saldo</dt><dd>{clp(q.balanceAmount)}</dd>
               <dt>Cotización válida hasta</dt><dd>{when(q.validUntil)}</dd>
+              {quoteConditionRows(order.planId, q.depositPercent).map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>))}
               {enabled && (<><dt>Método de pago</dt><dd>Webpay Plus · crédito, débito y prepago</dd></>)}
             </dl>
             {q.note && <p className="bd-note left">{q.note}</p>}

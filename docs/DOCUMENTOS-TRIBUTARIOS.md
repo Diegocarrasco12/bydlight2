@@ -22,7 +22,7 @@ Cada registro y anulación deja un evento en la orden (`DOCUMENTO_TRIBUTARIO_REG
 
 ## Conciliación manual y fechas
 - `taxdoc-pending` lista los pagos AUTORIZADOS sin documento vigente y agrega un `summary` por `tipoCliente/tipoPago` (persona o empresa; anticipo o saldo) con cantidad y total. Solo agrupa: **no clasifica un pago como boleta ni emite nada**; la decisión (voucher, boleta o factura) es del titular por cada pago. Un anticipo y su saldo son pagos distintos y se documentan por separado.
-- Modelo de emisión declarado el 2026-11-09 con **efecto desde el 2026-12-01**: antes de esa fecha cada cobro debe documentarse manualmente. Las facturas a empresas dependen de la verificación de actividades del SII (no confirmada).
+- El titular informó haber declarado el 2026-11-09 el modelo de emisión ante el SII. **La fecha desde la que rige ese modelo no está verificada** (el titular mencionó 2026-12-01; confirmarla en el sitio del SII o con el contador). Mientras no se confirme el modelo efectivamente vigente, cada cobro debe documentarse manualmente y los textos públicos solo dicen que el voucher «puede» tener validez según el modelo vigente. Las facturas a empresas dependen de la verificación de actividades del SII (no confirmada).
 
 ## Uso (el titular, con el patrón de `$RUN` del procedimiento)
 ```

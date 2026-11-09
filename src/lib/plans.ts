@@ -275,6 +275,23 @@ function checkoutUiVisible() {
 /** Planes que se pueden solicitar y pagar en linea (los proyectos a medida quedan fuera del checkout). */
 export const isDirectPlan = (planId: string) => PLANS.some((p) => p.id === planId && p.modality === "directa")
 
+/**
+ * Condiciones que toda cotizacion informa junto al monto: plazo, revisiones, soporte y correccion de defectos (publicados por plan) y
+ * condiciones de pago. Son las del plan elegido salvo lo que la nota de la cotizacion indique distinto; para proyectos a medida
+ * constan en la cotizacion o contrato especificos. No inventa datos: solo reutiliza `limits` del plan.
+ */
+export function quoteConditionRows(planId: string, depositPercent: number): [string, string][] {
+  const p = PLANS.find((x) => x.id === planId)
+  const rows: [string, string][] = []
+  if (p) {
+    rows.push(["Plazo de entrega (referencial)", p.limits.delivery])
+    rows.push(["Revisiones incluidas", p.limits.revisions])
+    rows.push(["Soporte y corrección de defectos", p.limits.support])
+  }
+  rows.push(["Condiciones de pago", `Anticipo ${depositPercent} % para iniciar; saldo ${100 - depositPercent} % según las condiciones de entrega de la cotización`])
+  return rows
+}
+
 /** Destino del boton «Solicitar este plan». */
 export function planHref(planId: string) {
   return checkoutUiVisible() && isDirectPlan(planId) ? `/contratar?plan=${planId}` : `/contacto?plan=${planId}`

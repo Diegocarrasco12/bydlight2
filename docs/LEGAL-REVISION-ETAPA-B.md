@@ -1,6 +1,6 @@
 # Revisión legal de la Etapa B (2026-11-09): textos listos para aprobación, NO aprobados
 
-**Estado:** los seis documentos publicados quedaron redactados y coherentes entre sí, pero **ninguno está aprobado por el titular ni por un abogado**: este documento no es asesoría jurídica. `TERMS_VERSION = "2026-11-09-r3"` es la **etiqueta de edición del texto** (fecha de redacción + revisión), no una fecha de aprobación; la aprobación del titular se registra aparte (decisión D1) y no se escribe en ninguna página.
+**Estado:** los seis documentos publicados quedaron redactados y coherentes entre sí, pero **ninguno está aprobado por el titular ni por un abogado**: este documento no es asesoría jurídica. `TERMS_VERSION = "2026-11-09-r4"` es la **etiqueta de edición del texto** (fecha de redacción + revisión), no una fecha de aprobación; la aprobación del titular se registra aparte (decisión D1) y no se escribe en ninguna página.
 
 ## Documentos y estado
 | Documento (ruta) | Contenido y cambios de esta ronda | Estado |

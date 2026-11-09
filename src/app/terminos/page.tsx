@@ -63,7 +63,7 @@ export default function TerminosPage() {
       <p>
         Los derechos sobre cada entregable específico se definen expresamente en la cotización o contrato (cesión o licencia de uso), y se activan una vez pagado el precio
         acordado. Los componentes preexistentes y reutilizables de Bydlight (herramientas, bibliotecas, plantillas y código propio anterior al proyecto) son de propiedad de
-        Bydlight, que otorga al cliente las licencias de uso necesarias para operar su entregable. El cliente conserva la titularidad de los contenidos y materiales que aporta. Los materiales de terceros y los componentes de código abierto conservan sus propias licencias. Bydlight
+        Bydlight, que otorga al cliente las licencias de uso necesarias para operar su entregable. El cliente conserva la titularidad de los contenidos y materiales que aporta. Cada cotización informa, para ese proyecto, qué se entrega (por ejemplo, sitio publicado, archivos, repositorio o código fuente), si el cliente podrá acceder al código fuente y en qué formato, qué componentes se licencian y con qué alcance (uso, modificación, plazo), y si hay restricciones; lo que la cotización no incluya expresamente no se entiende entregado, sin perjuicio de los derechos que la ley reconoce. Los materiales de terceros y los componentes de código abierto conservan sus propias licencias. Bydlight
         solo menciona un proyecto como referencia con autorización del cliente.
       </p>
       <h2>9. Servicios de terceros, hosting y dominios</h2>
