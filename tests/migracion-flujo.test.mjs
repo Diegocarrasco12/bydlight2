@@ -4,7 +4,7 @@ import test from "node:test"
 import assert from "node:assert/strict"
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, existsSync, chmodSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { join, dirname } from "node:path"
 import { spawnSync } from "node:child_process"
 import { DatabaseSync } from "node:sqlite"
 import { createHash } from "node:crypto"
@@ -50,6 +50,7 @@ case "$*" in
         -v) v="\${args[$((i+1))]}"; src="\${v%%:*}"; rest="\${v#*:}"; dst="\${rest%%:*}"
             [ "$src" = bydlight-prod_bydlight_data ] && src="$TEST_DATA"; MAP["$dst"]="$src"; i=$((i+2)) ;;
         -e) ENVS+=("\${args[$((i+1))]}"); i=$((i+2)) ;;
+        --user) CUSER="\${args[$((i+1))]%%:*}"; i=$((i+2)) ;;
         node) shift $((i+1)); break ;;
         *) i=$((i+1)) ;;
       esac
@@ -62,6 +63,8 @@ case "$*" in
     done
     if [ "$1" = "-e" ]; then W="$(cygpath -m "$TEST_DATA" 2>/dev/null || echo "$TEST_DATA")"; js="$2"; js="\${js//\\/data\\//$W/}"; exec node -e "$js"; fi
     script="$1"; for d in "\${!MAP[@]}"; do case "$script" in "$d"*) script="\${MAP[$d]}\${script#$d}";; esac; done
+    # El clon del servidor es privado de root (umask 077): un contenedor sin root ni capacidades no puede leerlo y node informa "Cannot find module".
+    if [ "\${CUSER:-0}" != "0" ] && [ -n "\${ROOT_PRIVATE_DIR:-}" ]; then case "$script" in "$ROOT_PRIVATE_DIR"/*) echo "Error: Cannot find module '$1'" >&2; exit 1 ;; esac; fi
     shift 1; exec node "$script" "$@" ;;
 esac
 `
@@ -94,7 +97,7 @@ function sandbox(name) {
     const out = join(base, f); writeFileSync(out, s); return posix(out)
   }
   const exec = (f, { deployed = PREV, clone = TARGET } = {}) =>
-    spawnSync("bash", ["-c", `id() { echo 0; }; export -f id; export PATH="${posix(bin)}:$PATH" TEST_DATA="${posix(data)}" TEST_TMP="${posix(base)}" FAKE_DEPLOYED=${deployed} FAKE_CLONE=${clone}; bash "${adapt(f)}" ${TARGET}`], { encoding: "utf8" })
+    spawnSync("bash", ["-c", `id() { echo 0; }; export -f id; export PATH="${posix(bin)}:$PATH" TEST_DATA="${posix(data)}" TEST_TMP="${posix(base)}" ROOT_PRIVATE_DIR="${posix(app)}" FAKE_DEPLOYED=${deployed} FAKE_CLONE=${clone}; bash "${adapt(f)}" ${TARGET}`], { encoding: "utf8" })
   const version = () => { const d = new DatabaseSync(join(data, "bydlight.db"), { readOnly: true }); const v = d.prepare("SELECT MAX(version) v FROM schema_migrations").get().v; d.close(); return v }
   return { exec, bk, data, bkdb, bsha, version }
 }
@@ -154,4 +157,36 @@ test("MF3. 04 (verificador final) falla sobre la base v3 y pasa tras 07: compara
   assert.match(after.stdout, /schema_v=5 migraciones_registradas=5/)
   assert.match(after.stdout, /variacion desde el respaldo: ordenes \+0, pagos autorizados \+0, monto \+0/)
   assert.match(after.stdout, /MIGRACION 5 VERIFICADA OK/)
+})
+
+test("MF4. Regresion MODULE_NOT_FOUND: 07 no monta el clon privado de root en el contenedor 1000:1000; usa una copia legible con el mismo SHA-256 y la limpia", { skip: !hasBash }, () => {
+  const sb = sandbox("modulo")
+  assert.equal(sb.exec("06-ensayo-migracion.sh").status, 0)
+  const text = readFileSync(join(root, "docs/deploy/07-aplicar-migraciones.sh"), "utf8")
+  assert.doesNotMatch(text, /-v\s+"\$APP_DIR[^"]*"\s*:/, "07 no debe montar el clon directamente")
+  assert.match(text, /--user 1000:1000/, "el contenedor sigue sin root")
+  assert.match(text, /--cap-drop ALL/)
+  assert.match(text, /--read-only/)
+  const r7 = sb.exec("07-aplicar-migraciones.sh", { deployed: TARGET })
+  assert.equal(r7.status, 0, r7.stdout + r7.stderr)
+  assert.doesNotMatch(r7.stdout + r7.stderr, /Cannot find module/)
+  assert.match(r7.stdout, /orders-admin\.mjs sha256=[0-9a-f]{16}/)
+  assert.match(r7.stdout, /MIGRACIONES APLICADAS OK/)
+  assert.equal(sb.version(), 5)
+})
+
+test("MF5. El simulador reproduce el fallo real: montar el clon privado de root con --user 1000:1000 da Cannot find module", { skip: !hasBash }, () => {
+  const sb = sandbox("repro")
+  assert.equal(sb.exec("06-ensayo-migracion.sh").status, 0)
+  const viejo = readFileSync(join(root, "docs/deploy/07-aplicar-migraciones.sh"), "utf8")
+  const a = viejo.indexOf("STAGE=\"$(mktemp"), b = viejo.indexOf("  || { printf")
+  const conMontajeDirecto = viejo.slice(0, a) + `OUT="$("\${DR[@]}" --network none -v "$VOL":/data -v "$APP_DIR/scripts":/w/scripts:ro -v "$APP_DIR/src/lib/payments/migrations.mjs":/w/src/lib/payments/migrations.mjs:ro -e PAYMENTS_DB=/data/bydlight.db "$IMG" node /w/scripts/orders-admin.mjs check)" \
+` + viejo.slice(b)
+  const dst = join(dirname(sb.bkdb), "..", "07-viejo.sh")
+  writeFileSync(dst, conMontajeDirecto
+    .replace(/readonly BACKUP_DIR=.*/, `readonly BACKUP_DIR="${posix(sb.bk)}"`).replace(/readonly APP_DIR=.*/, `readonly APP_DIR="${posix(join(sb.bk, "..", "app"))}"`))
+  const r = spawnSync("bash", ["-c", `id() { echo 0; }; export -f id; export PATH="${posix(join(sb.bk, "..", "bin"))}:$PATH" TEST_DATA="${posix(sb.data)}" TEST_TMP="${posix(join(sb.bk, ".."))}" ROOT_PRIVATE_DIR="${posix(join(sb.bk, "..", "app"))}" FAKE_DEPLOYED=${TARGET} FAKE_CLONE=${TARGET}; bash "${posix(dst)}" ${TARGET}`], { encoding: "utf8" })
+  assert.notEqual(r.status, 0)
+  assert.match(r.stderr, /Cannot find module '\/w\/scripts\/orders-admin\.mjs'/)
+  assert.equal(sb.version(), 3)
 })

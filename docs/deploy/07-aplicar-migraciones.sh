@@ -82,15 +82,32 @@ if [ "${BASH_REMATCH[1]}" = "true" ] && [ "${BASH_REMATCH[2]}" = "public" ]; the
 say "== 3. Pagos no publicos: ${CFG}"
 
 # ---------------------------------------------------------------------------------------------- 4. aplicar (orders-admin check con la imagen nueva)
+# La imagen standalone NO incluye scripts/ (.dockerignore lo excluye), asi que se montan desde el clon del servidor. El contenedor corre como
+# 1000:1000 (duenio de la base en /data) y SIN capacidades, y el clon del servidor es privado de root (umask 077): montarlo directamente
+# deja a node sin permiso de lectura y falla con "Cannot find module '/w/scripts/orders-admin.mjs'" (EACCES se informa como modulo no
+# encontrado). Por eso se copian SOLO los dos archivos necesarios a un directorio temporal legible (755/644), de solo lectura dentro del
+# contenedor, y se deja constancia de su SHA-256. No se relajan los permisos del clon ni se ejecuta el contenedor como root.
 [ -f "$APP_DIR/scripts/orders-admin.mjs" ] && [ -f "$APP_DIR/src/lib/payments/migrations.mjs" ] || die "faltan scripts/orders-admin.mjs o migrations.mjs en el clon del servidor"
-OUT="$("${DR[@]}" --network none -v "$VOL":/data \
-  -v "$APP_DIR/scripts":/w/scripts:ro -v "$APP_DIR/src/lib/payments/migrations.mjs":/w/src/lib/payments/migrations.mjs:ro \
+[ ! -L "$APP_DIR/scripts/orders-admin.mjs" ] && [ ! -L "$APP_DIR/src/lib/payments/migrations.mjs" ] || die "los archivos del clon no pueden ser enlaces simbolicos"
+STAGE="$(mktemp -d /tmp/bd-migrar-XXXXXX)"
+cleanup() { if [ -n "${STAGE:-}" ] && [ -d "$STAGE" ]; then rm -rf -- "$STAGE"; fi; return 0; }
+trap 'rc=$?; cleanup; [ "$rc" = 0 ] || printf "\nLA APLICACION DE MIGRACIONES FALLO (codigo %s). No restaure la base a ciegas: envie esta salida.\n" "$rc" >&2' EXIT
+mkdir -p "$STAGE/scripts" "$STAGE/src/lib/payments"
+install -m 0644 "$APP_DIR/scripts/orders-admin.mjs" "$STAGE/scripts/orders-admin.mjs"
+install -m 0644 "$APP_DIR/src/lib/payments/migrations.mjs" "$STAGE/src/lib/payments/migrations.mjs"
+chmod 0755 "$STAGE" "$STAGE/scripts" "$STAGE/src" "$STAGE/src/lib" "$STAGE/src/lib/payments"
+for f in scripts/orders-admin.mjs src/lib/payments/migrations.mjs; do
+  [ "$(sha256sum "$APP_DIR/$f" | cut -d' ' -f1)" = "$(sha256sum "$STAGE/$f" | cut -d' ' -f1)" ] || die "la copia de $f no coincide con el clon"
+  say "   $f sha256=$(sha256sum "$STAGE/$f" | cut -c1-16)"
+done
+OUT="$("${DR[@]}" --network none -v "$VOL":/data -v "$STAGE":/w:ro \
   -e PAYMENTS_DB=/data/bydlight.db "$IMG" node /w/scripts/orders-admin.mjs check)" \
   || { printf '%s\n' "${OUT:-}"; die "orders-admin check fallo (ver arriba)"; }
 printf '%s\n' "$OUT"
 LATEST="$(printf '%s\n' "$OUT" | sed -n 's/.*migracion: v\([0-9]*\).*/\1/p' | head -1)"
 printf '%s\n' "$OUT" | grep -Fq "integridad: ok | claves foraneas: ok" || die "orders-admin check no informa integridad ok"
 [ "$LATEST" = "5" ] || die "la migracion final es v${LATEST:-?} (se esperaba v5)"
+cleanup
 trap - EXIT
 say ""
 say "MIGRACIONES APLICADAS OK (esquema v5). Siguiente: 04-verificar-migracion-5.sh"
