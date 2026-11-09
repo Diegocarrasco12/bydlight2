@@ -25,7 +25,7 @@ Las 6 páginas legales siguen en borrador y responden 404 en producción (`LEGAL
 El modo piloto (`PLAN-ACTIVACION-WEBPAY-PRODUCCION.md`) permite la compra de $50 del titular con las páginas legales todavía ocultas: la casilla de términos aparece sin enlaces y se registra la versión `borrador-2026-11-06`. **No** habilita el checkout para el público: eso exige los textos legales publicados (`LEGAL_PAGES_PUBLISHED=true`), que el código verifica.
 
 ## 3. Bloqueos que no son de texto
-1. **Titularidad del comercio: RESUELTA (2026-11-09, confirmación del titular).** El contrato Webpay Plus está a nombre de Bydlight Solutions SpA, que es la vendedora en todos los textos; no se modifica el titular ni las credenciales. Solo la cuenta bancaria de abonos es personal del representante: **pendiente confirmar por escrito con Transbank que la autoriza como destino de abonos** (y con el contador su registro, ver `SII-PROCEDIMIENTO-PROPUESTO.md`).
+1. **Titularidad del comercio: RESUELTA (2026-11-09, confirmación del titular).** El contrato Webpay Plus está a nombre de Bydlight Solutions SpA, que es la vendedora en todos los textos; no se modifica el titular ni las credenciales. La cuenta bancaria de abonos (personal del representante) fue autorizada y validada por Transbank: **sin pendiente de Transbank**. Solo queda la consulta contable sobre su registro (ver `SII-PROCEDIMIENTO-PROPUESTO.md`).
 2. **Logos de marcas:** Webpay Plus y Transbank ya están autorizados y publicados. Visa, Mastercard, Amex y Redcompra siguen sin anunciarse hasta que el área comercial de Transbank confirme las marcas habilitadas: ver `WEBPAY-LOGOS-FUENTES.md`.
 3. **Credenciales productivas:** ya están instaladas en el servidor (`payments.json`, 0600); no se vuelven a pedir ni a tocar.
 

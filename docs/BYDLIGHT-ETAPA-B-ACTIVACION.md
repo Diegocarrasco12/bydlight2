@@ -33,21 +33,21 @@ Pruebas y verificaciones adaptadas al nuevo estado (L3, G6/G7, P1/P8, H12 y las 
 | # | Decisión | Recomendación | ¿Bloquea abrir al público? |
 |---|---|---|---|
 | D1 | Aprobar los textos legales (6 páginas) y las cláusulas de la sección 3 | Revisión de un abogado (Ley 19.496, retracto, privacidad) antes de abrir; si decide asumir el riesgo, aprobación suya expresa | **Sí** (publicar textos propios sin aprobar) |
-| D2 | **Resuelta (2026-11-09, confirmación del titular):** el contrato Webpay Plus está a nombre de Bydlight Solutions SpA, que sigue como vendedora en todos los documentos; no se toca el titular del comercio ni las credenciales. **Pendiente única:** confirmar por escrito con Transbank que autoriza la cuenta bancaria personal del representante como destino de los abonos (y con el contador cómo se registran esos ingresos de la SpA, ver D3) | Pedir la confirmación a Transbank (soporte comercial) y guardarla | Recomendado antes de abrir; no afecta el código |
+| D2 | **Resuelta del todo (2026-11-09):** contrato a nombre de la SpA y Transbank autorizó y validó la cuenta de abonos; no hay pendiente. La SpA sigue como vendedora en todos los documentos; no se toca el titular ni las credenciales | Ninguna | No afecta el código |
 | D3 | Modelo tributario con el contador (boleta/factura, anticipo, voucher) y registro de los abonos que Transbank deposita en una cuenta personal siendo ingresos de la SpA | Obtener respuesta escrita; mientras tanto emitir documento manual por cada pago | Riesgo tributario del titular; no lo bloquea el código |
 | D4 | Configurar el correo (Gmail OAuth, `mail.json`) antes de abrir | Sí: confirmación escrita del contrato y comprobante dependen de él | Recomendado como requisito |
 | D5 | Anticipo por defecto (50 %) y vigencia de cotización (7 días) | Mantener los valores actuales | No |
 | D6 | Etiqueta de versión de términos (`2026-11-09-r1`) = fecha de aprobación | Cambiarla a la fecha real si no es hoy | No |
 | D7 | Verificar la Ley 21.719 (vigente el 01-12-2026 salvo postergación) y reconfirmar la política de privacidad | Confirmar con el abogado | No (riesgo normativo) |
 | D8 | EmailJS (formulario de contacto): confirmar en su panel que el destino es `bydlightsolutions@gmail.com` | Revisar el panel | No |
-| D9 | Autorización para subir la Etapa B a `main` (fast-forward desde `13aaf17`, sin force) | Autorizar cuando D1 y D4 estén resueltas (y D2 confirmada) | Sí (el ejecutor solo descarga `main`) |
+| D9 | Autorización para subir la Etapa B a `main` (fast-forward desde `13aaf17`, sin force) | Autorizar cuando D1 y D4 estén resueltas | Sí (el ejecutor solo descarga `main`) |
 Marcas de tarjeta (Visa, Mastercard, etc.): siguen sin anunciarse hasta que el área comercial de Transbank las confirme por escrito; no bloquea.
 
 ## 5. Qué no cambia
 Docker Compose, Dockerfile, dependencias y `next.config.ts`: sin cambios (no hay `accept-compose`). Devoluciones (`adminRefunds=false`), credenciales y base: intactas. Contenedores ajenos: ningún comando los toca.
 
 ## 6. Procedimiento en Ubuntu (cada bloque en un subshell: si falla, no ve «OK» y se detiene; no ejecute el siguiente)
-Antes: subir los scripts de `docs/deploy/` por `scp` (`02-verificar-migracion-4.sh`, `03-backup-etapa-b.sh`), comprobar su huella con `sha256sum` y tener **D1 y D4 resueltas, D2 confirmada y D9 autorizada** (esto último: Claude hace el push a `main` y entrega el SHA).
+Antes: subir los scripts de `docs/deploy/` por `scp` (`02-verificar-migracion-4.sh`, `03-backup-etapa-b.sh`), comprobar su huella con `sha256sum` y tener **D1 y D4 resueltas y D9 autorizada** (esto último: Claude hace el push a `main` y entrega el SHA).
 
 **Paso 1: correo (solo si aún no está; lo hace usted, sin pegar secretos en el chat)**
 Crear el cliente OAuth y el refresh token con la guía paso a paso `docs/GMAIL-OAUTH-PASOS.md` (la app debe quedar «En producción» o el token caduca a los 7 días). Luego:
@@ -143,7 +143,7 @@ sleep 6
 $RUN node /s/payments-config-set.mjs /data/config/payments.json --show
 curl -s -o /dev/null -w '/contratar: %{http_code} (esperado 200)\n' https://bydlightsolutions.com/contratar
 ```
-Éxito: `--show` indica `enabled: true`, `access: public`, `adminRefunds: false`; `/contratar` 200. Solo ejecute este paso con D1 y D4 resueltas, D2 confirmada y la autorización final expresa del titular.
+Éxito: `--show` indica `enabled: true`, `access: public`, `adminRefunds: false`; `/contratar` 200. Solo ejecute este paso con D1 y D4 resueltas y la autorización final expresa del titular.
 
 **Paso 8: prueba final y vigilancia (48 h)**
 1. Desde un navegador sin enlace piloto, solicite un plan con datos propios y anote el código de la orden `ID`. Debe llegar el correo de «Recibimos tu solicitud» (y el aviso interno).
@@ -161,7 +161,7 @@ curl -s -o /dev/null -w '/contratar: %{http_code} (esperado 200)\n' https://bydl
 Con el interruptor en `enabled=false` el sitio sigue anunciando Webpay (el anuncio es de código) pero los botones llevan a contacto: es un degradado seguro. Para ocultar el anuncio hay que hacer rollback de código. **Nunca** `down -v`, borrar volúmenes ni restaurar un respaldo sobre pagos nuevos sin decisión expresa.
 
 ## 8. Riesgos conocidos
-1. Si se abre `access=public` antes de resolver D4 (correo) o de confirmar D2 (cuenta de abonos), el cliente puede no recibir sus confirmaciones o el abono podría quedar retenido o rechazado por Transbank.
+1. Si se abre `access=public` antes de resolver D4 (correo), el cliente puede no recibir sus confirmaciones.
 2. Documento tributario: manual hasta la respuesta del contador (D3).
 3. `monitor` y `reconcile` no están programados; dependen de la ejecución manual las primeras 48 h.
 4. Los límites de envío de Gmail y el remitente `@gmail.com` pueden afectar la entregabilidad; considerar un proveedor transaccional con dominio propio si el volumen crece.
