@@ -145,9 +145,9 @@ export default function ContractForm({ plans, initialPlan, termsVersion, legalLi
         <input type="checkbox" name="acceptTerms" required />
         <span>
           {legalLinks ? (
-            <>Acepto los <a href="/terminos" target="_blank" rel="noopener">términos de contratación</a> y la <a href="/privacidad" target="_blank" rel="noopener">política de privacidad</a>.</>
+            <>Acepto los <a href="/terminos" target="_blank" rel="noopener">términos de contratación</a>, la <a href="/devoluciones" target="_blank" rel="noopener">política de cancelación y devoluciones</a> y la <a href="/privacidad" target="_blank" rel="noopener">política de privacidad</a>.</>
           ) : (
-            <>Acepto los términos de contratación y la política de privacidad.</>
+            <>Acepto los términos de contratación, la política de cancelación y devoluciones y la política de privacidad.</>
           )}
         </span>
       </label>

@@ -147,7 +147,7 @@ html:root {
   html:root .lg-wrap { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   html:root .lg-nav, html:root .bd-legal { min-width: 0; }
   html:root .lg-nav { position: static; }
-  html:root .lg-nav ul { display: flex; gap: 8px; overflow-x: auto; border-left: 0; padding-bottom: 6px; scrollbar-width: thin; }
+  html:root .lg-nav ul { display: flex; gap: 8px; overflow-x: auto; border-left: 0; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; color-scheme: dark; }
   html:root .lg-nav a { border: 1px solid var(--line-2); border-radius: 999px; white-space: nowrap; padding: 7px 14px; margin: 0; }
   html:root .lg-nav a[aria-current="page"] { border-color: var(--orange); }
 }

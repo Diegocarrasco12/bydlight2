@@ -1,6 +1,6 @@
 import { COMPANY } from "@/lib/company"
 import { SITE } from "@/lib/site"
-import { LEGAL_PAGES_PUBLISHED } from "@/lib/legal"
+import { LEGAL_PAGES_PUBLISHED, TAX_NOTE } from "@/lib/legal"
 import { IVA_PERCENT, ivaBreakdown } from "@/lib/tax"
 import { buildVoucher, formatClp, formatWhen } from "@/lib/payments/voucher"
 import type { Attempt, Order } from "@/lib/payments/types"
@@ -73,7 +73,7 @@ const legalLinks = (): string[] =>
   LEGAL_PAGES_PUBLISHED
     ? [`Términos de contratación: ${SITE.url}/terminos`, `Cancelación, retracto y devoluciones: ${SITE.url}/devoluciones`, `Política de privacidad: ${SITE.url}/privacidad`]
     : []
-const NO_TAX_DOC = "Este correo y el comprobante de pago no reemplazan el documento tributario que corresponda emitir por separado conforme a la normativa del SII."
+const NO_TAX_DOC = TAX_NOTE
 
 export function solicitudRecibida(o: Order): Rendered {
   const { html, text } = layout("Recibimos tu solicitud", "Revisaremos tus requisitos y te enviaremos una cotización.", [
@@ -195,7 +195,7 @@ export function pagoPendiente(o: Order, a: Attempt): Rendered {
       para: [
         `Hola ${first(o)}, aún no recibimos la confirmación final de Transbank por el pago de ${formatClp(a.amount)} de tu orden ${o.id}. Esto no es una confirmación de pago.`,
         "Estamos consultando el resultado directamente a Transbank. Si se confirma, te enviaremos el comprobante; si no se autoriza, te lo informaremos. No necesitas volver a pagar mientras tanto.",
-        `Si tu banco te muestra un cargo y no recibes noticias nuestras en 24 horas, escríbenos a ${SITE.email} con el código de tu orden.`,
+        `Si tu banco te muestra un cargo y no recibes noticias nuestras, escríbenos a ${SITE.email} con el código de tu orden.`,
       ],
     },
     { cta: { label: "Ver el estado de mi orden", href: orderUrl(o) } },

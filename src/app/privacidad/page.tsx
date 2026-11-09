@@ -5,7 +5,7 @@ import { requireLegalVisible } from "@/lib/legal"
 import { SITE } from "@/lib/site"
 
 export const metadata: Metadata = {
-  title: "Política de privacidad",
+  title: "Política de privacidad y cookies",
   robots: { index: false, follow: false },
 }
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default function PrivacidadPage() {
   requireLegalVisible()
   return (
-    <LegalPage path="/privacidad" title="Política de privacidad" lead="Qué datos recogemos, para qué, con quién se comparten y cómo ejercer tus derechos.">
+    <LegalPage path="/privacidad" title="Política de privacidad y cookies" lead="Qué datos recogemos, para qué, con quién se comparten, qué cookies usamos y cómo ejercer tus derechos.">
       <h2>1. Responsable</h2>
       <p>
         {COMPANY.legalName}, RUT {COMPANY.rut}, domicilio {COMPANY.address}. Contacto en materia de datos personales: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
@@ -32,7 +32,7 @@ export default function PrivacidadPage() {
         <li>Datos técnicos: la infraestructura del sitio registra datos de conexión (como la dirección IP y la fecha de acceso) con fines de seguridad y funcionamiento.</li>
       </ul>
       <h2>3. Para qué los usamos</h2>
-      <p>Responder tu consulta; preparar, gestionar y ejecutar cotizaciones y proyectos; procesar pagos y emitir comprobantes y documentos tributarios; cumplir obligaciones legales (por ejemplo, tributarias); y resguardar la seguridad del sitio y prevenir fraudes.</p>
+      <p>Responder tu consulta; preparar, gestionar y ejecutar cotizaciones y proyectos; procesar pagos y emitir comprobantes y documentos tributarios; cumplir obligaciones legales (por ejemplo, tributarias); y resguardar la seguridad del sitio y prevenir fraudes. Los usamos para ejecutar lo que solicitas o contratas, para cumplir obligaciones legales y, cuando la ley lo exija, con tu consentimiento.</p>
       <h2>4. Con quién se comparten</h2>
       <ul>
         <li>Transbank S.A.: procesa los pagos con tarjeta mediante Webpay Plus.</li>
@@ -43,7 +43,7 @@ export default function PrivacidadPage() {
         <li>Autoridades, cuando una ley lo exija.</li>
       </ul>
       <p>No vendemos tus datos. Algunos de estos proveedores pueden tratar datos en servidores fuera de Chile; la ubicación depende de cada proveedor.</p>
-      <h2>5. Cookies y tecnologías de seguimiento</h2>
+      <h2 id="cookies">5. Cookies y tecnologías de seguimiento</h2>
       <p>
         El sitio no usa cookies de analítica, publicidad ni seguimiento, ni almacena identificadores de navegación en tu dispositivo con esos fines. Las tipografías se sirven
         desde el propio sitio. Solo puede crearse una cookie técnica de acceso controlado y corta duración (para pruebas administrativas autorizadas) que no recoge datos de navegación.
@@ -57,7 +57,7 @@ export default function PrivacidadPage() {
       <h2>7. Tus derechos</h2>
       <p>
         Puedes solicitar acceso, rectificación, cancelación o supresión, oposición y bloqueo de tus datos, y, desde la entrada en vigencia de la Ley N° 21.719 (prevista para el
-        1 de diciembre de 2026, fecha que podría postergarse si se publica la ley en tramitación), los demás derechos que esa ley reconozca, como la portabilidad. Escríbenos a <a href={`mailto:${SITE.email}`}>{SITE.email}</a> indicando qué derecho
+        1 de diciembre de 2026; existe un proyecto de ley en tramitación que propone postergar esa fecha, por lo que podría cambiar), los demás derechos que esa ley reconozca, como la portabilidad. Escríbenos a <a href={`mailto:${SITE.email}`}>{SITE.email}</a> indicando qué derecho
         ejerces y un medio para responderte; podremos pedirte datos para verificar tu identidad. Responderemos por escrito dentro de los plazos que fije la ley. También podrás
         reclamar ante la autoridad de protección de datos que la ley establezca.
       </p>

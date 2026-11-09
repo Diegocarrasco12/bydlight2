@@ -7,7 +7,7 @@ import { TERMS_VERSION } from "@/lib/terms"
 import PaymentBrandShowcase from "@/components/payments/PaymentBrandShowcase"
 import { checkoutMode, paymentsEnabled } from "@/lib/payments/config"
 import { webpaySandbox } from "@/lib/payments/availability"
-import { legalVisible } from "@/lib/legal"
+import { legalVisible, TAX_NOTE } from "@/lib/legal"
 import { previewMode } from "@/lib/preview"
 import { previewOrder } from "@/lib/payments/preview-data"
 import { clientIp, rateLimited } from "@/lib/payments/http"
@@ -112,7 +112,7 @@ function Result({ a, order }: { a: Attempt; order: Order }) {
               <div key={row.label} className="bd-dl-row"><dt>{row.label}</dt><dd>{row.value}</dd></div>
             ))}
           </dl>
-          <p className="bd-note left">Este comprobante acredita el pago en línea con Webpay Plus. No reemplaza el documento tributario que corresponda emitir por separado.</p>
+          <p className="bd-note left">{TAX_NOTE}</p>
           {refunded.length > 0 && <p className="bd-note">Se registró una devolución sobre este pago. Si tienes dudas, escríbenos con el código de la orden.</p>}
           <div className="bd-voucher-brand">
             <span>Pago procesado por Webpay Plus de Transbank</span>

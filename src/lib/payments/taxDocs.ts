@@ -6,11 +6,12 @@ import { normalizeRut } from "@/lib/rut"
 
 // Modelo de documentos tributarios. SOLO REGISTRA lo que el titular emitio por los canales autorizados del SII (sistema gratuito de
 // boletas, facturacion, etc.): este modulo NO emite, NO firma y NO se comunica con el SII. Un voucher de Webpay no se asume como documento:
-// cada pago autorizado queda «pendiente de documento» hasta que se registra uno. Reglas: un solo documento vigente por pago (indice unico en la
+// cada pago autorizado queda «pendiente de documento» hasta que se registra uno... salvo que el voucher electronico del medio de pago tenga validez
+// tributaria: entonces se registra como `voucher_pago` (NO_REQUERIDO) y no se emite nada adicional (un pago NO siempre requiere boleta). Reglas: un solo documento vigente por pago (indice unico en la
 // base), folio unico por tipo, y el importe sale siempre del pago autorizado (nunca del operador).
 
-export type TaxKind = "boleta" | "factura" | "factura_exportacion" | "nota_credito"
-export type TaxStatus = "PENDIENTE" | "EMITIDO" | "ANULADO"
+export type TaxKind = "boleta" | "factura" | "factura_exportacion" | "nota_credito" | "voucher_pago"
+export type TaxStatus = "PENDIENTE" | "EMITIDO" | "ANULADO" | "NO_REQUERIDO"
 
 export type TaxDocument = {
   id: number
@@ -61,7 +62,7 @@ function rowToDoc(r: Row): TaxDocument {
   }
 }
 
-const KINDS: TaxKind[] = ["boleta", "factura", "factura_exportacion", "nota_credito"]
+const KINDS: TaxKind[] = ["boleta", "factura", "factura_exportacion", "nota_credito", "voucher_pago"]
 const FOLIO_RE = /^[0-9A-Za-z-]{1,20}$/
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -90,10 +91,11 @@ export type RegisterInput = {
  */
 export async function registerTaxDocument(orderId: string, p: RegisterInput): Promise<TaxResult<TaxDocument>> {
   if (!isValidOrderId(orderId)) return fail("ID de orden invalido.")
-  if (!KINDS.includes(p.kind as TaxKind)) return fail("kind debe ser boleta, factura, factura_exportacion o nota_credito.")
+  if (!KINDS.includes(p.kind as TaxKind)) return fail("kind debe ser boleta, factura, factura_exportacion, nota_credito o voucher_pago.")
   const kind = p.kind as TaxKind
   if (p.folio !== undefined && !FOLIO_RE.test(p.folio)) return fail("folio invalido (1 a 20 letras, numeros o guion).")
   if (p.issuedAt !== undefined && !validDate(p.issuedAt)) return fail("issuedAt debe ser una fecha AAAA-MM-DD valida y no futura.")
+  if (kind === "voucher_pago" && (p.folio || p.issuedAt)) return fail("El voucher de pago no lleva folio ni fecha: no es un documento emitido por Bydlight.")
   if (Boolean(p.folio) !== Boolean(p.issuedAt)) return fail("Indique folio e issuedAt juntos (documento emitido) o ninguno (pendiente).")
   if (p.note && p.note.length > 300) return fail("note es demasiado larga.")
   return withOrderLock(orderId, async () => {
@@ -101,7 +103,7 @@ export async function registerTaxDocument(orderId: string, p: RegisterInput): Pr
     if (!order) return fail("Orden no encontrada.")
     const db = openDb()
     const now = new Date().toISOString()
-    const status: TaxStatus = p.folio ? "EMITIDO" : "PENDIENTE"
+    const status: TaxStatus = kind === "voucher_pago" ? "NO_REQUERIDO" : p.folio ? "EMITIDO" : "PENDIENTE"
     let total: number
     let attemptId: string | null = null
     let refDocId: number | null = null
@@ -137,7 +139,12 @@ export async function registerTaxDocument(orderId: string, p: RegisterInput): Pr
       if (attempt.status !== "AUTORIZADO") return fail(`Solo se documentan pagos AUTORIZADOS (estado actual: ${attempt.status}).`)
       total = attempt.amount // el importe sale del pago, nunca del operador
       attemptId = attempt.id
-      if (kind === "boleta") {
+      if (kind === "voucher_pago") {
+        // El voucher del medio de pago cubre el pago: no se emite boleta adicional. Se registra para que el pago deje de figurar como pendiente.
+        const b = ivaBreakdown(total)
+        net = b.net
+        vat = b.iva
+      } else if (kind === "boleta") {
         const b = ivaBreakdown(total)
         net = b.net
         vat = b.iva

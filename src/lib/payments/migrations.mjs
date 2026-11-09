@@ -181,8 +181,8 @@ CREATE TABLE tax_documents (
   id               INTEGER PRIMARY KEY AUTOINCREMENT,
   order_id         TEXT NOT NULL REFERENCES orders(id),
   attempt_id       TEXT REFERENCES attempts(id),
-  kind             TEXT NOT NULL CHECK (kind IN ('boleta','factura','factura_exportacion','nota_credito')),
-  status           TEXT NOT NULL CHECK (status IN ('PENDIENTE','EMITIDO','ANULADO')),
+  kind             TEXT NOT NULL CHECK (kind IN ('boleta','factura','factura_exportacion','nota_credito','voucher_pago')),
+  status           TEXT NOT NULL CHECK (status IN ('PENDIENTE','EMITIDO','ANULADO','NO_REQUERIDO')),
   folio            TEXT,
   issued_at        TEXT,
   currency         TEXT NOT NULL DEFAULT 'CLP' CHECK (currency IN ('CLP')),
@@ -198,6 +198,9 @@ CREATE TABLE tax_documents (
   updated_at       TEXT NOT NULL,
   CHECK (status <> 'EMITIDO' OR (folio IS NOT NULL AND issued_at IS NOT NULL)),
   CHECK (kind <> 'nota_credito' OR ref_doc_id IS NOT NULL),
+  -- voucher_pago: el voucher electronico del medio de pago es el documento tributario valido; no se emite documento adicional (NO_REQUERIDO).
+  CHECK (status <> 'NO_REQUERIDO' OR kind = 'voucher_pago'),
+  CHECK (kind <> 'voucher_pago' OR status IN ('NO_REQUERIDO','ANULADO')),
   CHECK (kind = 'nota_credito' OR attempt_id IS NOT NULL)
 ) STRICT;
 CREATE INDEX tax_documents_by_order ON tax_documents(order_id);

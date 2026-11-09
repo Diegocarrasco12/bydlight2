@@ -245,6 +245,28 @@ test("E12. pagos sin documento vigente: la lista de pendientes baja a medida que
   assert.equal(has("att-t9"), false)
 })
 
+test("E14. no todo pago requiere un documento adicional: el voucher con validez tributaria se registra sin boleta y el pago deja de estar pendiente", async () => {
+  const o = await mk()
+  addAttempt(o.id, { id: "att-t12", amount: 50000 })
+  assert.equal(tax.pendingTaxDocuments(500).some((p) => p.attemptId === "att-t12"), true)
+  assert.equal((await tax.registerTaxDocument(o.id, { attemptId: "att-t12", kind: "voucher_pago", folio: "1", issuedAt: "2026-11-09" })).ok, false) // no lleva folio: no lo emite Bydlight
+  const v = await tax.registerTaxDocument(o.id, { attemptId: "att-t12", kind: "voucher_pago", note: "Voucher Webpay con validez tributaria segun el contador" })
+  assert.ok(v.ok, v.error)
+  assert.equal(v.data.status, "NO_REQUERIDO")
+  assert.equal(v.data.folio, undefined)
+  assert.equal(v.data.totalAmount, 50000)
+  assert.equal(tax.pendingTaxDocuments(500).some((p) => p.attemptId === "att-t12"), false)
+  // Con el voucher vigente no se registra ademas una boleta (seria emision duplicada); anulando el registro se puede documentar de otro modo.
+  assert.equal((await tax.registerTaxDocument(o.id, { attemptId: "att-t12", kind: "boleta" })).ok, false)
+  assert.ok((await tax.voidTaxDocument(o.id, v.data.id, "el contador indico emitir boleta")).ok)
+  assert.ok((await tax.registerTaxDocument(o.id, { attemptId: "att-t12", kind: "boleta" })).ok)
+  // La base tambien lo impide por si sola.
+  assert.throws(
+    () => db.openDb().prepare("INSERT INTO tax_documents (order_id, attempt_id, kind, status, total_amount, created_by, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?)").run(o.id, "att-t12", "boleta", "NO_REQUERIDO", 1, "t", NOW(), NOW()),
+    /CHECK/i,
+  )
+})
+
 test("E13. la base impide por si sola documentos duplicados o incoherentes (aunque se evite el codigo)", async () => {
   const o = await mk()
   addAttempt(o.id, { id: "att-t11" })

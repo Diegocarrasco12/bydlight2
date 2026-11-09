@@ -1,5 +1,7 @@
 # Documentos tributarios: modelo de datos y flujo manual (preparado 2026-11-09)
 
+> Modelo declarado por el titular: normalmente **no** se emite una boleta adicional cuando el voucher electrónico tiene validez tributaria. Por eso el sistema no da por supuesto que todo pago necesita boleta: el titular decide por pago (`voucher_pago`, `boleta`, etc.).
+
 **Alcance:** el sistema **registra** los documentos que el titular emite por los canales autorizados del SII (sistema gratuito de boletas electrónicas, facturación). **No emite, no firma y no se comunica con el SII.** No se implementó emisión automática: requiere confirmar antes los requisitos y autorizaciones aplicables (ver «Pendientes»). Un voucher de Webpay **no se asume** como documento: cada pago autorizado queda «pendiente de documento» hasta que se registra uno.
 
 ## Situación tributaria informada por el titular (2026-11-09)
@@ -8,8 +10,9 @@ Bydlight Solutions SpA, RUT 78.161.844-6, Pro Pyme General (14D), actividad 6202
 ## Modelo (migración 5, tabla `tax_documents`)
 | Campo | Regla |
 |---|---|
-| `kind` | `boleta`, `factura` (nacional), `factura_exportacion`, `nota_credito` |
-| `status` | `PENDIENTE` (preparado) → `EMITIDO` (con folio y fecha reales) → `ANULADO` (queda el registro) |
+| `kind` | `boleta`, `factura` (nacional), `factura_exportacion`, `nota_credito`, `voucher_pago` |
+| `status` | `PENDIENTE` (preparado) → `EMITIDO` (con folio y fecha reales) → `ANULADO` (queda el registro); `NO_REQUERIDO` solo para `voucher_pago` |
+| `voucher_pago` | **Un pago no siempre requiere documento adicional:** si el voucher electrónico del medio de pago tiene validez tributaria, se registra así (sin folio ni fecha: no lo emite Bydlight) y el pago deja de figurar como pendiente. Impide registrar además una boleta (emisión duplicada) hasta anular este registro |
 | `attempt_id` | El pago AUTORIZADO al que corresponde. El **importe sale del pago**, nunca del operador (la nota de crédito puede ser parcial, sin superar el documento corregido) |
 | Duplicados | La base impide **dos documentos vigentes por pago** (índice único) y repetir **folio dentro de un tipo**; `EMITIDO` exige folio y fecha |
 | `factura` | Exige orden de **empresa** con razón social y RUT validado |

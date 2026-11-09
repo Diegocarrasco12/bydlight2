@@ -23,11 +23,13 @@ export default function TerminosPage() {
         Domicilio: {COMPANY.address}. Contacto: <a href={`mailto:${SITE.email}`}>{SITE.email}</a> · WhatsApp {SITE.whatsappDisplay}.
         Bydlight es contribuyente afecto a IVA.
       </p>
-      <h2>2. Servicios</h2>
-      <p>
-        Desarrollo de sitios web, ecommerce, software a medida, integraciones y consultoría tecnológica, según el plan o la cotización aceptada.
-        El alcance, los entregables y los plazos de cada proyecto se detallan por escrito en su cotización.
-      </p>
+      <h2>2. Servicios y modalidades de contratación</h2>
+      <p>Bydlight ofrece servicios de desarrollo de sitios web, ecommerce, software, integraciones y consultoría tecnológica, en dos modalidades:</p>
+      <ul>
+        <li><strong>Servicios con precio publicado (contratación directa).</strong> Los planes de <a href="/planes">Planes y precios</a> tienen alcance, entregables, revisiones y plazo referencial publicados, y un precio «desde» con IVA incluido. Se solicitan desde el sitio: Bydlight te envía la cotización con el monto total final con IVA, el anticipo y el saldo, y la contratación solo se perfecciona cuando aceptas estos términos y pagas el anticipo. No se cobra nada antes de eso.</li>
+        <li><strong>Proyectos a medida</strong> (software, integraciones y desarrollos personalizados). Se cotizan y contratan de forma independiente por los canales de contacto: alcance, precio, plazos, condiciones de pago y aceptación constan en una cotización o contrato específico. No se contratan ni se pagan por el pago en línea del sitio.</li>
+      </ul>
+      <p>El alcance, los entregables y los plazos de cada proyecto se detallan por escrito en su cotización; lo que un plan no incluye se indica en su ficha de la página de planes.</p>
       <h2>3. Quién contrata y qué ley protege</h2>
       <p>
         Estos términos se aplican a toda contratación realizada en este sitio. Cuando quien contrata es un consumidor, conforme a la Ley N° 19.496 sobre
@@ -50,10 +52,11 @@ export default function TerminosPage() {
         <li>Los precios se informan en pesos chilenos (CLP). Todos los precios publicados en el sitio y cotizados son finales e incluyen IVA (no se suma impuesto adicional). Cada cotización indica el monto total con IVA en CLP, el anticipo y el saldo.</li>
         <li>El anticipo (su porcentaje consta en la cotización) da inicio al proyecto; el saldo se paga en las condiciones de la cotización y se habilita desde la página de la orden.</li>
         <li>Los pagos en línea se procesan mediante Webpay Plus de Transbank. El número completo y el código de seguridad de la tarjeta se ingresan solo en el sitio de Transbank; Bydlight no los recibe ni los almacena. Bydlight conserva únicamente el resultado de la operación (estado, monto, código de autorización, últimos 4 dígitos y tipo de pago).</li>
-        <li>Comprobantes y documentos tributarios: el comprobante de pago de este sitio acredita la transacción en línea y no reemplaza el documento tributario que corresponda emitir por separado, el cual se emite conforme a la normativa del Servicio de Impuestos Internos y a la modalidad de emisión declarada por Bydlight.</li>
+        <li>Estado de los pagos: un pago puede quedar autorizado, pendiente de confirmación, rechazado o devuelto; qué significa cada uno y qué ocurre en cada caso se explica en <a href="/informacion-comercial#pagos">Información comercial y medios de pago</a>.</li>
+        <li>Documentos tributarios: los comprobantes de este sitio y los correos de confirmación son informativos y no son una boleta ni una factura. El comprobante electrónico del medio de pago puede tener validez tributaria según la normativa del Servicio de Impuestos Internos; cuando corresponda otro documento (boleta o factura electrónica), se emite conforme a esa normativa y a la habilitación vigente de Bydlight. La factura no se emite de forma automática: si la necesitas, indícalo antes de contratar. Detalle en <a href="/informacion-comercial#documentos-tributarios">Información comercial y medios de pago</a>.</li>
       </ul>
       <h2>6. Plazos de ejecución</h2>
-      <p>Los plazos se acuerdan en la cotización y dependen de la entrega oportuna de contenidos, accesos y aprobaciones por parte del cliente. Si hay retrasos de cualquiera de las partes, se informará por escrito y se acordará un nuevo calendario.</p>
+      <p>Cada plan publica un plazo referencial; el plazo del proyecto se acuerda en la cotización y depende de la entrega oportuna de contenidos, accesos y aprobaciones por parte del cliente. Si hay retrasos de cualquiera de las partes, se informará por escrito y se acordará un nuevo calendario.</p>
       <h2>7. Obligaciones del cliente</h2>
       <p>Entregar información veraz, contenidos y accesos oportunamente; contar con los derechos y licencias sobre los materiales que aporte; y revisar los entregables dentro de los plazos acordados. Más detalle en las <a href="/servicios-digitales">Condiciones de prestación de servicios digitales</a>.</p>
       <h2>8. Propiedad intelectual y licencias</h2>
