@@ -87,10 +87,11 @@ try {
   const nfHtml = await nf.text()
   check("La 404 (tambien la de /orden) esta en espanol, con marca y sin mencionar pagos", nf.status === 404 && nfHtml.includes("No encontramos esa página") && !/could not be found/i.test(nfHtml) && !/webpay|transbank|pago/i.test(nfHtml.replace(/<script[\s\S]*?<\/script>/g, "")))
 
-  // --- Paginas legales en borrador ---
+  // --- Paginas legales PUBLICADAS (Etapa B): visibles, sin banner de borrador ni marcadores pendientes ---
   for (const p of ["/terminos", "/devoluciones", "/soporte", "/servicios-digitales", "/privacidad", "/informacion-comercial", "/legal"]) {
     const r = await req(p, { headers: ip() })
-    check(`GET ${p} (borrador) no se publica`, r.status === 404, `HTTP ${r.status}`)
+    const t = r.status === 200 ? await r.text() : ""
+    check(`GET ${p} publicada, sin banner de borrador ni [PENDIENTE]`, r.status === 200 && !/BORRADOR/.test(t) && !/\[PENDIENTE/.test(t), `HTTP ${r.status}`)
   }
 
   // --- Vista previa local: no existe en produccion ---
@@ -160,7 +161,8 @@ try {
   }
   const claims = /(paga(r)? (tu )?anticipo|pagos? en l[ií]nea|Webpay|Transbank|tarjeta de cr[eé]dito|Pagos procesados)/i
   const leaking = publicTexts.filter(([, t]) => claims.test(t.replace(/<script[\s\S]*?<\/script>/g, "")))
-  check("Ninguna pagina publica afirma que se aceptan pagos online", leaking.length === 0, leaking.map(([p]) => p).join(", "))
+  // Etapa B: con las dos llaves de codigo abiertas el sitio anuncia Webpay Plus; el cobro real sigue cerrado en el servidor (este script no crea payments.json).
+  check("Etapa B: la portada anuncia el pago con Webpay Plus", leaking.some(([p]) => p === "/"), leaking.map(([p]) => p).join(", "))
   const wp = publicTexts.filter(([, t]) => /wordpress|\bdivi\b/i.test(t))
   check("Ninguna pagina publica menciona WordPress/Divi", wp.length === 0, wp.map(([p]) => p).join(", "))
   check("Cabecera anti-clickjacking presente", (home.headers.get("x-frame-options") ?? "").toUpperCase() === "DENY")

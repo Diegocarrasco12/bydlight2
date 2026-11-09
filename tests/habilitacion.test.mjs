@@ -44,8 +44,9 @@ beforeEach(() => {
   globalThis.__tbk = tbk
 })
 
+const { TERMS_VERSION } = await import("../src/lib/terms.ts")
 const BASE = "http://localhost:3000"
-const sol = { planId: "emprendedor", name: "Cliente Habilitacion", email: "hab@example.com", message: "Necesito una landing page de prueba", accept: true, acceptTerms: true, termsVersion: "borrador-2026-11-06-r3" }
+const sol = { planId: "emprendedor", name: "Cliente Habilitacion", email: "hab@example.com", message: "Necesito una landing page de prueba", accept: true, acceptTerms: true, termsVersion: TERMS_VERSION }
 async function quoted(amount = 100000) {
   const o = await svc.createOrder(svc.parseSolicitud(sol).data)
   assert.ok((await admin.approveQuote(o.id, { amount, depositPercent: 50 })).ok)
@@ -211,7 +212,7 @@ test("H12. publicidad separada de los cobros: produccion apagada por defecto y c
   const pages = /LEGAL_PAGES_PUBLISHED\s*=\s*(true|false)/.exec(legal)?.[1]
   assert.ok(online && pages)
   assert.equal(cfg.publicCheckoutReady(), online === "true" && pages === "true")
-  // el codigo versionado hoy mantiene el checkout publico cerrado (cambiarlo es una decision de activacion)
-  assert.equal(online, "false")
-  assert.equal(pages, "false")
+  // Etapa B: el codigo versionado abre las dos llaves; el acceso publico real sigue dependiendo de access=public en payments.json
+  assert.equal(online, "true")
+  assert.equal(pages, "true")
 })

@@ -56,12 +56,13 @@ test("G6. aceptacion de terminos: casilla sin premarcar y version nueva del text
   const form = read("src/components/checkout/ContractForm.tsx")
   assert.ok(!/name="acceptTerms"[^>]*(defaultChecked|checked)/.test(form))
   assert.ok(!/name="acceptTerms"[^>]*(defaultChecked|checked)/.test(read("src/app/orden/[id]/page.tsx")))
-  assert.match(read("src/lib/terms.ts"), /borrador-2026-11-06-r3/)
+  assert.match(read("src/lib/terms.ts"), /TERMS_VERSION = "2026-11-09-r1"/) // version definitiva: sin prefijo «borrador»
 })
 
-test("G7. el cierre legal no activo nada: banderas y pagos siguen cerrados", () => {
-  assert.match(read("src/lib/plans.ts"), /ONLINE_CHECKOUT_UI\s*=\s*false/)
-  assert.match(read("src/lib/legal.ts"), /LEGAL_PAGES_PUBLISHED\s*=\s*false/)
+test("G7. Etapa B: las dos llaves de codigo estan abiertas y la version de terminos ya no es borrador", () => {
+  assert.match(read("src/lib/plans.ts"), /ONLINE_CHECKOUT_UI\s*=\s*true/)
+  assert.match(read("src/lib/legal.ts"), /LEGAL_PAGES_PUBLISHED\s*=\s*true/)
+  assert.ok(!/borrador/i.test(read("src/lib/terms.ts").match(/TERMS_VERSION = "([^"]+)"/)[1]))
 })
 
 test("G8. cookies: el codigo no usa analitica, publicidad ni almacenamiento local (afirmacion de la politica)", () => {

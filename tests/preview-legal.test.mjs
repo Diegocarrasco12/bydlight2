@@ -86,8 +86,11 @@ test("L2. con LEGAL_PAGES_PUBLISHED = true no puede quedar ningun marcador [PEND
   assert.deepEqual(offenders, [])
 })
 
-test("L3. las paginas legales siguen cerradas en produccion mientras no se publiquen", () => {
+test("L3. la visibilidad de las paginas legales sigue gobernada por la bandera y publicar exige version de terminos definitiva", () => {
   const legal = readFileSync(join(root, "src/lib/legal.ts"), "utf8")
-  assert.match(legal, /export const LEGAL_PAGES_PUBLISHED = false/)
   assert.match(legal, /LEGAL_PAGES_PUBLISHED \|\| process\.env\.NODE_ENV !== "production"/)
+  if (/export const LEGAL_PAGES_PUBLISHED = true/.test(legal)) {
+    const v = /TERMS_VERSION = "([^"]+)"/.exec(readFileSync(join(root, "src/lib/terms.ts"), "utf8"))[1]
+    assert.ok(!/borrador/i.test(v), "paginas publicadas con version de terminos en borrador")
+  }
 })

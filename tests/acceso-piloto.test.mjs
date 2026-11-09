@@ -76,8 +76,10 @@ test("P1. modos de acceso: apagado = closed; produccion sin 'access' = pilot; 'p
   writeCfg({ enabled: true, access: "pilot" })
   assert.equal(cfg.checkoutMode(), "pilot")
   writeCfg({ enabled: true, access: "public" })
-  assert.equal(cfg.publicCheckoutReady(), false) // ONLINE_CHECKOUT_UI y LEGAL_PAGES_PUBLISHED siguen en false
-  assert.equal(cfg.checkoutMode(), "pilot") // 'public' se degrada: no se abre sin legales ni interfaz aprobada
+  assert.equal(cfg.publicCheckoutReady(), true) // Etapa B: ONLINE_CHECKOUT_UI y LEGAL_PAGES_PUBLISHED en true
+  assert.equal(cfg.checkoutMode(), "public") // las dos llaves de codigo abiertas + access=public en payments.json
+  writeCfg({ enabled: true, access: "pilot" })
+  assert.equal(cfg.checkoutMode(), "pilot") // sin access=public el checkout sigue cerrado al publico (la 3a llave)
   process.env.PAYMENTS_ENABLED = "false"
   assert.equal(cfg.checkoutMode(), "closed") // el interruptor de emergencia por entorno apaga todo
   delete process.env.PAYMENTS_ENABLED
@@ -232,11 +234,11 @@ test("P7. cliente administrativo: el enlace que emite pilot-link lo acepta el se
   assert.notEqual(run(["pilot-link"], { BYDLIGHT_ADMIN_SECRET: "" }).status, 0) // sin terminal ni secreto: no inventa nada
 })
 
-test("P8. /contratar valida el acceso en el servidor antes de armar el formulario y la UI publica sigue apagada", () => {
+test("P8. /contratar valida el acceso en el servidor antes de armar el formulario y la UI publica esta habilitada por codigo (Etapa B)", () => {
   const page = readFileSync(new URL("../src/app/contratar/page.tsx", import.meta.url), "utf8")
   assert.ok(page.indexOf("checkoutOpenFor(") > 0 && page.indexOf("checkoutOpenFor(") < page.indexOf("const initial"))
-  assert.match(readFileSync(new URL("../src/lib/plans.ts", import.meta.url), "utf8"), /export const ONLINE_CHECKOUT_UI = false/)
-  assert.match(readFileSync(new URL("../src/lib/legal.ts", import.meta.url), "utf8"), /export const LEGAL_PAGES_PUBLISHED = false/)
+  assert.match(readFileSync(new URL("../src/lib/plans.ts", import.meta.url), "utf8"), /export const ONLINE_CHECKOUT_UI = true/)
+  assert.match(readFileSync(new URL("../src/lib/legal.ts", import.meta.url), "utf8"), /export const LEGAL_PAGES_PUBLISHED = true/)
   assert.equal(access.checkoutOpenFor(undefined), false)
   assert.equal(access.checkoutOpenFor(`bd_piloto=${pilot.makePilotCookie(1).value}`), true)
 })

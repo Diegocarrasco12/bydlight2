@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test": "node --import ./tests/register.mjs --test tests/*.test.mjs",
     "verify:prod": "node scripts/verify-prod-lockdown.mjs",
-    "verify:pilot": "node scripts/verify-prod-pilot.mjs"
+    "verify:pilot": "node scripts/verify-prod-pilot.mjs",
+    "verify:public": "node scripts/verify-prod-public.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

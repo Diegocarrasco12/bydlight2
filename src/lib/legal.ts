@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation"
 
 /**
- * Las paginas legales son BORRADORES pendientes de aprobacion del titular (ver docs/AUDITORIA-WEBPAY-2026-11-04.md).
- * Mientras esta bandera sea false responden 404 en produccion (siguen visibles en desarrollo para revision),
- * no estan en el sitemap ni en el menu. Cambiarla a true solo tras revision y aprobacion expresas.
+ * Paginas legales PUBLICADAS (Etapa B, aprobadas por el titular). Con la bandera en false responden 404 en produccion
+ * (siguen visibles en desarrollo para revision), sin menu ni enlaces en correos. Es una de las DOS llaves del checkout
+ * publico (la otra es ONLINE_CHECKOUT_UI); ademas hace falta access=public en payments.json.
  *
- * Garantia tecnica: con la bandera en true, el componente <Pend> (marcador [PENDIENTE]) lanza un error. Si queda
- * un solo dato pendiente, `next build` falla y no se puede publicar texto con marcadores. Ver tests/legal.test.mjs.
+ * Garantia tecnica: con la bandera en true, un marcador de dato pendiente en el texto hace fallar `next build`
+ * (ver LegalPage y tests/preview-legal.test.mjs L2). Volver a false oculta las seis paginas de inmediato tras recompilar.
  */
-export const LEGAL_PAGES_PUBLISHED = false
+export const LEGAL_PAGES_PUBLISHED = true
 
 /** true si las paginas legales se muestran (publicadas, o desarrollo local para revision). */
 export function legalVisible(): boolean {

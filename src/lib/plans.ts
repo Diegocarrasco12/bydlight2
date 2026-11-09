@@ -253,7 +253,7 @@ export const COMPARISON_ROWS: { label: string; key: keyof Plan["limits"] }[] = [
  * llevan a solicitar cotizacion por contacto/WhatsApp. Es solo la capa visual: los pagos se apagan ademas desde
  * el servidor (paymentsEnabled) y /contratar y /orden se cierran aunque alguien conozca la URL.
  */
-export const ONLINE_CHECKOUT_UI = false
+export const ONLINE_CHECKOUT_UI = true
 
 /** La vista previa local (BD_PREVIEW=1, solo desarrollo) muestra la interfaz de contratacion; produccion solo con la bandera. */
 function checkoutUiVisible() {

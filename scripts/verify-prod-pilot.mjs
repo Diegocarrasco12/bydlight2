@@ -18,6 +18,7 @@ if (!fs.existsSync(serverJs)) {
   process.exit(2)
 }
 
+const TERMS_VERSION = /TERMS_VERSION = "([^"]+)"/.exec(fs.readFileSync(path.join(root, "src", "lib", "terms.ts"), "utf8"))[1]
 const PORT = 3291
 const base = `http://127.0.0.1:${PORT}`
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "bd-pilot-prod-"))
@@ -62,7 +63,7 @@ const newLink = () => {
   const r = client(["pilot-link", "--minutes", "5", "--hours", "1"])
   return r.status === 0 ? new URL(r.stdout.trim()) : null
 }
-const solBody = JSON.stringify({ planId: "emprendedor", name: "Titular Prueba", email: "titular@example.com", message: "Prueba productiva controlada", accept: true, acceptTerms: true, termsVersion: "borrador-2026-11-06-r3" })
+const solBody = JSON.stringify({ planId: "emprendedor", name: "Titular Prueba", email: "titular@example.com", message: "Prueba productiva controlada", accept: true, acceptTerms: true, termsVersion: TERMS_VERSION })
 
 try {
   if (!(await waitUp())) {
@@ -78,7 +79,7 @@ try {
   const forged = { cookie: "bd_piloto=v1.9999999999." + "a".repeat(64) }
   const s1 = await req("/api/solicitudes", { method: "POST", headers: { "content-type": "application/json", ...ORIGIN, ...forged, ...ip() }, body: solBody })
   check("Cookie falsificada: tampoco crea ordenes (503)", s1.status === 503, `HTTP ${s1.status}`)
-  const fd = () => { const f = new FormData(); f.set("orderId", "ABCDEFGHJKMN"); f.set("kind", "anticipo"); f.set("acceptTerms", "on"); f.set("termsVersion", "borrador-2026-11-06-r3"); return f }
+  const fd = () => { const f = new FormData(); f.set("orderId", "ABCDEFGHJKMN"); f.set("kind", "anticipo"); f.set("acceptTerms", "on"); f.set("termsVersion", TERMS_VERSION); return f }
   const i0 = await req("/api/pagos/iniciar", { method: "POST", headers: { ...ORIGIN, ...ip() }, body: fd() })
   check("Sin enlace: POST /api/pagos/iniciar no inicia cobros", i0.status === 303 && (i0.headers.get("location") ?? "").includes("aviso=error"), `HTTP ${i0.status} ${i0.headers.get("location")}`)
   check("Sin enlace: no se creo la base de datos (nada se escribio)", !fs.existsSync(dbPath))
@@ -95,12 +96,18 @@ try {
     const t = strip(await (await req(p, { headers: ip() })).text())
     if (claims.test(t) || /wordpress|\bdivi\b/i.test(t)) leaking.push(p)
   }
-  check("Modo piloto: ninguna pagina publica anuncia pagos (ni menciona WordPress/Divi)", leaking.length === 0, leaking.join(", "))
-  const visibles = []
-  for (const p of ["/terminos", "/devoluciones", "/privacidad", "/soporte", "/servicios-digitales", "/informacion-comercial", "/legal", "/vista-previa"]) {
-    if ((await req(p, { headers: ip() })).status !== 404) visibles.push(p)
+  // Etapa B: el anuncio es de codigo; lo que protege el modo piloto es que /contratar y las solicitudes siguen cerrados (comprobado arriba).
+  const wpOnly = []
+  for (const p of ["/", "/planes", "/servicios", "/nosotros", "/contacto", "/proyectos"]) {
+    if (/wordpress|\bdivi\b/i.test(strip(await (await req(p, { headers: ip() })).text()))) wpOnly.push(p)
   }
-  check("Paginas legales en borrador y vista previa siguen ocultas (404)", visibles.length === 0, visibles.join(", "))
+  check("Modo piloto: ninguna pagina publica menciona WordPress/Divi", wpOnly.length === 0, wpOnly.join(", "))
+  const visibles = []
+  for (const p of ["/terminos", "/devoluciones", "/privacidad", "/soporte", "/servicios-digitales", "/informacion-comercial", "/legal"]) {
+    if ((await req(p, { headers: ip() })).status !== 200) visibles.push(p)
+  }
+  check("Paginas legales publicadas (200)", visibles.length === 0, visibles.join(", "))
+  check("La vista previa de desarrollo sigue oculta (404)", (await req("/vista-previa", { headers: ip() })).status === 404)
 
   // --- Con el enlace firmado del administrador ---
   const link = newLink()
@@ -150,7 +157,7 @@ try {
   const noTerms = new FormData(); noTerms.set("orderId", id); noTerms.set("kind", "anticipo")
   const nt = await req("/api/pagos/iniciar", { method: "POST", headers: { ...ORIGIN, ...ck, ...ip() }, body: noTerms })
   check("Aun con la cookie, sin aceptar terminos no se inicia el pago", nt.status === 303 && (nt.headers.get("location") ?? "").includes("aviso=terminos"), `HTTP ${nt.status} ${nt.headers.get("location")}`)
-  const noCk = new FormData(); noCk.set("orderId", id); noCk.set("kind", "anticipo"); noCk.set("acceptTerms", "on"); noCk.set("termsVersion", "borrador-2026-11-06-r3")
+  const noCk = new FormData(); noCk.set("orderId", id); noCk.set("kind", "anticipo"); noCk.set("acceptTerms", "on"); noCk.set("termsVersion", TERMS_VERSION)
   const nc = await req("/api/pagos/iniciar", { method: "POST", headers: { ...ORIGIN, ...ip() }, body: noCk })
   check("Un tercero con el codigo de la orden NO puede iniciar el cobro (sin cookie)", nc.status === 303 && (nc.headers.get("location") ?? "").includes("aviso=error"), `HTTP ${nc.status} ${nc.headers.get("location")}`)
 
