@@ -20,6 +20,10 @@ Bydlight Solutions SpA, RUT 78.161.844-6, Pro Pyme General (14D), actividad 6202
 | `nota_credito` | Exige un documento `EMITIDO` de la misma orden como referencia |
 Cada registro y anulación deja un evento en la orden (`DOCUMENTO_TRIBUTARIO_REGISTRADO`, `..._ANULADO`). Moneda: solo CLP.
 
+## Conciliación manual y fechas
+- `taxdoc-pending` lista los pagos AUTORIZADOS sin documento vigente y agrega un `summary` por `tipoCliente/tipoPago` (persona o empresa; anticipo o saldo) con cantidad y total. Solo agrupa: **no clasifica un pago como boleta ni emite nada**; la decisión (voucher, boleta o factura) es del titular por cada pago. Un anticipo y su saldo son pagos distintos y se documentan por separado.
+- Modelo de emisión declarado el 2026-11-09 con **efecto desde el 2026-12-01**: antes de esa fecha cada cobro debe documentarse manualmente. Las facturas a empresas dependen de la verificación de actividades del SII (no confirmada).
+
 ## Uso (el titular, con el patrón de `$RUN` del procedimiento)
 ```
 $RUN node /s/admin-remote.mjs taxdoc-pending --config-file /data/config/payments.json                       # pagos aún sin documento

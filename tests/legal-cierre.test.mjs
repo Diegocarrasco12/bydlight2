@@ -56,7 +56,7 @@ test("G6. aceptacion de terminos: casilla sin premarcar y version nueva del text
   const form = read("src/components/checkout/ContractForm.tsx")
   assert.ok(!/name="acceptTerms"[^>]*(defaultChecked|checked)/.test(form))
   assert.ok(!/name="acceptTerms"[^>]*(defaultChecked|checked)/.test(read("src/app/orden/[id]/page.tsx")))
-  assert.match(read("src/lib/terms.ts"), /TERMS_VERSION = "2026-11-09-r2"/) // version definitiva: sin prefijo «borrador»
+  assert.match(read("src/lib/terms.ts"), /TERMS_VERSION = "2026-11-09-r3"/) // version definitiva: sin prefijo «borrador»
 })
 
 test("G7. Etapa B: las dos llaves de codigo estan abiertas y la version de terminos ya no es borrador", () => {

@@ -75,8 +75,18 @@ export async function POST(req: Request) {
     }
     case "taxdoc-list":
       return json({ documents: listTaxDocuments(id) })
-    case "taxdoc-pending":
-      return json({ pending: pendingTaxDocuments() })
+    case "taxdoc-pending": {
+      const pending = pendingTaxDocuments()
+      // Resumen para la conciliacion manual: solo agrupa por tipo de cliente y de pago; no decide ni emite ningun documento.
+      const summary: Record<string, { count: number; total: number }> = {}
+      for (const p of pending) {
+        const k = `${p.customerType}/${p.kind}`
+        summary[k] ??= { count: 0, total: 0 }
+        summary[k].count += 1
+        summary[k].total += p.amount
+      }
+      return json({ pending, summary })
+    }
     case "release-balance": {
       const r = await releaseBalance(id)
       return r.ok ? json({ ok: true }) : json({ error: r.error }, 422)

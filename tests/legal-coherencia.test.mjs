@@ -99,3 +99,14 @@ test("LG10. los derechos del consumidor no se restringen: retracto sin exclusion
   assert.match(t, /90 días/)
   assert.match(text(page("terminos")), /ninguna cláusula de estos términos limita ni renuncia/)
 })
+
+test("LG11. clausulas comerciales propuestas: sin aprobacion por silencio, anticipo 50 %, vigencia 7 dias, licencias y dominios", () => {
+  const t = text(page("terminos"))
+  assert.match(t, /El silencio del cliente no equivale a aprobación/)
+  assert.doesNotMatch(t, /se entienden dadas cuando el cliente las confirma o vence/)
+  assert.match(t, /anticipo habitual es del 50 %/)
+  assert.match(t, /vigencia habitual de 7 días/)
+  assert.match(t, /componentes preexistentes y reutilizables de Bydlight[^.]*son de propiedad de Bydlight/)
+  assert.match(t, /definen expresamente en la cotización o contrato/)
+  assert.match(t, /Preferentemente, los dominios y cuentas del proyecto se registran a nombre del cliente/)
+})
