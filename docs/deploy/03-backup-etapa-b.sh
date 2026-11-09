@@ -195,7 +195,7 @@ if [ -f "$MP/config/mail.json" ]; then
   safe_copy "$MP/config/mail.json" "$DEST_MAIL"
   say "   mail.json respaldado"
 else
-  say "   mail.json no existe (esperado: el correo aun no esta configurado)"
+  say "   mail.json no existe (esperado: el correo de Brevo se instala despues de desplegar)"
 fi
 
 # ----------------------------------------------------------------------------------------------- 7. el checkout publico sigue cerrado

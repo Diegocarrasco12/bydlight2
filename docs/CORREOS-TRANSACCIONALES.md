@@ -1,46 +1,52 @@
-# Correos transaccionales (implementado; pendiente de configuración externa)
+# Correos transaccionales (Brevo; implementado y probado, pendiente de instalar la clave en producción)
 
-Estado (2026-11-06): **código implementado y probado con un transporte falso; NO configurado ni activo en producción.** Hasta que el titular cree las credenciales y encienda `enabled`, el sistema no encola ni envía ningún correo (los pagos funcionan igual).
+Estado (2026-11-09): **proveedor Brevo implementado y probado con `fetch` falso (nunca se contactó a Brevo); la clave API NO está instalada ni los correos activos en producción.** Mientras el titular no instale la clave y encienda `enabled`, el sistema no encola ni envía ningún correo (los pagos funcionan igual). Gmail OAuth quedó descartado y su código eliminado.
+
+Configuración del titular ya hecha en Brevo/DNS: dominio `bydlightsolutions.com` autenticado (DKIM/DMARC), recepción en Zoho Mail, envío transaccional por Brevo, plan gratuito. Remitente `notificaciones@bydlightsolutions.com`; Reply-To `contacto@bydlightsolutions.com`.
 
 ## Qué envía el sistema
 | Hecho | Destinatario | Plantilla |
 |---|---|---|
-| Solicitud creada | cliente + titular (aviso interno) | `solicitud_recibida`, `nueva_solicitud` |
+| Solicitud creada | cliente + aviso interno a `contacto@` | `solicitud_recibida`, `nueva_solicitud` |
 | Cotización aprobada (o actualizada) | cliente | `cotizacion_aprobada` (total con IVA, anticipo, saldo, vigencia) |
 | Anticipo autorizado | cliente | `contratacion_confirmada` (confirmación escrita: proveedor, servicio, montos, versión y fecha de los términos, retracto) |
 | Pago autorizado (anticipo o saldo) | cliente | `pago_autorizado` (comprobante) |
 | Pago rechazado | cliente | `pago_rechazado` (sin cargo, enlace para reintentar) |
 | Saldo habilitado | cliente | `saldo_habilitado` (acción requerida) |
-| Pago en ERROR / hallazgos de conciliación | titular | `alerta_interna`, `alerta_conciliacion` |
-No se envía correo por pago cancelado por el cliente ni por resultado incierto (PENDIENTE) hasta que Transbank confirme. El comprobante es parte del correo de pago.
+| Pago en ERROR / hallazgos de conciliación | `contacto@` | `alerta_interna`, `alerta_conciliacion` |
+Las plantillas no cambiaron. No se envía correo por pago cancelado por el cliente ni por resultado incierto hasta que Transbank confirme.
 
-## Garantías de diseño
-- **Solo tras el estado real:** los correos de pago salen cuando el intento pasó a AUTORIZADO/RECHAZADO con datos ya validados contra Transbank, por transición de estado (nunca por consulta ni retorno repetido). Órdenes históricas no generan correos retroactivos.
-- **Idempotencia:** `dedupe_key` única en la cola (`mail_outbox`, migración 4). Un callback repetido no duplica.
-- **Persistente y con reintentos:** espera 1, 5, 30, 120 y 720 min; máximo 6 intentos; luego `FALLIDO` (alerta en `monitor`). Un envío interrumpido vuelve a `PENDIENTE` a los 10 min.
-- **El correo nunca afecta al pago:** se encola después de guardar el estado y sin propagar errores.
-- **Privacidad:** al enviarse, el cuerpo se vacía de la cola; solo se conserva el registro (plantilla, estado, fechas).
-- **Entrega "al menos una vez":** si el proceso cae justo tras aceptar el proveedor, podría reenviarse una vez.
-- Sin tokens ni tarjeta completa en ningún correo; texto del cliente escapado; sin inyección de cabeceras.
+## Integración con Brevo (`src/lib/mail/transport.ts`)
+- `POST https://api.brevo.com/v3/smtp/email`, cabecera `api-key`, JSON con `sender` (notificaciones@, «Bydlight Solutions»), `to`, `replyTo` (contacto@), `subject`, `htmlContent`, `textContent`, `tags`. Sin cabeceras libres: nada del cliente llega a una cabecera. Éxito = 2xx (`201 {messageId}`); timeout de 20 s.
+- **Clave:** campo `apiKey` de `/data/config/mail.json` (0600) o variable `MAIL_BREVO_API_KEY`. Nunca en Git, imagen ni navegador; no se escribe en la cola, en los registros ni en los errores (prueba B13). Opcionales en el mismo archivo: `from`, `fromName`, `replyTo`, `notifyTo`.
+- Una `mail.json` antigua de Gmail (sin `apiKey`) se trata como «sin configurar»: no se envía nada.
 
-## Método evaluado
-| Opción | Evaluación |
+## Clasificación de errores y reintentos
+| Respuesta | Tratamiento |
 |---|---|
-| **API de Gmail + OAuth2 (implementada)** | Envía desde `bydlightsolutions@gmail.com` sin usar la contraseña de la cuenta; sin dependencias nuevas; solo `fetch`. Costo: $0. Límites de envío diarios de Gmail (verificar los vigentes); remitente `@gmail.com` (sin dominio propio). |
-| SMTP de Gmail con contraseña de aplicación | Descartado: credencial de larga vida con acceso amplio; Google lo desaconseja para nuevos desarrollos. |
-| Proveedor transaccional (por ejemplo Amazon SES, Postmark, Resend, Brevo) | Mejor entregabilidad y remitente con dominio propio (SPF/DKIM de `bydlightsolutions.com`), pero requiere cuenta, verificación de dominio y registros DNS (Cloudflare) y costo según volumen (consultar precios vigentes). **No se contrató ni se creó ninguna cuenta.** Recomendado si el volumen crece. |
-El transporte está aislado (`src/lib/mail/transport.ts`): cambiar de proveedor es reemplazar un archivo.
+| 2xx | `ENVIADO`; el cuerpo se vacía de la cola |
+| 400 y otros 4xx (mensaje/destinatario inválido); destinatario con formato inválido (sin llamar a Brevo) | **Permanente**: `FALLIDO`, sin reintento. Solo se guarda `brevo <estado> <código>`, nunca el cuerpo de la respuesta |
+| 429, 402, 400 `not_enough_credits` (cuota o límite de velocidad) | **Se aplaza** (`Retry-After`, 1 h por defecto, máx. 12 h) **sin gastar intentos** y la tanda se detiene (el resto fallaría igual); se reanuda sola |
+| 401 / 403 (clave inválida o revocada, **IP del servidor no autorizada en Brevo**) | Se aplaza 30 min sin gastar intentos, con mensaje «revisar clave API e IPs autorizadas»; el correo no se pierde. Si lleva más de 72 h aplazado queda `FALLIDO` y visible |
+| 5xx, 408, red caída o timeout | Reintento con espera 1, 5, 30, 120 y 720 min; máximo 6 intentos; luego `FALLIDO` |
 
-## Configuración (la hace el titular; nada se ejecutó)
-1. Google Cloud (cuenta del titular): crear proyecto, **habilitar Gmail API**, pantalla de consentimiento, y crear un **cliente OAuth** (tipo "Aplicación web" con URI de redirección de OAuth Playground, o "Escritorio"). Scope único: `https://www.googleapis.com/auth/gmail.send`.
-2. Importante: si la app queda en modo **"Testing"**, el refresh token **caduca a los 7 días**; hay que pasarla a **"En producción"** (para uso propio basta sin verificación, con la advertencia de Google). Verificar la política vigente al configurar.
-3. Obtener **una vez** el refresh token con la cuenta `bydlightsolutions@gmail.com` (OAuth 2.0 Playground con "Use your own OAuth credentials", o un flujo local).
-4. En el servidor, con el patrón de contenedor efímero del runbook (`$RUN`):
-   `$RUN node /s/mail-config-set.mjs /data/config/mail.json --init` (pide las 3 credenciales sin eco), luego `... enabled=true`. Archivo `0600`, nunca en el repositorio.
-5. Probar sin tocar clientes: `$RUN node /s/admin-remote.mjs mail-test --config-file /data/config/payments.json` (envía un correo de prueba **solo** a `bydlightsolutions@gmail.com`).
-6. Estado y recuperación: `... mail-status` y `... mail-dispatch`. Un despachador interno corre cada 60 s mientras el servidor está activo.
-Apagar: `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false` (≤ 5 s). Variables de entorno equivalentes: `MAIL_ENABLED`, `MAIL_CLIENT_ID`, `MAIL_CLIENT_SECRET`, `MAIL_REFRESH_TOKEN`.
+## Garantías de diseño (sin cambios)
+- **Solo tras el estado real:** los correos de pago salen por transición de estado ya validada contra Transbank; órdenes históricas no generan correos retroactivos.
+- **Idempotencia:** `dedupe_key` única (`mail_outbox`, migración 4); un callback repetido no duplica (prueba B12). No se usa idempotencia del lado de Brevo (no está documentada como garantía).
+- **Entrega «al menos una vez»:** si el proceso cae justo después de que Brevo aceptó el mensaje y antes de marcarlo, podría reenviarse una vez (prueba B14). Es preferible a perder el aviso.
+- **El correo nunca afecta al pago:** se encola después de guardar el estado, sin propagar errores.
+- **Privacidad:** el cuerpo se vacía al enviarse; sin tokens ni tarjeta completa; texto del cliente escapado.
 
-## Pendiente de verificar fuera del código
-- El formulario de **contacto** usa EmailJS (plantilla `template_jnsxd4o`): su destinatario se define en el panel de EmailJS, no en el repositorio. Confirmar allí que apunta a `bydlightsolutions@gmail.com` y no a `contacto@bydlightsolutions.com`.
-- Revisar la bandeja/Spam con un correo de prueba real antes de la apertura pública.
+## Plan gratuito de Brevo (300 correos/día)
+Una orden completa genera ≈ 7 correos (solicitud 2, cotización 1, anticipo 2, saldo habilitado 1, saldo pagado 1), es decir ~40 órdenes completas por día. Al agotarse la cuota el sistema aplaza y reanuda (prueba B8); no se pierden ni duplican correos. Verificar límites vigentes en la cuenta. Detalle y problemas típicos: `BREVO-CLAVE-API-PASOS.md`.
+
+## Instalación y operación
+Procedimiento completo (clave dedicada, autorizar la IP del servidor, `--init` con entrada oculta, prueba y apagado): **`docs/BREVO-CLAVE-API-PASOS.md`**; ubicación en la activación: Paso 6b de `BYDLIGHT-ETAPA-B-ACTIVACION.md`.
+- Estado y recuperación: `$RUN node /s/admin-remote.mjs mail-status|mail-dispatch --config-file /data/config/payments.json`. Un despachador interno corre cada 60 s.
+- Apagar (≤ 5 s): `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false`.
+- Variables equivalentes: `MAIL_ENABLED`, `MAIL_BREVO_API_KEY`.
+
+## Pendiente fuera del código
+- Los textos públicos (`SITE.email`, páginas legales, plantillas) siguen mostrando `bydlightsolutions@gmail.com` como contacto; las respuestas a los correos llegan a `contacto@bydlightsolutions.com`. Decisión del titular: unificar ambos (cambio de una constante en `src/lib/site.ts` y sus pruebas) o mantenerlos. Hasta entonces, vigile ambos buzones.
+- El formulario de **contacto** usa EmailJS (plantilla `template_jnsxd4o`): su destino se define en el panel de EmailJS (decisión D8).
+- Revisar bandeja y Spam con el correo de prueba real antes de la apertura pública.

@@ -37,7 +37,8 @@ export default function PrivacidadPage() {
       <ul>
         <li>Transbank S.A.: procesa los pagos con tarjeta mediante Webpay Plus.</li>
         <li>EmailJS: servicio que transporta los mensajes del formulario de contacto hacia nuestro correo.</li>
-        <li>Google (Gmail): servicio de correo desde el cual enviamos los correos de confirmación de tu solicitud, cotización y pagos.</li>
+        <li>Brevo: servicio de envío de correos transaccionales desde el cual enviamos la confirmación de tu solicitud, la cotización y los comprobantes de pago.</li>
+        <li>Zoho Mail: servicio de correo donde recibimos tus mensajes y tus respuestas a nuestros correos.</li>
         <li>Cloudflare: opera la red de entrega y seguridad del sitio y, por ello, procesa datos técnicos de conexión.</li>
         <li>Autoridades, cuando una ley lo exija.</li>
       </ul>

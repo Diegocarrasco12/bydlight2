@@ -1,7 +1,7 @@
 import "server-only"
 import { TERMS_VERSION } from "@/lib/terms"
 import type { Order } from "@/lib/payments/types"
-import { mailCredentials, OFFICIAL_EMAIL } from "./config"
+import { mailCredentials, MAIL_REPLY_TO } from "./config"
 import { enqueueMail, kickDispatch } from "./outbox"
 import * as T from "./templates"
 import { activeTransport } from "./transport"
@@ -18,7 +18,7 @@ export function snapshotOf(o: Order): OrderSnapshot {
 }
 
 export function internalTo(): string {
-  return mailCredentials()?.notifyTo ?? OFFICIAL_EMAIL
+  return mailCredentials()?.notifyTo ?? MAIL_REPLY_TO
 }
 
 export async function notifyChanges(before: OrderSnapshot | null, o: Order): Promise<void> {

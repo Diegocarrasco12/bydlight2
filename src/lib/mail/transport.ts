@@ -1,14 +1,16 @@
 import "server-only"
-import { createHash } from "node:crypto"
-import { mailCredentials, mailEnabledFlag, OFFICIAL_EMAIL, type MailCredentials } from "./config"
+import { mailCredentials, mailEnabledFlag, type MailCredentials } from "./config"
 
 export type MailMessage = { to: string; subject: string; html: string; text: string; replyTo?: string; messageKey: string }
 
 export class MailError extends Error {
   permanent: boolean
-  constructor(message: string, permanent = false) {
+  /** Minutos a aplazar sin consumir intentos (cuota, limite de velocidad, clave o IP): la cola se detiene y reanuda despues. */
+  deferMin?: number
+  constructor(message: string, permanent = false, deferMin?: number) {
     super(message)
     this.permanent = permanent
+    this.deferMin = deferMin
   }
 }
 
@@ -22,69 +24,61 @@ export function setMailTransportForTests(t: MailTransport | null) {
   override = t
 }
 
-const b64 = (s: string) => Buffer.from(s, "utf8").toString("base64")
-const wrap = (s: string) => s.replace(/(.{76})/g, "$1\r\n")
-const headerWord = (s: string) => (/^[\x20-\x7e]*$/.test(s) ? s : `=?UTF-8?B?${b64(s)}?=`)
+const BREVO_URL = "https://api.brevo.com/v3/smtp/email"
+const EMAIL_RE = /^[^\s@<>",;]+@[^\s@<>",;]+\.[^\s@<>",;]+$/
 
-/** Mensaje RFC 822 multipart/alternative (texto + HTML), UTF-8, sin cabeceras controladas por el usuario. */
-export function buildRfc822(from: string, m: MailMessage): string {
-  const clean = (v: string) => v.replace(/[\r\n]+/g, " ").trim() // impide inyeccion de cabeceras
-  const boundary = `bd_${createHash("sha256").update(m.messageKey).digest("hex").slice(0, 24)}`
-  const lines = [
-    `From: Bydlight Solutions <${clean(from)}>`,
-    `To: ${clean(m.to)}`,
-    ...(m.replyTo ? [`Reply-To: ${clean(m.replyTo)}`] : []),
-    `Subject: ${headerWord(clean(m.subject))}`,
-    "MIME-Version: 1.0",
-    "Auto-Submitted: auto-generated",
-    `Content-Type: multipart/alternative; boundary="${boundary}"`,
-    "",
-    `--${boundary}`,
-    'Content-Type: text/plain; charset="UTF-8"',
-    "Content-Transfer-Encoding: base64",
-    "",
-    wrap(b64(m.text)),
-    `--${boundary}`,
-    'Content-Type: text/html; charset="UTF-8"',
-    "Content-Transfer-Encoding: base64",
-    "",
-    wrap(b64(m.html)),
-    `--${boundary}--`,
-    "",
-  ]
-  return lines.join("\r\n")
+/** Cuerpo JSON de la API de Brevo (exportado para las pruebas). Sin cabeceras libres: nada del cliente llega a una cabecera. */
+export function buildBrevoPayload(c: Pick<MailCredentials, "from" | "fromName" | "replyTo">, m: MailMessage) {
+  return {
+    sender: { email: c.from, name: c.fromName },
+    to: [{ email: m.to.trim() }],
+    replyTo: { email: (m.replyTo ?? c.replyTo).trim() },
+    subject: m.subject.replace(/[\r\n]+/g, " ").trim(),
+    htmlContent: m.html,
+    textContent: m.text,
+    tags: ["transaccional"],
+  }
 }
 
-let tokenCache: { value: string; exp: number } | null = null
-
-async function accessToken(c: MailCredentials): Promise<string> {
-  if (tokenCache && tokenCache.exp > Date.now() + 60_000) return tokenCache.value
-  const res = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ client_id: c.clientId, client_secret: c.clientSecret, refresh_token: c.refreshToken, grant_type: "refresh_token" }),
-    signal: AbortSignal.timeout(15_000),
-  })
-  if (!res.ok) throw new MailError(`oauth ${res.status}`, res.status === 400 || res.status === 401) // credenciales revocadas: no reintentar a ciegas
-  const j = (await res.json()) as { access_token?: string; expires_in?: number }
-  if (!j.access_token) throw new MailError("oauth sin access_token", true)
-  tokenCache = { value: j.access_token, exp: Date.now() + (j.expires_in ?? 3000) * 1000 }
-  return j.access_token
+/** Codigo corto del error de Brevo (campo `code`); nunca se guarda el cuerpo completo de la respuesta. */
+async function brevoCode(res: Response): Promise<string> {
+  try {
+    const j = (await res.json()) as { code?: unknown }
+    return typeof j.code === "string" ? j.code.replace(/[^a-z0-9_-]/gi, "").slice(0, 40) : ""
+  } catch {
+    return ""
+  }
 }
 
-function gmailTransport(c: MailCredentials): MailTransport {
+function retryAfterMin(res: Response, fallback: number): number {
+  const v = Number(res.headers.get("retry-after"))
+  return Number.isFinite(v) && v > 0 ? Math.min(720, Math.max(1, Math.ceil(v / 60))) : fallback
+}
+
+function brevoTransport(c: MailCredentials): MailTransport {
   return {
     async send(m) {
-      const token = await accessToken(c)
-      const raw = Buffer.from(buildRfc822(c.from, m), "utf8").toString("base64url")
-      const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ raw }),
-        signal: AbortSignal.timeout(20_000),
-      })
-      if (res.status === 401) tokenCache = null
-      if (!res.ok) throw new MailError(`gmail ${res.status}`, res.status === 400) // 400 = mensaje o destinatario invalido
+      if (!EMAIL_RE.test(m.to.trim())) throw new MailError("destinatario invalido", true)
+      let res: Response
+      try {
+        res = await fetch(BREVO_URL, {
+          method: "POST",
+          headers: { "api-key": c.apiKey, "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(buildBrevoPayload(c, m)),
+          signal: AbortSignal.timeout(20_000),
+        })
+      } catch {
+        throw new MailError("brevo sin respuesta (red o tiempo agotado)") // reintento con espera progresiva
+      }
+      if (res.ok) return // 201 {messageId}
+      const code = await brevoCode(res)
+      const tag = `brevo ${res.status}${code ? ` ${code}` : ""}`
+      // Cuota agotada (plan gratuito: 300 correos/dia) o limite de velocidad: se aplaza SIN gastar intentos.
+      if (res.status === 429 || res.status === 402 || code === "not_enough_credits") throw new MailError(`${tag}: cuota o limite de envios`, false, retryAfterMin(res, 60))
+      // Clave invalida/revocada o IP del servidor no autorizada en Brevo: problema de configuracion, no del correo; se aplaza y no se pierde.
+      if (res.status === 401 || res.status === 403) throw new MailError(`${tag}: revisar clave API e IPs autorizadas en Brevo`, false, 30)
+      if (res.status >= 500 || res.status === 408) throw new MailError(tag) // transitorio: reintento normal
+      throw new MailError(tag, true) // 400 y demas 4xx: mensaje o destinatario invalido; reintentar no lo arregla
     },
   }
 }
@@ -94,7 +88,6 @@ export function activeTransport(): MailTransport | null {
   if (override) return mailEnabledFlag() ? override : null
   if (!mailEnabledFlag()) return null
   const c = mailCredentials()
-  return c ? gmailTransport(c) : null
+  return c ? brevoTransport(c) : null
 }
 
-export { OFFICIAL_EMAIL }

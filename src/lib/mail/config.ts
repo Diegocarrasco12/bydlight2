@@ -6,23 +6,28 @@ import { previewMode } from "@/lib/preview"
 // Configuracion del correo transaccional. Mismas reglas que payments.json: los secretos viven SOLO en el servidor
 // (variables de entorno o /data/config/mail.json con permisos 0600); nunca en el repositorio ni en la imagen.
 //
-// Proveedor implementado: API de Gmail con OAuth2 (scope gmail.send) para enviar desde bydlightsolutions@gmail.com SIN usar la
-// contrasena de la cuenta. Requiere (pendiente de configurar por el titular): proyecto en Google Cloud con la API de Gmail,
-// cliente OAuth (id y secreto) y un refresh token obtenido una vez. Ver docs/CORREOS-TRANSACCIONALES.md.
+// Proveedor: Brevo (API transaccional HTTPS, POST /v3/smtp/email). Remitente con dominio propio autenticado (DKIM/DMARC) en
+// notificaciones@bydlightsolutions.com; las respuestas de los clientes van a contacto@ (recepcion en Zoho Mail). Unico secreto: la
+// clave API de Brevo (`apiKey`), que se instala en el servidor con scripts/mail-config-set.mjs --init (entrada oculta).
+// Ver docs/CORREOS-TRANSACCIONALES.md.
 
 export type MailFileConfig = {
   enabled?: boolean
-  provider?: "gmail-oauth2"
-  clientId?: string
-  clientSecret?: string
-  refreshToken?: string
-  /** Remitente (debe ser la cuenta autorizada). Por defecto el correo oficial. */
+  provider?: "brevo"
+  /** Clave API de Brevo (xkeysib-...). Solo en el servidor. */
+  apiKey?: string
+  /** Remitente (debe ser un remitente autenticado en Brevo). */
   from?: string
-  /** Destino de las notificaciones internas (nuevas solicitudes, alertas). Por defecto, el correo oficial. */
+  fromName?: string
+  /** Direccion a la que responde el cliente. */
+  replyTo?: string
+  /** Destino de las notificaciones internas (nuevas solicitudes, alertas): un buzon que reciba Zoho. */
   notifyTo?: string
 }
 
-export const OFFICIAL_EMAIL = "bydlightsolutions@gmail.com"
+export const MAIL_SENDER = "notificaciones@bydlightsolutions.com"
+export const MAIL_SENDER_NAME = "Bydlight Solutions"
+export const MAIL_REPLY_TO = "contacto@bydlightsolutions.com"
 
 function configPath(): string {
   if (process.env.MAIL_CONFIG) return process.env.MAIL_CONFIG
@@ -49,16 +54,20 @@ export function resetMailConfigCache() {
   cache = null
 }
 
-export type MailCredentials = { clientId: string; clientSecret: string; refreshToken: string; from: string; notifyTo: string }
+export type MailCredentials = { apiKey: string; from: string; fromName: string; replyTo: string; notifyTo: string }
 
 /** Credenciales completas, o null si el correo no esta configurado (en ese caso NO se encola ni se envia nada). */
 export function mailCredentials(): MailCredentials | null {
   const f = mailFileConfig()
-  const clientId = process.env.MAIL_CLIENT_ID ?? f.clientId
-  const clientSecret = process.env.MAIL_CLIENT_SECRET ?? f.clientSecret
-  const refreshToken = process.env.MAIL_REFRESH_TOKEN ?? f.refreshToken
-  if (!clientId || !clientSecret || !refreshToken) return null
-  return { clientId, clientSecret, refreshToken, from: f.from ?? OFFICIAL_EMAIL, notifyTo: f.notifyTo ?? OFFICIAL_EMAIL }
+  const apiKey = (process.env.MAIL_BREVO_API_KEY ?? f.apiKey ?? "").trim()
+  if (!apiKey) return null
+  return {
+    apiKey,
+    from: f.from ?? MAIL_SENDER,
+    fromName: f.fromName ?? MAIL_SENDER_NAME,
+    replyTo: f.replyTo ?? MAIL_REPLY_TO,
+    notifyTo: f.notifyTo ?? MAIL_REPLY_TO,
+  }
 }
 
 export function mailEnabledFlag(): boolean {

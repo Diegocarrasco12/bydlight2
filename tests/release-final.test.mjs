@@ -184,12 +184,12 @@ test("R8. migracion 4: ordenes anteriores quedan como persona y la tabla de corr
 
 /* ---------------- Correos ---------------- */
 
-test("R9. solicitud: un correo al cliente y uno interno al correo oficial, sin duplicar", async () => {
+test("R9. solicitud: un correo al cliente y uno interno al buzon de contacto, sin duplicar", async () => {
   await flush() // vacia lo que dejaron las pruebas anteriores
   sent.length = 0
   const o = await mk()
   await flush()
-  assert.deepEqual(sent.map((m) => m.to).sort(), ["bydlightsolutions@gmail.com", "cliente@example.com"])
+  assert.deepEqual(sent.map((m) => m.to).sort(), ["cliente@example.com", "contacto@bydlightsolutions.com"])
   const c = sent.find((m) => m.to === "cliente@example.com")
   assert.match(c.subject, /Recibimos tu solicitud/)
   assert.match(c.html, new RegExp(o.id))
@@ -312,15 +312,16 @@ test("R15. plantillas: escapan el texto del cliente, sin cabeceras inyectables y
   const r = T.nuevaSolicitudInterna(o)
   assert.doesNotMatch(r.html, /<script>|<img src=x/)
   assert.match(r.html, /&lt;script&gt;/)
-  const raw = transport.buildRfc822("bydlightsolutions@gmail.com", { to: "a@b.cl\r\nBcc: x@y.cl", subject: "Hola\r\nBcc: x@y.cl", html: "<p>x</p>", text: "x", messageKey: "k" })
-  assert.doesNotMatch(raw, /\r\nBcc:/)
-  assert.match(raw, /^From: Bydlight Solutions <bydlightsolutions@gmail\.com>/)
-  assert.match(raw, /Content-Type: multipart\/alternative/)
+  const body = transport.buildBrevoPayload({ from: "notificaciones@bydlightsolutions.com", fromName: "Bydlight Solutions", replyTo: "contacto@bydlightsolutions.com" }, { to: "a@b.cl", subject: "Hola\r\nBcc: x@y.cl", html: "<p>x</p>", text: "x", messageKey: "k" })
+  assert.doesNotMatch(body.subject, /[\r\n]/) // el asunto no puede inyectar cabeceras
+  assert.equal(body.headers, undefined) // no se envian cabeceras libres
+  assert.deepEqual(body.sender, { email: "notificaciones@bydlightsolutions.com", name: "Bydlight Solutions" })
+  assert.deepEqual(body.replyTo, { email: "contacto@bydlightsolutions.com" })
   assert.match(T.solicitudRecibida(o).html, /RUT 78\.161\.844-6/)
   assert.match(T.solicitudRecibida(o).html, /meta name="viewport"/)
 })
 
-test("R16. correo oficial: bydlightsolutions@gmail.com; el remitente no es contacto@ ni hay credenciales en el repo", () => {
+test("R16. correo publico del sitio sin cambios; el codigo no contiene claves ni restos de Gmail OAuth", () => {
   assert.equal(SITE.email, "bydlightsolutions@gmail.com")
   const walk = (d, out = []) => {
     for (const n of readdirSync(d)) {
@@ -332,8 +333,8 @@ test("R16. correo oficial: bydlightsolutions@gmail.com; el remitente no es conta
   }
   for (const f of walk(join(process.cwd(), "src"))) {
     const t = readFileSync(f, "utf8")
-    assert.ok(!t.includes("contacto@bydlightsolutions.com"), f)
-    assert.ok(!/refresh_token"?\s*[:=]\s*["'][A-Za-z0-9/_-]{20,}/.test(t), `credencial en ${f}`)
+    assert.ok(!/xkeysib-[A-Za-z0-9]{20,}/.test(t), `clave de Brevo en ${f}`)
+    assert.ok(!/gmail\.googleapis|oauth2\.googleapis|refresh_token/.test(t), `resto de Gmail OAuth en ${f}`)
   }
 })
 
@@ -353,7 +354,7 @@ test("R17. monitor: solo lectura (no cambia ordenes), alerta una sola vez por di
   assert.equal(r1.alerted, true)
   await flush()
   assert.equal(sent.filter((m) => /conciliación/.test(m.subject)).length, 1)
-  assert.equal(sent.find((m) => /conciliación/.test(m.subject)).to, "bydlightsolutions@gmail.com")
+  assert.equal(sent.find((m) => /conciliación/.test(m.subject)).to, "contacto@bydlightsolutions.com")
   assert.equal((await monitor.monitorAndAlert()).alerted, false) // mismo conjunto, mismo dia
   assert.equal(JSON.stringify(await store.readOrder(o.id)), snapshot) // no modifico nada
 })

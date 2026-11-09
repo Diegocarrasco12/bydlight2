@@ -1,51 +1,57 @@
-# Gmail OAuth para los correos transaccionales: pasos exactos (los hace el titular)
+# Brevo: clave API de los correos transaccionales, pasos exactos (los hace el titular)
 
-Objetivo: que el servidor envíe los correos de Bydlight (solicitud, cotización, contratación confirmada, comprobante de pago, alertas) desde `bydlightsolutions@gmail.com` **sin usar la contraseña de la cuenta**. Se necesitan tres valores: **clientId**, **clientSecret** y **refreshToken**. **No los pegue en el chat, en correos ni en el repositorio**: se escriben solo en la consola del servidor, con entrada oculta, y quedan en `/data/config/mail.json` (modo 0600).
+Reemplaza a la guía de Gmail OAuth (descartada). El servidor envía los correos de Bydlight (solicitud, cotización, contratación confirmada, comprobante, alertas) por la API transaccional de Brevo, desde `notificaciones@bydlightsolutions.com` (dominio ya autenticado con DKIM/DMARC), con **Reply-To `contacto@bydlightsolutions.com`** (que recibe Zoho). El único secreto es la **clave API de Brevo**.
 
-Las pantallas de Google cambian de nombre con frecuencia; si algún menú no coincide, busque el equivalente. El código usa solo el permiso `https://www.googleapis.com/auth/gmail.send` (enviar; no puede leer correo).
+**La clave no se pega en el chat, en correos, en el repositorio ni en el historial de la consola.** Se escribe solo en la consola del servidor, con entrada oculta, y queda en `/data/config/mail.json` (modo 0600, volumen `bydlight-prod_bydlight_data`). Nunca llega al navegador ni a la imagen.
 
-## A. Proyecto y API (cuenta `bydlightsolutions@gmail.com`)
-1. Entre a https://console.cloud.google.com con **`bydlightsolutions@gmail.com`** (así el remitente y la cuenta autorizada son la misma).
-2. Cree un proyecto: nombre «Bydlight Correos».
-3. **APIs y servicios → Biblioteca →** busque **Gmail API → Habilitar**.
+**Cuándo se hace:** la clave se instala **después de desplegar la Etapa B** (Paso 6b del procedimiento), porque el script y el código que la usan vienen en esa versión. Las partes A y B de abajo se pueden hacer antes, en el panel de Brevo.
 
-## B. Pantalla de consentimiento (paso crítico: «En producción»)
-1. **APIs y servicios → Pantalla de consentimiento de OAuth** (o «Google Auth Platform»). Tipo de usuario: **Externo** (cuenta @gmail.com).
-2. Nombre de la app «Bydlight Correos»; correo de asistencia y de contacto: `bydlightsolutions@gmail.com`.
-3. **Permisos (scopes):** agregue `https://www.googleapis.com/auth/gmail.send`.
-4. **Publicar la app → «En producción».** Si queda en «Prueba/Testing», el refresh token **caduca a los 7 días** y los correos dejarán de salir sin aviso. Para uso propio no hace falta la verificación de Google; al autorizar verá la advertencia «Google no verificó esta app»: **Avanzado → Ir a Bydlight Correos (no seguro)** es esperable porque la app es suya.
+## A. Crear una clave API dedicada (panel de Brevo)
+1. Brevo → su nombre (arriba a la derecha) → **SMTP & API → pestaña «API Keys» → Generate a new API key**.
+2. Nombre: `bydlight-prod-servidor`. Cópiela **una sola vez** a su gestor de contraseñas (empieza con `xkeysib-`). Brevo no la vuelve a mostrar.
+3. No reutilice la clave en otros sistemas: si se filtra, se revoca sin afectar a nada más.
 
-## C. Credenciales
-1. **Credenciales → Crear credenciales → ID de cliente de OAuth → Aplicación web.**
-2. **URI de redireccionamiento autorizado:** `https://developers.google.com/oauthplayground`
-3. Cree y copie el **ID de cliente** y el **secreto del cliente** (guárdelos en su gestor de contraseñas, no en el chat).
+## B. Autorizar la IP del servidor (paso que más falla)
+Si en **Seguridad → Authorised IPs** está activo el control de IPs (Brevo puede activarlo solo), cualquier petición desde una IP no autorizada recibe **401 aunque la clave sea correcta**.
+1. En el servidor Ubuntu: `curl -s https://api.ipify.org ; echo` (IP pública de salida; los contenedores salen por la misma IP).
+2. Brevo → **Security → Authorised IPs → Add an IP** → esa IP. Tarda unos 5 minutos en aplicarse.
+3. Si su proveedor cambia la IP del servidor, los envíos darán 401 hasta actualizarla (ver «Problemas»).
 
-## D. Obtener el refresh token (OAuth 2.0 Playground)
-1. Abra https://developers.google.com/oauthplayground
-2. Engranaje (arriba a la derecha) → marque **«Use your own OAuth credentials»** → pegue su ID de cliente y secreto. Verifique que «Access type» sea **Offline**.
-3. Paso 1: en el cuadro «Input your own scopes» escriba `https://www.googleapis.com/auth/gmail.send` → **Authorize APIs** → elija `bydlightsolutions@gmail.com` → permita.
-4. Paso 2: **Exchange authorization code for tokens** → copie el **Refresh token** (empieza con `1//`). No necesita el access token.
-5. Cuando termine, en el engranaje puede pulsar **Revoke** del *access token* del Playground si lo desea; el refresh token que copió sigue siendo válido hasta que lo revoque en su cuenta de Google.
-
-## E. Instalar en el servidor (sin mostrar secretos)
-Defina `TAG` y `RUN` como en el procedimiento de la Etapa B (`BYDLIGHT-ETAPA-B-ACTIVACION.md`, Paso 1) y ejecute:
+## C. Instalar la clave en el servidor (sin mostrarla)
+Con `TAG` y `RUN` definidos como en el Paso 3 del procedimiento (`BYDLIGHT-ETAPA-B-ACTIVACION.md`) y **el código de la Etapa B ya desplegado**:
 ```
 docker run --rm -it --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/s:ro bydlight-web:$TAG node /s/mail-config-set.mjs /data/config/mail.json --init
 ```
-Pega los tres valores cuando los pida (no se ven al escribir; el `-it` es necesario). Queda `enabled: false`. Compruebe sin ver secretos:
+Pegue la clave cuando la pida (no se ve al escribir; el `-it` es necesario) y Enter. Queda `enabled: false`. Si existía una configuración antigua de Gmail en `mail.json`, se descarta. Compruebe sin ver secretos:
 ```
 $RUN node /s/mail-config-set.mjs /data/config/mail.json --show
 ```
-Debe decir `credencialesOAuth: true`. Después:
+Debe mostrar `claveApiBrevo: true`, `from: notificaciones@bydlightsolutions.com`, `replyTo` y `notifyTo: contacto@bydlightsolutions.com`.
+
+## D. Encender y probar
 ```
 $RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=true
 $RUN node /s/admin-remote.mjs mail-test --config-file /data/config/payments.json
 $RUN node /s/admin-remote.mjs mail-status --config-file /data/config/payments.json
 ```
-**Éxito:** llega **un** correo de prueba a `bydlightsolutions@gmail.com` (revise Spam) y `mail-status` no muestra correos `FALLIDO`. Si no llega o hay errores: `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false`, y envíe a Claude la salida de `mail-status` (sin secretos). Errores típicos: `invalid_grant` (token caducado o revocado: app en «Prueba» o contraseña de la cuenta cambiada; repetir D y `--init`), `403` (falta habilitar Gmail API o el scope), `401` (clientId/clientSecret equivocados).
+**Éxito:** `mail-test` responde `"sent": 1` y llega **un** correo a `contacto@bydlightsolutions.com` (revise Spam; debe verse remitente `notificaciones@bydlightsolutions.com`) y `mail-status` no muestra `FALLIDO`. En Brevo → **Transactional → Logs** aparece el envío como «Delivered».
+
+Si no llega o falla: `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false` y envíe a Claude la salida de `mail-status` (sin secretos).
+
+## Problemas típicos (el campo `lastError` de `mail-status` los nombra; nunca incluye la clave)
+| Mensaje | Causa | Qué hacer |
+|---|---|---|
+| `brevo 401 … revisar clave API e IPs autorizadas` / `403` | Clave equivocada o revocada, o IP del servidor no autorizada (parte B) | Corregir y esperar: el correo **no se pierde**; se reintenta cada 30 min sin gastar intentos (hasta 72 h) |
+| `brevo 429 … cuota o limite` / `not_enough_credits` | Se agotó el plan gratuito (300 correos/día) o hay límite de velocidad | Se aplaza (respeta `Retry-After`, mínimo 1 h por defecto), la tanda se detiene y se reanuda sola; nada se pierde ni se duplica |
+| `brevo 400 invalid_parameter` | Dirección o contenido inválido | Queda `FALLIDO` sin reintentar; revise el correo del cliente |
+| `brevo 5xx` / «sin respuesta» | Falla transitoria de Brevo o de red | Reintentos 1, 5, 30, 120 y 720 min; máximo 6 |
+
+## E. Límites del plan gratuito (Brevo)
+- **300 correos por día** (API y SMTP), según la documentación de Brevo consultada el 2026-11-09. Verifique en su cuenta los límites vigentes (Brevo los cambia) y si el plan gratuito agrega algún pie o marca de Brevo a los correos transaccionales: se revisa en el correo de prueba.
+- **Consumo estimado por orden:** solicitud (cliente + aviso interno) = 2; cotización = 1; anticipo = 2 (contratación + comprobante); saldo habilitado = 1; saldo pagado = 1. Una orden completa ≈ 7 correos → **unas 40 órdenes completas por día** caben en el plan. Las alertas internas se limitan a una por día y por conjunto de hallazgos.
+- Si se supera, el sistema no falla: aplaza y envía al día siguiente. Para más volumen, subir de plan en Brevo (no requiere cambios de código).
 
 ## F. Mantenimiento
-- Cambiar la contraseña de la cuenta de Gmail **revoca** el refresh token de los permisos de Gmail: habrá que repetir los pasos D y E.
-- Gmail limita los envíos diarios de una cuenta personal; para el volumen inicial basta. Si el negocio crece, evalúe un proveedor transaccional con dominio propio (`CORREOS-TRANSACCIONALES.md`).
-- Apagar los correos en cualquier momento (≤ 5 s): `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false`. Los pagos siguen funcionando.
-- Antes de abrir al público, confirme además en el panel de **EmailJS** que el formulario de contacto envía a `bydlightsolutions@gmail.com`.
+- **Rotar la clave:** crear una nueva en Brevo, repetir C (`--init` reemplaza la clave), probar con D y luego revocar la antigua en Brevo.
+- **Apagar los correos** (≤ 5 s, no afecta a los pagos): `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false`.
+- Antes de abrir al público, confirme además en el panel de **EmailJS** el destino del formulario de contacto (decisión D8).

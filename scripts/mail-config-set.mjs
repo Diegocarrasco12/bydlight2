@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Crea o actualiza mail.json (correo transaccional por la API de Gmail con OAuth2) en el servidor, sin dejar secretos en el
-// historial de la shell ni en el repositorio: las credenciales se piden por entrada OCULTA.
-//   node scripts/mail-config-set.mjs <ruta/mail.json> --init          pide clientId, clientSecret y refreshToken (sin eco)
+// Crea o actualiza mail.json (correo transaccional por la API de Brevo) en el servidor, sin dejar secretos en el historial de la
+// shell ni en el repositorio: la clave API se pide por entrada OCULTA.
+//   node scripts/mail-config-set.mjs <ruta/mail.json> --init          pide la clave API de Brevo (sin eco)
 //   node scripts/mail-config-set.mjs <ruta/mail.json> enabled=true|false
 //   node scripts/mail-config-set.mjs <ruta/mail.json> --show          resumen sin secretos
 // Escritura atomica con permisos 0600. Los cambios rigen en <= 5 s, sin redeploy. Ver docs/CORREOS-TRANSACCIONALES.md.
@@ -50,10 +50,11 @@ function readHidden(prompt) {
 
 const summary = () => ({
   enabled: cfg.enabled === true,
-  provider: cfg.provider ?? "gmail-oauth2",
-  from: cfg.from ?? "bydlightsolutions@gmail.com",
-  notifyTo: cfg.notifyTo ?? "bydlightsolutions@gmail.com",
-  credencialesOAuth: Boolean(cfg.clientId && cfg.clientSecret && cfg.refreshToken),
+  provider: "brevo",
+  from: cfg.from ?? "notificaciones@bydlightsolutions.com",
+  replyTo: cfg.replyTo ?? "contacto@bydlightsolutions.com",
+  notifyTo: cfg.notifyTo ?? "contacto@bydlightsolutions.com",
+  claveApiBrevo: Boolean(cfg.apiKey),
 })
 
 if (rest.includes("--show")) {
@@ -62,15 +63,16 @@ if (rest.includes("--show")) {
 }
 
 if (rest.includes("--init")) {
-  const clientId = await readHidden("clientId de OAuth (entrada oculta): ")
-  const clientSecret = await readHidden("clientSecret (entrada oculta): ")
-  const refreshToken = await readHidden("refreshToken (entrada oculta): ")
-  if (!clientId || !clientSecret || !refreshToken) die("Faltan credenciales (se requiere una terminal interactiva). No se modifico nada.")
-  cfg = { ...cfg, provider: "gmail-oauth2", clientId, clientSecret, refreshToken, from: "bydlightsolutions@gmail.com", notifyTo: "bydlightsolutions@gmail.com", enabled: false }
+  const apiKey = await readHidden("Clave API de Brevo (entrada oculta): ")
+  if (!apiKey) die("Falta la clave (se requiere una terminal interactiva). No se modifico nada.")
+  if (/\s/.test(apiKey) || apiKey.length < 20) die("La clave no parece valida (sin espacios, minimo 20 caracteres). No se modifico nada.")
+  // Se descartan los campos de proveedores anteriores (Gmail) y se conservan from/replyTo/notifyTo si ya existian.
+  cfg = { provider: "brevo", apiKey, from: cfg.from, replyTo: cfg.replyTo, notifyTo: cfg.notifyTo, enabled: false }
+  for (const k of Object.keys(cfg)) if (cfg[k] === undefined) delete cfg[k]
 } else {
   if (rest.length === 0) die("Indique --init, enabled=true|false o --show.")
   for (const a of rest) {
-    if (a !== "enabled=true" && a !== "enabled=false") die("Cambio no permitido: solo enabled=true|false (las credenciales solo se cambian con --init).")
+    if (a !== "enabled=true" && a !== "enabled=false") die("Cambio no permitido: solo enabled=true|false (la clave solo se cambia con --init).")
     cfg.enabled = a === "enabled=true"
   }
 }

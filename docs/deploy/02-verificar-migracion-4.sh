@@ -102,7 +102,7 @@ try { c = JSON.parse(fs.readFileSync("/data/config/payments.json", "utf8")) } ca
 const s = (x) => (typeof x === "boolean" || /^[a-z]{1,12}$/.test(String(x)) ? String(x) : "?")
 console.log("pagos: enabled=" + s(c.enabled) + " access=" + s(c.access) + " adminRefunds=" + s(c.adminRefunds) + " env=" + s(c.env))
 let m = "no existe"
-try { const j = JSON.parse(fs.readFileSync("/data/config/mail.json", "utf8")); m = "existe; enabled=" + s(j.enabled) + "; credenciales_completas=" + (!!j.clientId && !!j.clientSecret && !!j.refreshToken) } catch {}
+try { const j = JSON.parse(fs.readFileSync("/data/config/mail.json", "utf8")); m = "existe; enabled=" + s(j.enabled) + "; clave_api_brevo=" + !!j.apiKey } catch {}
 console.log("correo (mail.json): " + m)
 EOF
 "${DR[@]}" -v "$VOL":/data:ro "$IMG" node -e "$JS_CFG"

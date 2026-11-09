@@ -14,6 +14,7 @@ import { activeTransport, MailError, type MailMessage } from "./transport"
 export const MAX_ATTEMPTS = 6
 const BACKOFF_MIN = [1, 5, 30, 120, 720]
 const CLAIM_MIN = 10
+const MAX_DEFER_AGE_H = 72 // un correo aplazado por cuota/clave que lleva mas de 3 dias ya no sirve: queda FALLIDO y visible
 
 type Row = Record<string, unknown>
 const iso = (ms = Date.now()) => new Date(ms).toISOString()
@@ -67,6 +68,15 @@ export async function dispatchDue(max = 10): Promise<{ sent: number; failed: num
         db.prepare("UPDATE mail_outbox SET status = 'ENVIADO', sent_at = ?, last_error = NULL, body_html = '', body_text = '' WHERE id = ?").run(iso(), id)
         out.sent++
       } catch (e) {
+        if (e instanceof MailError && e.deferMin) {
+          // Cuota/limite/clave/IP: no es culpa del mensaje. No se gastan intentos, se aplaza y se detiene la tanda (el resto fallaria igual).
+          const tooOld = Date.now() - Date.parse(String(m.created_at)) > MAX_DEFER_AGE_H * 3_600_000
+          if (tooOld) db.prepare("UPDATE mail_outbox SET status = 'FALLIDO', last_error = ? WHERE id = ?").run(e.message.slice(0, 200), id)
+          else db.prepare("UPDATE mail_outbox SET status = 'PENDIENTE', attempts = attempts - 1, last_error = ?, next_attempt_at = ? WHERE id = ?").run(e.message.slice(0, 200), iso(Date.now() + e.deferMin * 60_000), id)
+          if (tooOld) out.failed++
+          else out.retry++
+          break
+        }
         const permanent = e instanceof MailError && e.permanent
         const msgErr = (e instanceof Error ? e.message : "error").slice(0, 200) // sin cuerpos de respuesta ni credenciales
         if (permanent || attempts >= MAX_ATTEMPTS) {
