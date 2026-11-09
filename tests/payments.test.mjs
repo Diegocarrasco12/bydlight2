@@ -64,7 +64,7 @@ async function newQuoted(amount = 149990) {
   const parsed = svc.parseSolicitud(solicitud)
   assert.ok(parsed.ok)
   const order = await svc.createOrder(parsed.data)
-  const r = await admin.approveQuote(order.id, { amount })
+  const r = await admin.approveQuote(order.id, { allowBelowPlanPrice: true, amount })
   assert.ok(r.ok, r.error)
   return order.id
 }
@@ -111,8 +111,8 @@ test("1b. compra de prueba de $50 (exigida por Transbank): cotizacion de $100 co
   assert.ok(parsed.ok)
   const order = await svc.createOrder(parsed.data)
   // Limites reales: la cotizacion minima es $100 y el cobro minimo $50; por eso el $50 sale del anticipo.
-  assert.equal((await admin.approveQuote(order.id, { amount: 99 })).ok, false)
-  const r = await admin.approveQuote(order.id, { amount: 100, depositPercent: 50 })
+  assert.equal((await admin.approveQuote(order.id, { allowBelowPlanPrice: true, amount: 99 })).ok, false)
+  const r = await admin.approveQuote(order.id, { allowBelowPlanPrice: true, amount: 100, depositPercent: 50 })
   assert.ok(r.ok, r.error)
   assert.deepEqual(r.data, { amount: 100, deposit: 50, balance: 50 })
   const s = await svc.startPayment(order.id, "anticipo", BASE)
@@ -216,7 +216,7 @@ test("7. orden inexistente o codigo invalido", async () => {
   await svc.verifyOrder("nope")
   assert.equal(await store.readOrder("AAAAAAAAAAAA"), null)
   assert.equal(await store.readOrder("0123456789AB"), null) // alfabeto invalido
-  assert.equal((await admin.approveQuote("AAAAAAAAAAAA", { amount: 100000 })).ok, false)
+  assert.equal((await admin.approveQuote("AAAAAAAAAAAA", { allowBelowPlanPrice: true, amount: 100000 })).ok, false)
 })
 
 test("8. identificadores: 12 caracteres aleatorios, sin colisiones", () => {
@@ -258,11 +258,11 @@ test("9. API administrativa: solo con firma valida; sin secreto no existe", () =
 test("10. la cotizacion no se puede cambiar con pago en curso o ya pagado; validaciones de monto", async () => {
   const id = await newQuoted()
   const s = await svc.startPayment(id, "anticipo", BASE)
-  assert.equal((await admin.approveQuote(id, { amount: 1000 })).ok, false) // pago en curso
+  assert.equal((await admin.approveQuote(id, { allowBelowPlanPrice: true, amount: 1000 })).ok, false) // pago en curso
   const o = await store.readOrder(id)
   tbk.commit = async () => authorized(o, o.attempts[0])
   await svc.handleReturn(id, { tokenWs: s.token })
-  assert.equal((await admin.approveQuote(id, { amount: 1000 })).ok, false) // ya pagado
+  assert.equal((await admin.approveQuote(id, { allowBelowPlanPrice: true, amount: 1000 })).ok, false) // ya pagado
   assert.equal((await svc.startPayment(id, "anticipo", BASE)).ok, false)
   assert.equal((await admin.releaseBalance(id)).ok, true)
   assert.ok((await svc.startPayment(id, "saldo", BASE)).ok)

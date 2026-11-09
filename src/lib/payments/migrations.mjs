@@ -170,4 +170,41 @@ CREATE TABLE mail_outbox (
 CREATE INDEX mail_outbox_due ON mail_outbox(status, next_attempt_at);
 `,
   },
+  {
+    version: 5,
+    name: "documentos-tributarios",
+    sql: `
+-- Registro de documentos tributarios por pago (boleta, factura nacional, factura de exportacion, nota de credito). SOLO REGISTRA: el sistema
+-- no emite ni envia nada al SII; el titular registra aqui el folio del documento que emitio por los canales autorizados.
+-- Aditiva: no modifica tablas existentes; el codigo anterior la ignora.
+CREATE TABLE tax_documents (
+  id               INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id         TEXT NOT NULL REFERENCES orders(id),
+  attempt_id       TEXT REFERENCES attempts(id),
+  kind             TEXT NOT NULL CHECK (kind IN ('boleta','factura','factura_exportacion','nota_credito')),
+  status           TEXT NOT NULL CHECK (status IN ('PENDIENTE','EMITIDO','ANULADO')),
+  folio            TEXT,
+  issued_at        TEXT,
+  currency         TEXT NOT NULL DEFAULT 'CLP' CHECK (currency IN ('CLP')),
+  total_amount     INTEGER NOT NULL CHECK (total_amount > 0),
+  net_amount       INTEGER,
+  vat_amount       INTEGER,
+  receiver_tax_id  TEXT,
+  receiver_name    TEXT,
+  ref_doc_id       INTEGER REFERENCES tax_documents(id),
+  note             TEXT,
+  created_by       TEXT NOT NULL,
+  created_at       TEXT NOT NULL,
+  updated_at       TEXT NOT NULL,
+  CHECK (status <> 'EMITIDO' OR (folio IS NOT NULL AND issued_at IS NOT NULL)),
+  CHECK (kind <> 'nota_credito' OR ref_doc_id IS NOT NULL),
+  CHECK (kind = 'nota_credito' OR attempt_id IS NOT NULL)
+) STRICT;
+CREATE INDEX tax_documents_by_order ON tax_documents(order_id);
+-- Un folio no se repite dentro de un mismo tipo de documento.
+CREATE UNIQUE INDEX tax_documents_folio ON tax_documents(kind, folio) WHERE folio IS NOT NULL;
+-- A lo sumo un documento vigente (no anulado) de venta por pago: impide emision duplicada.
+CREATE UNIQUE INDEX tax_documents_one_per_payment ON tax_documents(attempt_id) WHERE kind <> 'nota_credito' AND status <> 'ANULADO';
+`,
+  },
 ]

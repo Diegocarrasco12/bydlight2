@@ -11,7 +11,7 @@ import { PILOT_COOKIE } from "@/lib/payments/pilot"
 import { storageWritable } from "@/lib/payments/store"
 import { previewMode } from "@/lib/preview"
 import { legalVisible } from "@/lib/legal"
-import { PLANS, PRICE_NOTE } from "@/lib/plans"
+import { isDirectPlan, PLANS, PRICE_NOTE } from "@/lib/plans"
 import { whatsappLink } from "@/lib/site"
 
 export const dynamic = "force-dynamic"
@@ -29,9 +29,9 @@ export default async function ContratarPage({ searchParams }: { searchParams: Pr
   // En modo piloto solo entra quien tiene la cookie firmada; los demas ven lo mismo que con los pagos apagados.
   const jar = await cookies()
   if (!paymentsEnabled() || !checkoutOpenFor(`${PILOT_COOKIE}=${jar.get(PILOT_COOKIE)?.value ?? ""}`)) redirect(`/contacto${plan && PLANS.some((p) => p.id === plan) ? `?plan=${plan}` : ""}`)
-  const initial = PLANS.some((p) => p.id === plan) ? (plan as string) : "profesional"
+  const initial = plan && isDirectPlan(plan) ? plan : "profesional"
   const available = paymentsEnabled() && (previewMode() || (await storageWritable()))
-  const options = PLANS.map((p) => ({ id: p.id, name: p.name, priceLabel: p.priceLabel, fixed: p.priceFrom !== null }))
+  const options = PLANS.filter((p) => p.modality === "directa").map((p) => ({ id: p.id, name: p.name, priceLabel: p.priceLabel, fixed: p.priceFrom !== null }))
 
   return (
     <>

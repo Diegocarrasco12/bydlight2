@@ -1,9 +1,10 @@
 import "server-only"
-import { PLANS } from "@/lib/plans"
+import { isDirectPlan, PLANS } from "@/lib/plans"
 import { normalizeRut } from "@/lib/rut"
 import { notifyChanges, snapshotOf } from "@/lib/mail/notify"
 import { TERMS_VERSION, checkTerms, termsEventDetail } from "@/lib/terms"
 import { createTransaction, tbkMode } from "./config"
+import { openDb } from "./db"
 import { isValidOrderId, newOrderId, readOrder, withOrderLock, writeOrder } from "./store"
 import type { Attempt, CustomerType, Order, PaymentKind } from "./types"
 
@@ -62,6 +63,7 @@ export function parseSolicitud(body: Record<string, unknown>): { ok: true; data:
     termsVersion: TERMS_VERSION,
   }
   if (!PLANS.some((p) => p.id === data.planId)) errors.push("Plan no válido.")
+  else if (!isDirectPlan(data.planId)) errors.push("Este servicio se cotiza a medida: escríbenos desde la página de contacto.")
   if (data.name.length < 2) errors.push("Ingresa tu nombre.")
   if (!EMAIL_RE.test(data.email)) errors.push("Ingresa un correo válido.")
   if (data.phone && !/^[0-9+()\-\s]{6,30}$/.test(data.phone)) errors.push("El teléfono no es válido.")
@@ -83,6 +85,19 @@ export function parseSolicitud(body: Record<string, unknown>): { ok: true; data:
   const termsError = checkTerms(body.acceptTerms, body.termsVersion)
   if (termsError) errors.push(termsError)
   return errors.length ? { ok: false, errors } : { ok: true, data }
+}
+
+/**
+ * Anti duplicados de solicitudes (doble clic, reintento de red, reenvio del formulario): mismo correo, plan y mensaje en los ultimos
+ * 30 min mientras la orden sigue SOLICITADA devuelve la orden existente (ni orden nueva ni correos repetidos). Lo usa la ruta publica.
+ */
+export async function findDuplicateRequest(input: SolicitudInput): Promise<Order | null> {
+  const dup = openDb()
+    .prepare("SELECT id FROM orders WHERE stage = 'SOLICITADA' AND lower(cust_email) = ? AND plan_id = ? AND message = ? AND created_at > ? ORDER BY created_at DESC LIMIT 1")
+    .get(input.email.toLowerCase(), input.planId, input.message, new Date(Date.now() - 30 * 60_000).toISOString()) as { id: string } | undefined
+  const existing = dup ? await readOrder(dup.id) : null
+  if (existing) log("order_duplicate_ignored", { orderId: existing.id })
+  return existing
 }
 
 export async function createOrder(input: SolicitudInput, opts: { pilot?: boolean } = {}): Promise<Order> {

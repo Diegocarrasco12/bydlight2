@@ -63,7 +63,7 @@ const { TERMS_VERSION } = await import("../src/lib/terms.ts")
 const solicitud = { planId: "emprendedor", name: "Cliente Prueba", email: "cliente@example.com", message: "Necesito una landing page de prueba", accept: true, acceptTerms: true, termsVersion: TERMS_VERSION }
 async function newQuoted(amount = 100000) {
   const order = await svc.createOrder(svc.parseSolicitud(solicitud).data)
-  const r = await admin.approveQuote(order.id, { amount, depositPercent: 50 })
+  const r = await admin.approveQuote(order.id, { allowBelowPlanPrice: true, amount, depositPercent: 50 })
   assert.ok(r.ok, r.error)
   return order.id
 }

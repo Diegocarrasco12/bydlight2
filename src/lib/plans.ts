@@ -10,8 +10,15 @@ export const IVA_LABEL = "IVA incluido"
 export const PRICE_NOTE =
   "Valores en pesos chilenos (CLP) con IVA incluido. El valor definitivo se confirma en la cotización, que indica el total con IVA."
 
+/**
+ * Modalidad comercial: «directa» = servicio estandarizado con alcance y precio publicados (solicitud en linea, cotizacion confirmada y
+ * anticipo con Webpay); «a-medida» = proyecto personalizado: se cotiza y acuerda por contacto y NO pasa por el checkout publico.
+ */
+export type PlanModality = "directa" | "a-medida"
+
 export type Plan = {
   id: string
+  modality: PlanModality
   name: string
   tagline: string
   priceFrom: number | null // null = cotizacion personalizada
@@ -35,6 +42,7 @@ export type Plan = {
 export const PLANS: Plan[] = [
   {
     id: "emprendedor",
+    modality: "directa",
     name: "Emprendedor",
     tagline: "Landing page para presentar tu negocio y recibir contactos.",
     priceFrom: 149990,
@@ -66,6 +74,7 @@ export const PLANS: Plan[] = [
   },
   {
     id: "profesional",
+    modality: "directa",
     name: "Web Profesional",
     tagline: "Sitio de varias páginas para pymes que quieren ser encontradas.",
     priceFrom: 299990,
@@ -99,6 +108,7 @@ export const PLANS: Plan[] = [
   },
   {
     id: "empresa",
+    modality: "directa",
     name: "Web Empresa",
     tagline: "Presencia corporativa completa, con blog y SEO técnico.",
     priceFrom: 499990,
@@ -131,6 +141,7 @@ export const PLANS: Plan[] = [
   },
   {
     id: "ecommerce",
+    modality: "directa",
     name: "Ecommerce",
     tagline: "Tienda online para vender con catálogo, carrito y pago.",
     priceFrom: 699990,
@@ -163,6 +174,7 @@ export const PLANS: Plan[] = [
   },
   {
     id: "software",
+    modality: "a-medida",
     name: "Software a medida",
     tagline: "Sistemas, plataformas e integraciones para tu operación.",
     priceFrom: null,
@@ -260,9 +272,12 @@ function checkoutUiVisible() {
   return ONLINE_CHECKOUT_UI || previewMode()
 }
 
+/** Planes que se pueden solicitar y pagar en linea (los proyectos a medida quedan fuera del checkout). */
+export const isDirectPlan = (planId: string) => PLANS.some((p) => p.id === planId && p.modality === "directa")
+
 /** Destino del boton «Solicitar este plan». */
 export function planHref(planId: string) {
-  return checkoutUiVisible() ? `/contratar?plan=${planId}` : `/contacto?plan=${planId}`
+  return checkoutUiVisible() && isDirectPlan(planId) ? `/contratar?plan=${planId}` : `/contacto?plan=${planId}`
 }
 
 export function planWhatsappMessage(plan: Plan) {

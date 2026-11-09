@@ -154,7 +154,7 @@ test("P4. solicitudes en modo piloto: terceros no crean ordenes; con la cookie d
 test("P5. inicio de pago en modo piloto: sin cookie no se llama a Transbank; con cookie se inicia una sola transaccion", async () => {
   const cookie = `bd_piloto=${cookieOf(await enter())}`
   const created = await (await postSol({ cookie })).json()
-  assert.ok((await admin.approveQuote(created.id, { amount: 100, depositPercent: 50 })).ok)
+  assert.ok((await admin.approveQuote(created.id, { allowBelowPlanPrice: true, amount: 100, depositPercent: 50 })).ok)
   const form = () => {
     const f = new FormData()
     f.set("orderId", created.id)
@@ -184,7 +184,7 @@ test("P5. inicio de pago en modo piloto: sin cookie no se llama a Transbank; con
 test("P6. la compra de $50 de extremo a extremo: anticipo $50, saldo $50, retornos duplicados y trazabilidad", async () => {
   const cookie = `bd_piloto=${cookieOf(await enter())}`
   const { id } = await (await postSol({ cookie })).json()
-  assert.ok((await admin.approveQuote(id, { amount: 100, depositPercent: 50, validDays: 1, note: "PRUEBA PRODUCTIVA" })).ok)
+  assert.ok((await admin.approveQuote(id, { allowBelowPlanPrice: true, amount: 100, depositPercent: 50, validDays: 1, note: "PRUEBA PRODUCTIVA" })).ok)
   const pay = async (kind) => {
     const s = await svc.startPayment(id, kind, "https://bydlightsolutions.com", { accepted: true })
     assert.ok(s.ok, JSON.stringify(s))

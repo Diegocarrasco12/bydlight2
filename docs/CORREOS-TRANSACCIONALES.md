@@ -12,9 +12,10 @@ Configuración del titular ya hecha en Brevo/DNS: dominio `bydlightsolutions.com
 | Anticipo autorizado | cliente | `contratacion_confirmada` (confirmación escrita: proveedor, servicio, montos, versión y fecha de los términos, retracto) |
 | Pago autorizado (anticipo o saldo) | cliente | `pago_autorizado` (comprobante) |
 | Pago rechazado | cliente | `pago_rechazado` (sin cargo, enlace para reintentar) |
+| Pago pendiente (resultado incierto) | cliente | `pago_pendiente` («estamos verificando»; NO es confirmación ni rechazo; un solo aviso) |
 | Saldo habilitado | cliente | `saldo_habilitado` (acción requerida) |
 | Pago en ERROR / hallazgos de conciliación | `contacto@` | `alerta_interna`, `alerta_conciliacion` |
-Las plantillas no cambiaron. No se envía correo por pago cancelado por el cliente ni por resultado incierto hasta que Transbank confirme.
+Las plantillas existentes no cambiaron; se agregó `pago_pendiente`. No se envía correo por pago cancelado por el cliente. Con resultado incierto solo sale el aviso «estamos verificando»; el comprobante únicamente tras la autorización real de Transbank.
 
 ## Integración con Brevo (`src/lib/mail/transport.ts`)
 - `POST https://api.brevo.com/v3/smtp/email`, cabecera `api-key`, JSON con `sender` (notificaciones@, «Bydlight Solutions»), `to`, `replyTo` (contacto@), `subject`, `htmlContent`, `textContent`, `tags`. Sin cabeceras libres: nada del cliente llega a una cabecera. Éxito = 2xx (`201 {messageId}`); timeout de 20 s.

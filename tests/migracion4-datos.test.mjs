@@ -57,12 +57,12 @@ test("M1. la base v3 de partida es valida y tiene datos", () => {
   assert.equal(before.events.length, 4)
 })
 
-test("M2. migrar a v4 conserva TODOS los datos sin alterarlos y deja a las ordenes anteriores como persona", () => {
+test("M2. migrar de v3 a la version actual (4 y 5) conserva TODOS los datos sin alterarlos y deja a las ordenes anteriores como persona", () => {
   const conn = db.openDb(file) // la ruta real: abre, aplica pragmas y migra
   const after = snapshot(conn)
   assert.deepEqual(after, before) // ninguna fila ni valor cambio
-  assert.equal(conn.prepare("SELECT MAX(version) AS v FROM schema_migrations").get().v, 4)
-  assert.equal(conn.prepare("SELECT COUNT(*) AS n FROM schema_migrations").get().n, 4)
+  assert.equal(conn.prepare("SELECT MAX(version) AS v FROM schema_migrations").get().v, MIGRATIONS.length)
+  assert.equal(conn.prepare("SELECT COUNT(*) AS n FROM schema_migrations").get().n, MIGRATIONS.length)
   const rows = conn.prepare("SELECT id, cust_type, cust_tax_id, cust_giro, cust_address FROM orders ORDER BY id").all()
   assert.deepEqual(rows.map((r) => [r.cust_type, r.cust_tax_id, r.cust_giro, r.cust_address]), [["persona", null, null, null], ["persona", null, null, null]])
   assert.equal(conn.prepare("PRAGMA integrity_check").get().integrity_check, "ok")

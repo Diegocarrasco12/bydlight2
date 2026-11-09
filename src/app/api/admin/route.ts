@@ -8,6 +8,7 @@ import { alertaInterna } from "@/lib/mail/templates"
 import { dispatchDue, enqueueMail, outboxStats } from "@/lib/mail/outbox"
 import { monitorAndAlert } from "@/lib/payments/monitor"
 import { json } from "@/lib/payments/http"
+import { listTaxDocuments, markTaxDocumentIssued, pendingTaxDocuments, registerTaxDocument, voidTaxDocument } from "@/lib/payments/taxDocs"
 import { storageWritable } from "@/lib/payments/store"
 
 export const dynamic = "force-dynamic"
@@ -46,9 +47,36 @@ export async function POST(req: Request) {
         depositPercent: b.depositPercent === undefined ? undefined : n(b.depositPercent),
         validDays: b.validDays === undefined ? undefined : n(b.validDays),
         note: typeof b.note === "string" ? b.note : undefined,
+        allowBelowPlanPrice: b.allowBelowPlanPrice === true,
       })
       return r.ok ? json(r.data) : json({ error: r.error }, 422)
     }
+    case "taxdoc-register": {
+      const r = await registerTaxDocument(id, {
+        attemptId: typeof b.attemptId === "string" ? b.attemptId : undefined,
+        kind: typeof b.kind === "string" ? b.kind : "",
+        folio: typeof b.folio === "string" ? b.folio : undefined,
+        issuedAt: typeof b.issuedAt === "string" ? b.issuedAt : undefined,
+        receiverTaxId: typeof b.receiverTaxId === "string" ? b.receiverTaxId : undefined,
+        receiverName: typeof b.receiverName === "string" ? b.receiverName : undefined,
+        refDocId: typeof b.refDocId === "number" ? b.refDocId : undefined,
+        totalAmount: typeof b.totalAmount === "number" ? b.totalAmount : undefined,
+        note: typeof b.note === "string" ? b.note : undefined,
+      })
+      return r.ok ? json({ document: r.data }, 201) : json({ error: r.error }, 422)
+    }
+    case "taxdoc-issue": {
+      const r = await markTaxDocumentIssued(id, n(b.docId), { folio: typeof b.folio === "string" ? b.folio : "", issuedAt: typeof b.issuedAt === "string" ? b.issuedAt : "" })
+      return r.ok ? json({ document: r.data }) : json({ error: r.error }, 422)
+    }
+    case "taxdoc-void": {
+      const r = await voidTaxDocument(id, n(b.docId), typeof b.reason === "string" ? b.reason : undefined)
+      return r.ok ? json({ document: r.data }) : json({ error: r.error }, 422)
+    }
+    case "taxdoc-list":
+      return json({ documents: listTaxDocuments(id) })
+    case "taxdoc-pending":
+      return json({ pending: pendingTaxDocuments() })
     case "release-balance": {
       const r = await releaseBalance(id)
       return r.ok ? json({ ok: true }) : json({ error: r.error }, 422)

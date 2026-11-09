@@ -87,7 +87,7 @@ if (action === "pilot-link") {
   process.exit(0)
 }
 
-const TEST = { amount: 100, depositPercent: 50, validDays: 1, note: "PRUEBA PRODUCTIVA: cotización de $100, anticipo $50 y saldo $50. Orden de verificación del titular." }
+const TEST = { allowBelowPlanPrice: true, amount: 100, depositPercent: 50, validDays: 1, note: "PRUEBA PRODUCTIVA: cotización de $100, anticipo $50 y saldo $50. Orden de verificación del titular." }
 const body = { action: action === "approve-test" ? "approve" : action }
 if (maybeId && !maybeId.startsWith("--")) body.orderId = maybeId
 if (action === "approve") {
@@ -95,6 +95,7 @@ if (action === "approve") {
   if (opt("deposit-percent")) body.depositPercent = Number(opt("deposit-percent"))
   if (opt("valid-days")) body.validDays = Number(opt("valid-days"))
   if (opt("note")) body.note = opt("note")
+  if (process.argv.includes("--allow-below-plan")) body.allowBelowPlanPrice = true
 }
 if (action === "approve-test") Object.assign(body, TEST)
 if (action === "list" && opt("q")) body.q = opt("q")
@@ -107,9 +108,16 @@ if (action === "refund") {
   if (opt("reason")) body.reason = opt("reason")
   console.error(`idempotencyKey: ${body.idempotencyKey}`)
 }
+if (action?.startsWith("taxdoc-")) {
+  // Documentos tributarios: SOLO registro de lo emitido por el titular (no emite nada ante el SII). Ver docs/DOCUMENTOS-TRIBUTARIOS.md.
+  for (const [flag, key] of [["attempt", "attemptId"], ["kind", "kind"], ["folio", "folio"], ["date", "issuedAt"], ["receiver-tax-id", "receiverTaxId"], ["receiver-name", "receiverName"], ["note", "note"], ["reason", "reason"]]) if (opt(flag)) body[key] = opt(flag)
+  if (opt("doc")) body.docId = Number(opt("doc"))
+  if (opt("ref")) body.refDocId = Number(opt("ref"))
+  if (opt("total")) body.totalAmount = Number(opt("total"))
+}
 if (action === "reconcile-refund") body.refundId = opt("refund")
-if (!["list", "audit", "show", "approve", "approve-test", "release-balance", "close", "reconcile", "refund", "reconcile-refund", "monitor", "mail-status", "mail-dispatch", "mail-test", "customer-data"].includes(action ?? "")) {
-  die("Acciones: list [--q texto] | audit | show <ID> | approve <ID> --amount N | approve-test <ID> | pilot-link | release-balance <ID> | close <ID> | reconcile | monitor | mail-status | mail-dispatch | mail-test | customer-data --email X | refund <ID> --amount N [--key K] [--attempt A] [--reason T] | reconcile-refund <ID> --refund RF...")
+if (!["list", "audit", "show", "approve", "approve-test", "release-balance", "close", "reconcile", "refund", "reconcile-refund", "monitor", "mail-status", "mail-dispatch", "mail-test", "customer-data", "taxdoc-register", "taxdoc-issue", "taxdoc-void", "taxdoc-list", "taxdoc-pending"].includes(action ?? "")) {
+  die("Acciones: list [--q texto] | audit | show <ID> | approve <ID> --amount N | approve-test <ID> | pilot-link | release-balance <ID> | close <ID> | reconcile | monitor | mail-status | mail-dispatch | mail-test | customer-data --email X | taxdoc-register|taxdoc-issue|taxdoc-void|taxdoc-list <ID> | taxdoc-pending | refund <ID> --amount N [--key K] [--attempt A] [--reason T] | reconcile-refund <ID> --refund RF...")
 }
 
 const raw = JSON.stringify(body)

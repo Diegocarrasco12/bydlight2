@@ -188,6 +188,21 @@ export function pagoRechazado(o: Order, a: Attempt): Rendered {
   return { subject: `Pago no autorizado · orden ${o.id}`, html, text }
 }
 
+/** Resultado aun incierto: NO es una confirmacion de pago ni un rechazo. Se envia solo al pasar el intento a PENDIENTE. */
+export function pagoPendiente(o: Order, a: Attempt): Rendered {
+  const { html, text } = layout("Estamos verificando tu pago", "Aún no tenemos la confirmación de Transbank.", [
+    {
+      para: [
+        `Hola ${first(o)}, aún no recibimos la confirmación final de Transbank por el pago de ${formatClp(a.amount)} de tu orden ${o.id}. Esto no es una confirmación de pago.`,
+        "Estamos consultando el resultado directamente a Transbank. Si se confirma, te enviaremos el comprobante; si no se autoriza, te lo informaremos. No necesitas volver a pagar mientras tanto.",
+        `Si tu banco te muestra un cargo y no recibes noticias nuestras en 24 horas, escríbenos a ${SITE.email} con el código de tu orden.`,
+      ],
+    },
+    { cta: { label: "Ver el estado de mi orden", href: orderUrl(o) } },
+  ])
+  return { subject: `Estamos verificando tu pago · orden ${o.id}`, html, text }
+}
+
 export function saldoHabilitado(o: Order): Rendered | null {
   const q = o.quote
   if (!q) return null

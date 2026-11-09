@@ -11,10 +11,19 @@ Preparado el 2026-11-09 en la rama local `etapa-b/checkout-publico` (sin push). 
 
 **Tres llaves, abrir en orden y cerrar en cualquier momento:** (1) código con las dos constantes (despliegue), (2) `payments.json` con `enabled=true` y `access=public` (efecto en ≤ 5 s, sin redeploy), (3) cada cotización la aprueba el titular a mano (`approve`): nadie paga sin cotización aprobada. Con `access=pilot` o `enabled=false` el checkout se cierra al público al instante, aunque el código ya esté desplegado.
 
-Pruebas y verificaciones adaptadas al nuevo estado (L3, G6/G7, P1/P8, H12 y las 5 pruebas que fijaban la versión «borrador»; `verify:prod` y `verify:pilot`) y una verificación nueva `npm run verify:public` (27 comprobaciones sobre el artefacto de producción: formulario público, términos obligatorios, origen ajeno, límite por IP, monto no manipulable, devoluciones apagadas, interruptores `access=pilot` y `enabled=false`). Prueba nueva `tests/migracion4-datos.test.mjs` (migración sobre una base v3 con datos).
+Pruebas y verificaciones adaptadas al nuevo estado (L3, G6/G7, P1/P8, H12 y las 5 pruebas que fijaban la versión «borrador»; `verify:prod` y `verify:pilot`) y una verificación nueva `npm run verify:public` (28 comprobaciones sobre el artefacto de producción: formulario público, términos obligatorios, origen ajeno, límite por IP, monto no manipulable, devoluciones apagadas, interruptores `access=pilot` y `enabled=false`). Prueba nueva `tests/migracion4-datos.test.mjs` (migración sobre una base v3 con datos).
+
+### 1b. Consolidación comercial (2026-11-09, además de las 3 constantes)
+| Tema | Cambio | Prueba |
+|---|---|---|
+| Modalidades | Cada plan tiene `modality`: **directa** (Emprendedor, Profesional, Empresa, Ecommerce: precio «desde», solicitud en línea, cotización confirmada y anticipo con Webpay) o **a-medida** (Software a medida: se cotiza por contacto y **no entra al checkout**; el servidor lo rechaza aunque el navegador lo envíe). | E1, E2 |
+| Consistencia de precio | `approve` rechaza un monto **menor al precio publicado** del plan (evita un error de digitación) salvo `--allow-below-plan` explícito. El cliente nunca envía montos. | E3, verify:public |
+| Duplicados | Una solicitud igual (mismo correo, plan y mensaje) en 30 min, aún sin cotizar, devuelve la orden existente: sin orden ni correos repetidos. | E4, E5 |
+| Pago pendiente | Nuevo correo «Estamos verificando tu pago» solo cuando el intento queda PENDIENTE: dice expresamente que **no es una confirmación de pago**, no promete ausencia de cargo y no se repite. El comprobante sale solo al autorizarse. | E6, E7 |
+| Documentos tributarios | **Migración 5** (aditiva, tabla `tax_documents`): registra boleta, factura nacional, factura de exportación y nota de crédito por pago. **Solo registra; no emite ni habla con el SII.** Importe tomado del pago; un solo documento vigente por pago y folio único por tipo, impuestos por la base; acciones `taxdoc-*` en `admin-remote.mjs`. Detalle: `docs/DOCUMENTOS-TRIBUTARIOS.md`. | E8 a E13 |
 
 ## 2. Resultado de las pruebas locales (rama `etapa-b/checkout-publico`)
-`npm test` **119/119** (105 previas + 14 del transporte Brevo, `tests/brevo.test.mjs`) · `tsc` y `eslint src scripts tests` limpios · build correcto · `verify:prod` 36/36 · `verify:pilot` 33/33 · `verify:public` 27/27. Sin transacciones reales ni correos reales (Brevo se probó con `fetch` falso).
+`npm test` **132/132** (105 previas + 14 de Brevo + 13 de consolidación, `tests/brevo.test.mjs` y `tests/consolidacion.test.mjs`) · `tsc` y `eslint src scripts tests` limpios · build correcto · `verify:prod` 36/36 · `verify:pilot` 33/33 · `verify:public` 28/28. Sin transacciones reales ni correos reales (Brevo se probó con `fetch` falso).
 
 ## 3. Estado por tema (lo implementado frente a lo pendiente)
 **Textos legales.** Los 6 textos están completos y sin marcadores (términos, devoluciones/retracto, privacidad, información comercial, servicios digitales, soporte) con los datos oficiales de la sociedad. Basados en la Ley 19.496 (arts. 3 bis y 12 A) sin plazos ni porcentajes inventados. **Son redacción técnica, no asesoría jurídica**; requieren su aprobación expresa (decisión D1). Cláusulas redactadas por Claude que debe aprobar: aprobaciones por vencimiento del plazo de revisión, propiedad intelectual (uso de entregables tras el pago, Bydlight conserva sus componentes), dominios y cuentas a nombre del cliente, soporte/mantenimiento no incluidos, retracto y evaluación del trabajo ejecutado (devuelve lo abonado no correspondiente a servicios prestados; no declara irreembolsables los anticipos).
@@ -47,7 +56,7 @@ Marcas de tarjeta (Visa, Mastercard, etc.): siguen sin anunciarse hasta que el �
 Docker Compose, Dockerfile, dependencias y `next.config.ts`: sin cambios (no hay `accept-compose`). Devoluciones (`adminRefunds=false`), credenciales y base: intactas. Contenedores ajenos: ningún comando los toca.
 
 ## 6. Procedimiento en Ubuntu (cada bloque en un subshell: si falla, no ve «OK» y se detiene; no ejecute el siguiente)
-Antes: subir los scripts de `docs/deploy/` por `scp` (`02-verificar-migracion-4.sh`, `03-backup-etapa-b.sh`), comprobar su huella con `sha256sum` y tener **D1 resuelta, el Paso 1 (Brevo) hecho y D9 autorizada** (esto último: Claude hace el push a `main` y entrega el SHA).
+Antes: subir los scripts de `docs/deploy/` por `scp` (`02-verificar-migracion-4.sh`, `03-backup-etapa-b.sh`, `04-verificar-migracion-5.sh`), comprobar su huella con `sha256sum` y tener **D1 resuelta, el Paso 1 (Brevo) hecho y D9 autorizada** (esto último: Claude hace el push a `main` y entrega el SHA).
 
 **Paso 1: preparar Brevo — HECHO por el titular (2026-11-09):** dominio y remitente verificados, DKIM/DMARC correctos, clave `BYDLIGHT2-PRODUCCION` creada, IP del servidor autorizada y restricción de IP activa. Solo recomprobar que la IP autorizada siga siendo la de salida: `curl -s https://api.ipify.org` debe coincidir con la autorizada en Brevo. Referencia (no repetir):
 Siga las partes A y B de `docs/BREVO-CLAVE-API-PASOS.md`: (A) crear una clave API dedicada `bydlight-prod-servidor` y guardarla en su gestor de contraseñas; (B) autorizar en Brevo (Security → Authorised IPs) la IP pública de salida del servidor (`curl -s https://api.ipify.org`), porque con el control de IPs activo Brevo responde 401 aun con clave válida. **La clave se instala en el Paso 6b**, cuando el código nuevo ya está desplegado (el `mail-config-set.mjs` que hoy hay en el servidor todavía es el de Gmail).
@@ -138,9 +147,16 @@ $RUN node /s/admin-remote.mjs mail-status --config-file /data/config/payments.js
 ```
 El primer `docker run` pide la clave con entrada oculta (no se ve ni queda en el historial). Éxito: `--show` indica `claveApiBrevo: true`; `mail-test` responde `"sent": 1`; llega **un** correo a `contacto@bydlightsolutions.com` (revise Spam) desde `notificaciones@bydlightsolutions.com`; `mail-status` sin `FALLIDO`; en Brevo (Transactional → Logs) figura «Delivered». Si falla: `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false` y detenerse (errores típicos: `BREVO-CLAVE-API-PASOS.md`). Con 401 casi siempre es la IP sin autorizar (Paso 1, B).
 
+**Paso 6c: verificar la migración 5 (solo lectura; después del 6b)**
+La migración 5 (tabla `tax_documents`, aditiva) se aplica sola la primera vez que el servicio abre la base tras `up`; el Paso 6b lo provoca (la API administrativa abre la base). Si `payments.json` está en `enabled=false` el Paso 6b no puede funcionar: use antes `$RUN node /s/payments-config-set.mjs /data/config/payments.json enabled=true access=pilot` (el público sigue cerrado) y vuelva a `enabled=false` al terminar si así estaba.
+```
+sudo bash ~/04-verificar-migracion-5.sh
+```
+Éxito: `schema_v=5`, 5 migraciones, `tax_documents` presente con sus 2 índices, órdenes y pagos **no menores** que en el respaldo del Paso 4, y «MIGRACION 5 VERIFICADA OK». Detenerse con cualquier `FALLAS`.
+
 **Lista de comprobación antes del Paso 7 (todas deben cumplirse)**
 1. Paso 2: «MIGRACION 4 VERIFICADA OK». Paso 4: «RESPALDO ETAPA B OK». Paso 5: `verify` y `status` con el SHA del release candidato y `salud: OK`.
-2. Paso 6: todo `OK` (páginas legales 200, retorno inerte, checkout aún cerrado).
+2. Paso 6: todo `OK` (páginas legales 200, retorno inerte, checkout aún cerrado). Paso 6c: «MIGRACION 5 VERIFICADA OK».
 3. Paso 6b: correo de prueba recibido en `contacto@`, `mail-status` sin `FALLIDO`.
 4. `$RUN node /s/payments-config-set.mjs /data/config/payments.json --show` sigue en `access: pilot` o `enabled: false` y `adminRefunds: false`.
 5. D1 aprobada por usted y su autorización final expresa y escrita.
@@ -168,7 +184,7 @@ curl -s -o /dev/null -w '/contratar: %{http_code} (esperado 200)\n' https://bydl
 | Cerrar cobros YA (≤ 5 s) | `$RUN node /s/payments-config-set.mjs /data/config/payments.json enabled=false` | `/contratar` redirige a `/contacto`; solicitudes y pagos 503 |
 | Volver al modo piloto | `... payments-config-set.mjs /data/config/payments.json access=pilot` | Solo el enlace firmado del titular abre el checkout |
 | Apagar correos | `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false` | No se envía ni encola |
-| Código anterior | `sudo bd-run rollback` → `sudo bd-run verify` → `sudo bd-run status` | Vuelve a `13aaf17` (legales ocultos, sin anuncio de pagos). La migración 4 ya existía en `13aaf17`; la base no cambia |
+| Código anterior | `sudo bd-run rollback` → `sudo bd-run verify` → `sudo bd-run status` | Vuelve a `13aaf17` (legales ocultos, sin anuncio de pagos). La migración 4 ya existía en `13aaf17`; la migración 5 (tabla `tax_documents`, aditiva) queda en la base y el código anterior la ignora: la base no se revierte |
 Con el interruptor en `enabled=false` el sitio sigue anunciando Webpay (el anuncio es de código) pero los botones llevan a contacto: es un degradado seguro. Para ocultar el anuncio hay que hacer rollback de código. **Nunca** `down -v`, borrar volúmenes ni restaurar un respaldo sobre pagos nuevos sin decisión expresa.
 
 ## 8. Riesgos conocidos

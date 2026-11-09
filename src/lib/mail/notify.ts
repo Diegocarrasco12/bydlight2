@@ -51,6 +51,8 @@ export async function notifyChanges(before: OrderSnapshot | null, o: Order): Pro
           q(`pago:${a.id}`, "pago_autorizado", cust, T.pagoAutorizado(o, a))
         } else if (a.status === "RECHAZADO") {
           q(`rechazo:${a.id}`, "pago_rechazado", cust, T.pagoRechazado(o, a))
+        } else if (a.status === "PENDIENTE") {
+          q(`pendiente:${a.id}`, "pago_pendiente", cust, T.pagoPendiente(o, a))
         } else if (a.status === "ERROR") {
           q(`interna-error:${a.id}`, "alerta_interna", internalTo(), T.alertaInterna(`Pago con revisión manual · orden ${o.id}`, [`${a.buyOrder}: ${a.note ?? "intento en ERROR"}`, `Revisa con: node scripts/admin-remote.mjs show ${o.id}`]))
         }

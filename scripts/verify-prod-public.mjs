@@ -121,7 +121,10 @@ try {
   check("El limite de solicitudes por IP corta el abuso (429)", lim.includes(429), lim.join(","))
 
   // --- Cotizacion aprobada por el administrador y resumen de pago ---
-  const ap = client(["approve", id, "--amount", "100000"])
+  // Consistencia de precio: bajo el valor publicado del plan se rechaza salvo orden expresa (--allow-below-plan).
+  const low = client(["approve", id, "--amount", "100000"])
+  check("Una cotizacion bajo el precio publicado del plan se rechaza sin orden expresa", low.status !== 0 && /precio publicado/.test(low.stdout + low.stderr), (low.stdout + low.stderr).replace(/\s+/g, " ").slice(0, 100))
+  const ap = client(["approve", id, "--amount", "100000", "--allow-below-plan"])
   check("El administrador aprueba una cotizacion de $100.000 con anticipo 50 %", ap.status === 0 && /"deposit": 50000/.test(ap.stdout) && /"balance": 50000/.test(ap.stdout), ap.stdout.replace(/\s+/g, " ").slice(0, 140))
   const o2 = await (await req(`/orden/${id}`, { headers: ip() })).text()
   check("La orden cotizada muestra el resumen previo al pago, IVA incluido, $50.000 y los logos de Webpay Plus y Transbank", o2.includes("Resumen previo al pago") && /50\.000/.test(o2) && /IVA incluido/i.test(o2) && o2.includes("/img/pagos/webpay-plus-negativo") && o2.includes("/img/pagos/transbank-negativo"))

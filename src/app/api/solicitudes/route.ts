@@ -1,7 +1,7 @@
 import { checkoutOpenFor } from "@/lib/payments/access"
 import { checkoutMode, paymentsEnabled } from "@/lib/payments/config"
 import { clientIp, json, rateLimited, sameOrigin } from "@/lib/payments/http"
-import { createOrder, parseSolicitud } from "@/lib/payments/service"
+import { createOrder, findDuplicateRequest, parseSolicitud } from "@/lib/payments/service"
 import { storageWritable } from "@/lib/payments/store"
 import { previewMode } from "@/lib/preview"
 
@@ -42,6 +42,8 @@ export async function POST(req: Request) {
   const parsed = parseSolicitud(body)
   if (!parsed.ok) return json({ error: parsed.errors.join(" ") }, 422)
 
+  const dup = await findDuplicateRequest(parsed.data)
+  if (dup) return json({ id: dup.id }, 200) // solicitud repetida: misma orden, sin correos nuevos
   const order = await createOrder(parsed.data, { pilot: checkoutMode() === "pilot" })
   return json({ id: order.id }, 201)
 }

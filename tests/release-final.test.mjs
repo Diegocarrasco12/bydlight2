@@ -105,7 +105,7 @@ test("R2. anticipo y saldo: redondeo consistente y la suma siempre es el total (
 test("R3. el monto enviado a Transbank es exactamente el anticipo aprobado del total con IVA (valores con diferencia de redondeo)", async () => {
   for (const [amount, pct] of [[100001, 50], [149990, 50], [99999, 33], [333333, 45]]) {
     const o = await mk()
-    const r = await admin.approveQuote(o.id, { amount, depositPercent: pct })
+    const r = await admin.approveQuote(o.id, { allowBelowPlanPrice: true, amount, depositPercent: pct })
     assert.ok(r.ok)
     const exp = tax.splitDeposit(amount, pct)
     assert.deepEqual([r.data.deposit, r.data.balance], [exp.deposit, exp.balance])
@@ -141,7 +141,7 @@ test("R4. ningun texto publico habla de precios '+ IVA' y las cotizaciones muest
 
 test("R5. la auditoria detecta anticipos que no siguen el calculo estandar y no toca ordenes historicas", async () => {
   const o = await mk()
-  await admin.approveQuote(o.id, { amount: 100001, depositPercent: 50 })
+  await admin.approveQuote(o.id, { allowBelowPlanPrice: true, amount: 100001, depositPercent: 50 })
   db.openDb().prepare("UPDATE quotes SET deposit_amount = 50000, balance_amount = 50001 WHERE order_id = ?").run(o.id)
   const { findings } = await admin.auditPayments()
   assert.ok(findings.some((f) => f.orderId === o.id && f.type === "COTIZACION_REDONDEO"))
@@ -175,11 +175,12 @@ test("R7. persona natural: no se piden ni se guardan datos de empresa; empresa e
   assert.deepEqual([r.customer.type, r.customer.company, r.customer.taxId, r.customer.giro, r.customer.address], ["empresa", "Mi Empresa SpA", "78.161.844-6", "Servicios", "Calle 1"])
 })
 
-test("R8. migracion 4: ordenes anteriores quedan como persona y la tabla de correos existe (version 4 aplicada)", () => {
+test("R8. migraciones 4 y 5: la tabla de correos y la de documentos tributarios existen (version 5 aplicada)", () => {
   const conn = db.openDb()
-  assert.equal(MIGRATIONS[MIGRATIONS.length - 1].version, 4)
+  assert.equal(MIGRATIONS[MIGRATIONS.length - 1].version, 5) // 4 = tipo de cliente y correos; 5 = documentos tributarios
   assert.equal(conn.prepare("SELECT COUNT(*) AS n FROM schema_migrations").get().n, MIGRATIONS.length)
   assert.ok(conn.prepare("SELECT name FROM sqlite_master WHERE name = 'mail_outbox'").get())
+  assert.ok(conn.prepare("SELECT name FROM sqlite_master WHERE name = 'tax_documents'").get())
 })
 
 /* ---------------- Correos ---------------- */
@@ -200,7 +201,7 @@ test("R9. solicitud: un correo al cliente y uno interno al buzon de contacto, si
 
 test("R10. flujo completo: cotizacion, contratacion, comprobante y saldo; el correo de pago sale solo tras la autorizacion real", async () => {
   const o = await mk()
-  await admin.approveQuote(o.id, { amount: 149990 })
+  await admin.approveQuote(o.id, { allowBelowPlanPrice: true, amount: 149990 })
   await flush()
   const quote = sent.find((m) => /Tu cotización/.test(m.subject))
   assert.match(quote.html, /IVA incluido/)
@@ -232,7 +233,7 @@ test("R10. flujo completo: cotizacion, contratacion, comprobante y saldo; el cor
 
 test("R11. pago rechazado: aviso sin cargo; cancelado por el cliente: sin correo; resultado incierto: sin correo", async () => {
   const o = await mk()
-  await admin.approveQuote(o.id, { amount: 149990 })
+  await admin.approveQuote(o.id, { allowBelowPlanPrice: true, amount: 149990 })
   await flush()
   sent.length = 0
   await pay(o.id, "anticipo", "fail")
@@ -249,7 +250,7 @@ test("R11. pago rechazado: aviso sin cargo; cancelado por el cliente: sin correo
 
 test("R12. si el correo falla, el pago queda autorizado una sola vez y el correo se reintenta sin duplicarse", async () => {
   const o = await mk()
-  await admin.approveQuote(o.id, { amount: 149990 })
+  await admin.approveQuote(o.id, { allowBelowPlanPrice: true, amount: 149990 })
   await flush()
   sent.length = 0
   failNext = 100 // el proveedor esta caido
@@ -279,7 +280,7 @@ test("R13. tras los reintentos maximos el correo queda FALLIDO y la conciliacion
   const o = await mk()
   await flush()
   failNext = 1000
-  await admin.approveQuote(o.id, { amount: 149990 })
+  await admin.approveQuote(o.id, { allowBelowPlanPrice: true, amount: 149990 })
   for (let i = 0; i < outbox.MAX_ATTEMPTS + 1; i++) {
     db.openDb().prepare("UPDATE mail_outbox SET next_attempt_at = ? WHERE status = 'PENDIENTE'").run(new Date(Date.now() - 1000).toISOString())
     await outbox.dispatchDue(50)
@@ -293,7 +294,7 @@ test("R14. sin correo configurado o apagado no se encola nada y los pagos funcio
   process.env.MAIL_ENABLED = "false"
   const before = db.openDb().prepare("SELECT COUNT(*) AS n FROM mail_outbox").get().n
   const o = await mk()
-  await admin.approveQuote(o.id, { amount: 149990 })
+  await admin.approveQuote(o.id, { allowBelowPlanPrice: true, amount: 149990 })
   await pay(o.id)
   assert.equal(db.openDb().prepare("SELECT COUNT(*) AS n FROM mail_outbox").get().n, before)
   assert.equal((await store.readOrder(o.id)).stage, "ANTICIPO_PAGADO")
@@ -342,7 +343,7 @@ test("R16. correo publico oficial contacto@; el codigo no contiene claves ni res
 
 test("R17. monitor: solo lectura (no cambia ordenes), alerta una sola vez por dia y por conjunto de hallazgos", async () => {
   const o = await mk()
-  await admin.approveQuote(o.id, { amount: 100001, depositPercent: 50 })
+  await admin.approveQuote(o.id, { allowBelowPlanPrice: true, amount: 100001, depositPercent: 50 })
   await pay(o.id)
   await flush()
   // Se simula un pago autorizado que no quedo reflejado en la etapa.

@@ -49,7 +49,7 @@ const BASE = "http://localhost:3000"
 const sol = { planId: "emprendedor", name: "Cliente Habilitacion", email: "hab@example.com", message: "Necesito una landing page de prueba", accept: true, acceptTerms: true, termsVersion: TERMS_VERSION }
 async function quoted(amount = 100000) {
   const o = await svc.createOrder(svc.parseSolicitud(sol).data)
-  assert.ok((await admin.approveQuote(o.id, { amount, depositPercent: 50 })).ok)
+  assert.ok((await admin.approveQuote(o.id, { allowBelowPlanPrice: true, amount, depositPercent: 50 })).ok)
   return o.id
 }
 const ok = (o, a, over = {}) => ({ status: "AUTHORIZED", response_code: 0, buy_order: a.buyOrder, session_id: o.id, amount: a.amount, authorization_code: "777", payment_type_code: "VN", installments_number: 0, transaction_date: "2026-11-06T15:00:00.000Z", card_detail: { card_number: "1234" }, ...over })

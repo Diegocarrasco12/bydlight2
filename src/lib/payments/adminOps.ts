@@ -4,6 +4,7 @@ import { openDb } from "./db"
 import { verifyOrder } from "./service"
 import { notifyChanges, snapshotOf } from "@/lib/mail/notify"
 import { splitDeposit } from "@/lib/tax"
+import { PLANS } from "@/lib/plans"
 import type { Order } from "./types"
 
 // Operaciones administrativas. Solo las invoca la API firmada (adminAuth) o las pruebas.
@@ -19,7 +20,7 @@ function ev(order: Order, type: string, detail?: string) {
 
 export async function approveQuote(
   orderId: string,
-  p: { amount: number; depositPercent?: number; validDays?: number; note?: string },
+  p: { amount: number; depositPercent?: number; validDays?: number; note?: string; allowBelowPlanPrice?: boolean },
 ): Promise<AdminResult<{ amount: number; deposit: number; balance: number }>> {
   const pct = p.depositPercent ?? 50
   const days = p.validDays ?? 7
@@ -33,6 +34,11 @@ export async function approveQuote(
     if (!order) return fail("Orden no encontrada.")
     const snap = snapshotOf(order)
     if (order.stage !== "SOLICITADA" && order.stage !== "COTIZADA") return fail(`No se puede cotizar una orden en estado ${order.stage}.`)
+    // Consistencia con el precio publicado: un plan de precio «desde» no se cotiza por debajo de ese valor salvo orden expresa (evita un monto mal digitado).
+    const floor = PLANS.find((x) => x.id === order.planId)?.priceFrom
+    if (floor && p.amount < floor && !p.allowBelowPlanPrice) {
+      return fail(`El monto ${p.amount} es menor al precio publicado del plan (${floor}, IVA incluido). Si es intencional, repita con allowBelowPlanPrice (--allow-below-plan).`)
+    }
     if (order.attempts.some((a) => a.status === "AUTORIZADO" || a.status === "INICIADO")) {
       return fail("La orden tiene un pago autorizado o en curso; no se puede cambiar la cotizacion.")
     }
