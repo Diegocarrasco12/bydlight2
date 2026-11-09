@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Bydlight2 - Etapa B - verificacion de SOLO LECTURA de la migracion 4 sobre los datos reales.
 #
+# OBSOLETO EN EL FLUJO ACTUAL: la produccion esta en esquema v3 y este verificador exige v4 (fallaria). NO se usa en el procedimiento
+# de docs/BYDLIGHT-ETAPA-B-ACTIVACION.md; solo sirve si alguien ya aplico la migracion 4 por separado. Verificador final: 04.
+#
 # Ejecutar en el servidor Ubuntu como root:   sudo bash 02-verificar-migracion-4.sh
 #
 # Comprueba, sin escribir nada (conexion SQLite de solo lectura; sin migrar, sin orders-admin, sin payments-config-set):

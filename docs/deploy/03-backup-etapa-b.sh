@@ -8,7 +8,7 @@
 #   - confirma proyecto, contenedor, volumen, imagen y SHA desplegado esperados;
 #   - autoprueba node:sqlite en la imagen real (con un archivo temporal en tmpfs, sin tocar el volumen);
 #   - copia la base con VACUUM INTO desde una conexion de SOLO LECTURA (consistente aunque la app escriba en modo WAL);
-#   - ejecuta PRAGMA integrity_check sobre la copia y lee la version del esquema (debe seguir en 3);
+#   - ejecuta PRAGMA integrity_check sobre la copia y lee la version del esquema (debe ser 3 o 4: ver ACCEPTED_SCHEMAS);
 #   - guarda la copia FUERA del volumen Docker, con modo 600 y dueno root, sin sobrescribir nada;
 #   - respalda payments.json (y mail.json si existe) sin imprimir su contenido;
 #   - comprueba que el checkout publico siga cerrado.
@@ -30,7 +30,15 @@ TARGET_SHA="${1:-}"                                                # release de 
 [[ "$TARGET_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "ERROR: indique el SHA de 40 caracteres a desplegar: sudo bash $0 <SHA>" >&2; exit 1; }
 [ "$TARGET_SHA" != "13aaf17507d5a0c08f8c8e4d8ff44d260c6a0fa7" ] || { echo "ERROR: el SHA destino es el ya desplegado" >&2; exit 1; }
 readonly TARGET_SHA
-readonly EXPECTED_SCHEMA=4                                         # el esquema actual (migracion 4 aplicada en la Etapa A)
+# Versiones de esquema ACEPTADAS en el respaldo previo a la Etapa B. Las migraciones se aplican de forma perezosa, la primera vez que
+# algo ABRE la base con codigo que las contiene (no al arrancar el contenedor). La Etapa A (13aaf17) trae la migracion 4 pero, con los
+# pagos apagados, nada abrio la base: produccion sigue en v3 (verificado por el titular). Por eso:
+#   v3 = la base nunca fue abierta por codigo >= 13aaf17 (estado real esperado);
+#   v4 = alguien aplico la migracion 4 (p. ej. orders-admin check de la Etapa A) y no se aplico la 5.
+# Cualquier otra version se rechaza: v5 o mas significa que el codigo de la Etapa B ya abrio la base (el respaldo ya no seria "previo");
+# menos de 3 o ausente significa una base que no corresponde. El respaldo es de SOLO LECTURA y registra schema_v en el .ref.
+readonly ACCEPTED_SCHEMAS="3 4"
+schema_accepted() { local v="$1" a; for a in $ACCEPTED_SCHEMAS; do [ "$v" = "$a" ] && return 0; done; return 1; }
 readonly PUBLIC_URL="https://bydlightsolutions.com"
 
 TS="$(date +%Y%m%d-%H%M%S)-$$"                                     # fecha y hora, mas el PID: unico por ejecucion
@@ -165,9 +173,9 @@ printf '%s\n' "$SNAP"
 [[ "$SNAP" =~ ^integrity_check=ok\ schema_v=([0-9]+)\ ordenes=([0-9]+)\ pagos_autorizados=([0-9]+)\ monto_autorizado=([0-9]+)$ ]] \
   || die "salida inesperada del respaldo o integrity_check distinto de ok"
 SCHEMA_V="${BASH_REMATCH[1]}"
-[ "$SCHEMA_V" = "$EXPECTED_SCHEMA" ] || die "la base esta en la version de esquema $SCHEMA_V (se esperaba $EXPECTED_SCHEMA): la base no esta en la version esperada; avise antes de seguir"
+schema_accepted "$SCHEMA_V" || die "la base esta en la version de esquema $SCHEMA_V (se aceptan: $ACCEPTED_SCHEMAS): no es el estado previo a la Etapa B; avise antes de seguir"
 [ -s "$MP/$DB_TMP_NAME" ] || die "la copia temporal no existe o esta vacia"
-say "== 4. Copia consistente creada; integrity_check=ok; esquema v$SCHEMA_V (migracion 4 ya aplicada)"
+say "== 4. Copia consistente creada; integrity_check=ok; esquema v$SCHEMA_V (las migraciones pendientes se aplicaran despues, con el codigo nuevo y tras el ensayo sobre una copia)"
 
 # ----------------------------------------------------------------------------------------------- 5. guardar fuera del volumen (sin sobrescribir)
 safe_copy() {  # safe_copy ORIGEN DESTINO_FINAL : copia 600 root, verifica sha256 y publica con mv -n (jamas sobrescribe)

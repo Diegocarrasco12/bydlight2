@@ -62,16 +62,99 @@ Marcas de tarjeta (Visa, Mastercard, etc.): siguen sin anunciarse hasta que el �
 Docker Compose, Dockerfile, dependencias y `next.config.ts`: sin cambios (no hay `accept-compose`). Devoluciones (`adminRefunds=false`), credenciales y base: intactas. Contenedores ajenos: ningún comando los toca.
 
 ## 6. Procedimiento en Ubuntu (cada bloque en un subshell: si falla, no ve «OK» y se detiene; no ejecute el siguiente)
-Antes: subir los scripts de `docs/deploy/` por `scp` (`02-verificar-migracion-4.sh`, `03-backup-etapa-b.sh`, `04-verificar-migracion-5.sh`; el `05-caducidad-respaldos.sh` es opcional), comprobar su huella con `sha256sum` y tener **D1 resuelta, el Paso 1 (Brevo) hecho y D9 autorizada** (esto último: Claude hace el push a `main` y entrega el SHA).
+> **Procedimiento corregido (2026-11-09, preparado y probado SOLO en local; no validado en producción).** Estado real de partida: release `13aaf17507d5a0c08f8c8e4d8ff44d260c6a0fa7` con esquema SQLite **v3**. Release objetivo: `b28448196fb89f9814621a709475029ae086dd21` (esquema v5). Los Pasos 2 y 4 anteriores (verificador de la migración 4 y respaldo que exigía v4) no sirven para partir de v3 y quedan reemplazados por los Pasos A–H de más abajo.
+
+### 6.0 Por qué la base está en v3 y cómo se migra
+- Las migraciones se aplican **al abrir la base** con el código que las contiene (`openDb()` → `migrate()`), **no** al arrancar el contenedor. Con pagos y correo apagados nadie abre la base: `13aaf17` ya contenía la migración 4 y la base siguió en v3.
+- Por eso la migración **no se deja a una petición HTTP**: el Paso F la ejecuta de forma explícita (`07-aplicar-migraciones.sh`) en un momento conocido, con respaldo y ensayo previos.
+- Las migraciones 4 y 5 son aditivas (columnas con valor por defecto, `mail_outbox`, `tax_documents`); las 1–3 no cambian. El código anterior ignora versiones superiores: **`bd-run rollback` basta; no hace falta restaurar la base**.
+- `03-backup-etapa-b.sh` acepta esquema **v3 o v4** (v3 = nadie abrió la base con código nuevo; v4 = alguien ejecutó `orders-admin check`) y **rechaza v5 o superior** (no sería un respaldo previo a la Etapa B). El respaldo es de solo lectura (`VACUUM INTO` desde una conexión de solo lectura).
+
+### 6.1 Qué se ejecuta dónde
+| Dónde | Qué |
+|---|---|
+| **WINDOWS** (PowerShell/Git Bash en el repositorio) | Calcular SHA256 de los scripts y copiarlos al servidor con `scp bydlight` (Paso A). |
+| **UBUNTU** (sesión del administrador, `sudo`) | Todo lo demás (Pasos B–H): `sudo bash`, `sudo bd-run …`, `docker ps`. Claude **no** ejecuta nada de esto. |
+
+### 6.2 SHA256 esperados de los scripts (LF; en Windows: `tr -d '\r' < archivo | sha256sum`; en Ubuntu: `sha256sum archivo`)
+Deben coincidir en ambos lados. La tabla vigente está en `docs/deploy/SHA256SUMS-etapa-b.txt` (se genera con la sección «Paso A»); si un hash no coincide, **no ejecute ese script**.
+
+### Paso A (WINDOWS): copiar los scripts y comparar huellas
+```
+cd <carpeta del repositorio>/docs/deploy
+for f in 00-admin.sh 01-backup-etapa-a.sh 03-backup-etapa-b.sh 04-verificar-migracion-5.sh 05-caducidad-respaldos.sh 06-ensayo-migracion.sh 07-aplicar-migraciones.sh; do tr -d '\r' < $f | sha256sum; done
+scp 00-admin.sh 03-backup-etapa-b.sh 04-verificar-migracion-5.sh 05-caducidad-respaldos.sh 06-ensayo-migracion.sh 07-aplicar-migraciones.sh bydlight:~/
+```
+Luego, en **UBUNTU**: `cd ~ && sha256sum 00-admin.sh 03-backup-etapa-b.sh 04-verificar-migracion-5.sh 05-caducidad-respaldos.sh 06-ensayo-migracion.sh 07-aplicar-migraciones.sh` y compare cada línea con la de Windows. Si el archivo llegó con CRLF (`file 03-backup-etapa-b.sh` dice «CRLF»), corríjalo con `sed -i 's/\r$//' <archivo>` y vuelva a comparar. **`02-verificar-migracion-4.sh` NO se usa** (exige v4).
+Requisitos previos: **D1 resuelta, Paso 1 (Brevo) hecho**. El SHA objetivo ya está en `origin/main`; no hace falta ningún push más porque los scripts de `docs/deploy/` se copian aparte y no forman parte de la imagen.
+
+### Paso B (UBUNTU): estado inicial, sin cambios
+```
+export SHA=b28448196fb89f9814621a709475029ae086dd21
+export PREV=13aaf17507d5a0c08f8c8e4d8ff44d260c6a0fa7
+(
+set -euo pipefail
+T=$(mktemp)
+sudo bd-run status | tee "$T"
+grep -q "desplegado: $PREV" "$T"; grep -q "salud: OK" "$T"; grep -q "linea base de compose: aceptada" "$T"
+sudo bd-run preflight
+sudo bd-run compose-diff | tee "$T"
+grep -q "politica: CUMPLE" "$T"; grep -q "linea base: igual" "$T"
+rm -f "$T"; echo "BLOQUE B OK"
+)
+sudo docker ps -a --format '{{.Names}} {{.Image}} {{.CreatedAt}} {{.Status}}' | grep -v '^bydlight-prod-web-1 ' | sort > ~/contenedores-antes.txt; wc -l ~/contenedores-antes.txt
+```
+Éxito: «BLOQUE B OK» y 18 contenedores ajenos listados. Compruebe que `$SHA` sea **exactamente** `b28448196fb89f9814621a709475029ae086dd21` (40 caracteres; no `b28448196f1`).
+
+### Paso C (UBUNTU): respaldo ANTES de cualquier migración (con la base en v3)
+```
+sudo bash ~/03-backup-etapa-b.sh "$SHA"
+```
+Éxito: «RESPALDO ETAPA B OK», línea `integrity_check=ok schema_v=3 …` con 1 orden y 1 pago autorizado de 50, y SHA-256 del respaldo. Detenerse en cualquier `ERROR` (el script no borra respaldos). Debe ejecutarse **antes** del fetch (exige que el clon siga en `$PREV`).
+
+### Paso D (UBUNTU): fetch y build (aún NO se publica)
+Es el Paso 5a de más abajo (bloque «BLOQUE 5a OK»). No ejecute `up` todavía.
+
+### Paso E (UBUNTU): ensayo de la migración sobre una COPIA aislada
+```
+sudo bash ~/06-ensayo-migracion.sh "$SHA"
+```
+Usa la imagen nueva ya construida, copia el respaldo a un área temporal sin red, aplica 4 y 5, y comprueba integridad, claves foráneas, conservación de datos y compatibilidad con el código anterior. No toca la base real. Éxito: «ENSAYO SOBRE COPIA: todas las comprobaciones pasaron» y «ENSAYO DE MIGRACION OK» (deja un marcador que el Paso F exige). Cualquier `FALLAS`: **no haga `up`**; envíe la salida.
+
+### Paso F (UBUNTU): publicar y aplicar las migraciones de forma explícita
+1. `up` (Paso 5b de más abajo, «BLOQUE 5b OK»). El checkout sigue cerrado (`payments.json` sin `access=public`).
+2. Inmediatamente:
+```
+sudo bash ~/07-aplicar-migraciones.sh "$SHA"
+sudo bash ~/04-verificar-migracion-5.sh
+```
+Éxito: «MIGRACIONES APLICADAS OK (esquema v5)» y «MIGRACION 5 VERIFICADA OK» (`schema_v=5`, 5 migraciones, `tax_documents` con sus índices, órdenes y pagos **no menores** que en el respaldo, el pago autorizado de 50 intacto). El script 07 se niega si falta el respaldo, el ensayo, si `access=public` o si las devoluciones están activas. Si falla: no repita; el código anterior ignora las migraciones, **`sudo bd-run rollback`** basta (ver «Recuperación»).
+
+### Paso G (UBUNTU): comprobar que los 18 contenedores ajenos no cambiaron
+Paso 5c de más abajo. Sin diferencias de nombre, imagen ni fecha de creación.
+
+### Paso H (UBUNTU): estado final, sin operaciones reales
+Compruebe: `sudo bd-run status` con `desplegado: $SHA` y `anterior: $PREV`; `sudo bd-run verify` sin `AVISO`; verificación pública (Paso 6); `sudo bash ~/00-admin.sh node /s/payments-config-set.mjs /data/config/payments.json --show` con `enabled: false` o `access: pilot`, nunca `public`, y `adminRefunds: false`. **No se realiza ningún pago real ni se abre el checkout público en estos pasos.** Después siguen Brevo (6b), privacidad en simulación (6e) y el resto, cada uno con su propia autorización.
+
+### Recuperación ante fallos (distinga siempre código de datos)
+| Situación | Acción |
+|---|---|
+| `up` dice «no sano» | El ejecutor vuelve solo a `13aaf17`. No repita; envíe la salida. La base no se tocó. |
+| Falla 06 (ensayo) | No haga `up`. La base real sigue en v3. Envíe la salida. |
+| Falla 07 o 04 tras `up` | `sudo bd-run rollback`, `sudo bd-run verify`, `sudo bd-run status` (**rollback de CÓDIGO**). Si una migración llegó a aplicarse, `13aaf17` la ignora: no se revierte la base. |
+| Corrupción comprobada de la base (`integrity_check` distinto de ok) | **Restauración de DATOS** solo con decisión expresa: detener el servicio web de Bydlight, conservar la base dañada aparte, restaurar el respaldo verificado por SHA-256 (`/srv/bydlight-prod/backups/bydlight-pre-etapa-b-*.db`) y avisar. Nunca restaurar sobre pagos nuevos sin decisión. |
+| Cualquier cambio en los otros contenedores | Detenerse y avisar; no tocar nada. |
+Nunca: `down -v`, `docker system prune`, borrar volúmenes, tocar otros contenedores.
+
+### Condiciones que obligan a detener el procedimiento
+`desplegado` distinto de `$PREV` antes del Paso C o del SHA objetivo antes del Paso F; esquema del respaldo distinto de 3 o 4; hash de un script distinto del de Windows; cualquier `ERROR`/`FALLAS`/falta del «OK» esperado; `access=public` o `adminRefunds=true`; diferencias en los 18 contenedores; `bd-run` con código 21 o `compose-diff` sin «politica: CUMPLE». No continúe «para ver qué pasa».
+
+> Desde aquí, los pasos 1–8 originales se conservan para Brevo, apertura y vigilancia. **Salvo los Pasos 2 y 4 (reemplazados por A–C) y la nota del 6c (la migración 5 ya no se aplica «sola»: la aplica el Paso F), siguen vigentes.** En el 6b, 6e, 6d y 7 puede usar `$RUN` = `"sudo bash $HOME/00-admin.sh"` (y `$RUNTTY` = `"sudo bash $HOME/00-admin.sh --tty"` para `mail-config-set.mjs --init`) en lugar de armar el `docker run` a mano: evita los errores de pegado.
 
 **Paso 1: preparar Brevo — HECHO por el titular (2026-11-09):** dominio y remitente verificados, DKIM/DMARC correctos, clave `BYDLIGHT2-PRODUCCION` creada, IP del servidor autorizada y restricción de IP activa. Solo recomprobar que la IP autorizada siga siendo la de salida: `curl -s https://api.ipify.org` debe coincidir con la autorizada en Brevo. Referencia (no repetir):
 Siga las partes A y B de `docs/BREVO-CLAVE-API-PASOS.md`: (A) crear una clave API dedicada `bydlight-prod-servidor` y guardarla en su gestor de contraseñas; (B) autorizar en Brevo (Security → Authorised IPs) la IP pública de salida del servidor (`curl -s https://api.ipify.org`), porque con el control de IPs activo Brevo responde 401 aun con clave válida. **La clave se instala en el Paso 6b**, cuando el código nuevo ya está desplegado (el `mail-config-set.mjs` que hoy hay en el servidor todavía es el de Gmail).
 
-**Paso 2: verificación de la migración 4 (solo lectura; antes de cualquier cambio)**
-```
-sudo bash ~/02-verificar-migracion-4.sh
-```
-Éxito: `schema_v=4`, columnas y `mail_outbox` presentes, órdenes y pagos **no menores** que en el respaldo de la Etapa A (se debe ver el pago real de $50), y «MIGRACION 4 VERIFICADA OK». Detenerse con cualquier `FALLAS`.
+**Paso 2: OBSOLETO.** La base real está en v3, no en v4: `02-verificar-migracion-4.sh` fallaría y no se usa. Sustituido por los Pasos B, C, E y F de la sección 6.1–6.2.
 
 **Paso 3: variables y estado mínimo**
 ```
@@ -94,11 +177,7 @@ sudo docker ps -a --format '{{.Names}} {{.Image}} {{.CreatedAt}} {{.Status}}' | 
 ```
 Debe listar los demás contenedores (18 informados). No los modifique.
 
-**Paso 4: respaldo** (consistente, fuera del volumen, sin migrar)
-```
-sudo bash ~/03-backup-etapa-b.sh "$SHA"
-```
-Éxito: «RESPALDO ETAPA B OK». Detenerse en cualquier ERROR (ver el mensaje; no borra ningún respaldo).
+**Paso 4: el respaldo se hace en el Paso C (ANTES del fetch, con la base en v3).** Si ya hizo el fetch sin respaldo, el script 03 se niega (exige el clon en `$PREV`): no lo fuerce, avise.
 
 **Paso 5: fetch, build, up (código con las dos llaves; el checkout sigue cerrado al público mientras `payments.json` no diga `access=public`)**
 ```
@@ -167,7 +246,7 @@ $RUN node /s/admin-remote.mjs mail-status --config-file /data/config/payments.js
 El primer `docker run` pide la clave con entrada oculta (no se ve ni queda en el historial). Éxito: `--show` indica `claveApiBrevo: true`; `mail-test` responde `"sent": 1`; llega **un** correo a `contacto@bydlightsolutions.com` (revise Spam) desde `notificaciones@bydlightsolutions.com`; `mail-status` sin `FALLIDO`; en Brevo (Transactional → Logs) figura «Delivered». Si falla: `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false` y detenerse (errores típicos: `BREVO-CLAVE-API-PASOS.md`). Con 401 casi siempre es la IP sin autorizar (Paso 1, B).
 
 **Paso 6c: verificar la migración 5 (solo lectura; después del 6b)**
-La migración 5 (tabla `tax_documents`, aditiva) se aplica sola la primera vez que el servicio abre la base tras `up`; el Paso 6b lo provoca (la API administrativa abre la base). Si `payments.json` está en `enabled=false` el Paso 6b no puede funcionar: use antes `$RUN node /s/payments-config-set.mjs /data/config/payments.json enabled=true access=pilot` (el público sigue cerrado) y vuelva a `enabled=false` al terminar si así estaba.
+Las migraciones 4 y 5 ya las aplicó el Paso F (`07-aplicar-migraciones.sh`) y las comprobó `04-verificar-migracion-5.sh`; **no dependen de que una petición abra la base**. Este paso solo repite la verificación de solo lectura si pasó tiempo. Si `payments.json` está en `enabled=false` el Paso 6b no puede funcionar: use antes `$RUN node /s/payments-config-set.mjs /data/config/payments.json enabled=true access=pilot` (el público sigue cerrado) y vuelva a `enabled=false` al terminar si así estaba.
 ```
 sudo bash ~/04-verificar-migracion-5.sh
 ```
@@ -229,7 +308,7 @@ curl -s -o /dev/null -w '/contratar: %{http_code} (esperado 200)\n' https://bydl
 | Cerrar cobros YA (≤ 5 s) | `$RUN node /s/payments-config-set.mjs /data/config/payments.json enabled=false` | `/contratar` redirige a `/contacto`; solicitudes y pagos 503 |
 | Volver al modo piloto | `... payments-config-set.mjs /data/config/payments.json access=pilot` | Solo el enlace firmado del titular abre el checkout |
 | Apagar correos | `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false` | No se envía ni encola |
-| Código anterior | `sudo bd-run rollback` → `sudo bd-run verify` → `sudo bd-run status` | Vuelve a `13aaf17` (legales ocultos, sin anuncio de pagos). La migración 4 ya existía en `13aaf17`; la migración 5 (tabla `tax_documents`, aditiva) queda en la base y el código anterior la ignora: la base no se revierte |
+| Código anterior | `sudo bd-run rollback` → `sudo bd-run verify` → `sudo bd-run status` | Vuelve a `13aaf17` (legales ocultos, sin anuncio de pagos). Las migraciones 4 y 5 (aditivas) quedan en la base y el código anterior las ignora: la base no se revierte (ver «Recuperación» en 6.2 para el caso de corrupción) |
 Con el interruptor en `enabled=false` el sitio sigue anunciando Webpay (el anuncio es de código) pero los botones llevan a contacto: es un degradado seguro. Para ocultar el anuncio hay que hacer rollback de código. **Nunca** `down -v`, borrar volúmenes ni restaurar un respaldo sobre pagos nuevos sin decisión expresa.
 
 ## 8. Riesgos conocidos

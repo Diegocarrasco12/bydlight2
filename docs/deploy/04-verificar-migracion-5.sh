@@ -32,7 +32,7 @@ IMG="$(docker inspect -f '{{.Config.Image}}' "$CONTAINER")"
 [[ "$IMG" =~ ^bydlight-web:[0-9a-f]{12}$ ]] || die "imagen inesperada: $IMG"
 docker inspect -f '{{range .Mounts}}{{.Name}}|{{.Destination}}|{{.RW}}{{"\n"}}{{end}}' "$CONTAINER" | grep -Fxq "${VOL}|/data|true" || die "el volumen $VOL no esta montado en /data"
 
-# Instantanea previa (respaldo del Paso 4, 03-backup-etapa-b.sh): linea "integrity_check=ok schema_v=4 ordenes=N pagos_autorizados=N monto_autorizado=N".
+# Instantanea previa (respaldo del Paso 4, 03-backup-etapa-b.sh): linea "integrity_check=ok schema_v=3|4 ordenes=N pagos_autorizados=N monto_autorizado=N".
 PRE=""
 if REF="$(ls -t "$BACKUP_DIR"/etapa-b-*.ref 2>/dev/null | head -1)" && [ -n "$REF" ]; then
   PRE="$(grep -E '^integrity_check=ok schema_v=[0-9]+ ordenes=[0-9]+ pagos_autorizados=[0-9]+ monto_autorizado=[0-9]+$' "$REF" | head -1 || true)"
