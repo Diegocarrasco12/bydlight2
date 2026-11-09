@@ -2,7 +2,7 @@ export const SITE = {
   name: "Byd Light Solutions",
   shortName: "Bydlight",
   url: "https://bydlightsolutions.com",
-  email: "bydlightsolutions@gmail.com", // correo oficial aprobado por el titular (2026-11-06)
+  email: "contacto@bydlightsolutions.com", // correo publico oficial (titular, 2026-11-09); recibe Zoho Mail
   whatsappNumber: "56983249135",
   whatsappDisplay: "+56 9 8324 9135",
   country: "CL",

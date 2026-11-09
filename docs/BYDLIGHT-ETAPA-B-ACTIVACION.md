@@ -39,7 +39,7 @@ Pruebas y verificaciones adaptadas al nuevo estado (L3, G6/G7, P1/P8, H12 y las 
 | D5 | Anticipo por defecto (50 %) y vigencia de cotización (7 días) | Mantener los valores actuales | No |
 | D6 | Etiqueta de versión de términos (`2026-11-09-r1`) = fecha de aprobación | Cambiarla a la fecha real si no es hoy | No |
 | D7 | Verificar la Ley 21.719 (vigente el 01-12-2026 salvo postergación) y reconfirmar la política de privacidad | Confirmar con el abogado | No (riesgo normativo) |
-| D8 | EmailJS (formulario de contacto): confirmar en su panel que el destino es `bydlightsolutions@gmail.com` | Revisar el panel | No |
+| D8 | EmailJS (formulario de contacto): confirmar en su panel que el destino es `contacto@bydlightsolutions.com` (el sitio ya publica ese correo) | Revisar el panel | No |
 | D9 | Autorización para subir la Etapa B a `main` (fast-forward desde `13aaf17`, sin force) | Autorizar cuando D1 esté resuelta | Sí (el ejecutor solo descarga `main`) |
 Marcas de tarjeta (Visa, Mastercard, etc.): siguen sin anunciarse hasta que el área comercial de Transbank las confirme por escrito; no bloquea.
 
@@ -49,7 +49,7 @@ Docker Compose, Dockerfile, dependencias y `next.config.ts`: sin cambios (no hay
 ## 6. Procedimiento en Ubuntu (cada bloque en un subshell: si falla, no ve «OK» y se detiene; no ejecute el siguiente)
 Antes: subir los scripts de `docs/deploy/` por `scp` (`02-verificar-migracion-4.sh`, `03-backup-etapa-b.sh`), comprobar su huella con `sha256sum` y tener **D1 resuelta, el Paso 1 (Brevo) hecho y D9 autorizada** (esto último: Claude hace el push a `main` y entrega el SHA).
 
-**Paso 1: preparar Brevo (en el panel de Brevo; no toca el servidor; sin pegar la clave en el chat)**
+**Paso 1: preparar Brevo — HECHO por el titular (2026-11-09):** dominio y remitente verificados, DKIM/DMARC correctos, clave `BYDLIGHT2-PRODUCCION` creada, IP del servidor autorizada y restricción de IP activa. Solo recomprobar que la IP autorizada siga siendo la de salida: `curl -s https://api.ipify.org` debe coincidir con la autorizada en Brevo. Referencia (no repetir):
 Siga las partes A y B de `docs/BREVO-CLAVE-API-PASOS.md`: (A) crear una clave API dedicada `bydlight-prod-servidor` y guardarla en su gestor de contraseñas; (B) autorizar en Brevo (Security → Authorised IPs) la IP pública de salida del servidor (`curl -s https://api.ipify.org`), porque con el control de IPs activo Brevo responde 401 aun con clave válida. **La clave se instala en el Paso 6b**, cuando el código nuevo ya está desplegado (el `mail-config-set.mjs` que hoy hay en el servidor todavía es el de Gmail).
 
 **Paso 2: verificación de la migración 4 (solo lectura; antes de cualquier cambio)**
@@ -138,6 +138,13 @@ $RUN node /s/admin-remote.mjs mail-status --config-file /data/config/payments.js
 ```
 El primer `docker run` pide la clave con entrada oculta (no se ve ni queda en el historial). Éxito: `--show` indica `claveApiBrevo: true`; `mail-test` responde `"sent": 1`; llega **un** correo a `contacto@bydlightsolutions.com` (revise Spam) desde `notificaciones@bydlightsolutions.com`; `mail-status` sin `FALLIDO`; en Brevo (Transactional → Logs) figura «Delivered». Si falla: `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false` y detenerse (errores típicos: `BREVO-CLAVE-API-PASOS.md`). Con 401 casi siempre es la IP sin autorizar (Paso 1, B).
 
+**Lista de comprobación antes del Paso 7 (todas deben cumplirse)**
+1. Paso 2: «MIGRACION 4 VERIFICADA OK». Paso 4: «RESPALDO ETAPA B OK». Paso 5: `verify` y `status` con el SHA del release candidato y `salud: OK`.
+2. Paso 6: todo `OK` (páginas legales 200, retorno inerte, checkout aún cerrado).
+3. Paso 6b: correo de prueba recibido en `contacto@`, `mail-status` sin `FALLIDO`.
+4. `$RUN node /s/payments-config-set.mjs /data/config/payments.json --show` sigue en `access: pilot` o `enabled: false` y `adminRefunds: false`.
+5. D1 aprobada por usted y su autorización final expresa y escrita.
+
 **Paso 7: abrir al público (llave 2; reversible en ≤ 5 s)**
 ```
 TAG=$(docker inspect -f '{{.Config.Image}}' bydlight-prod-web-1 | cut -d: -f2)
@@ -169,7 +176,7 @@ Con el interruptor en `enabled=false` el sitio sigue anunciando Webpay (el anunc
 2. Documento tributario: manual hasta la respuesta del contador (D3).
 3. `monitor` y `reconcile` no están programados; dependen de la ejecución manual las primeras 48 h.
 4. Plan gratuito de Brevo: 300 correos/día (≈ 40 órdenes completas). Al superarlo los correos se aplazan y se envían después, sin pérdida; si el volumen crece, subir de plan. Si cambia la IP de salida del servidor, Brevo dará 401 hasta autorizar la nueva (los correos se conservan hasta 72 h).
-5. Los textos públicos y las plantillas muestran `bydlightsolutions@gmail.com` como contacto mientras las respuestas llegan a `contacto@bydlightsolutions.com`: unifique o vigile ambos buzones (ver `CORREOS-TRANSACCIONALES.md`). La política de privacidad ahora nombra a Brevo y Zoho Mail como proveedores: forma parte de los textos que D1 debe aprobar.
+5. Correo unificado en `contacto@bydlightsolutions.com` (público, Reply-To y avisos internos); vigile que Zoho reciba y revise Spam. La política de privacidad ahora nombra a Brevo y Zoho Mail como proveedores: forma parte de los textos que D1 debe aprobar.
 5. Los textos legales no han sido revisados por un abogado.
 6. Entre el despliegue (Paso 5) y la apertura (Paso 7) el sitio anuncia Webpay y los botones de plan llevan a `/contratar`, que redirige a `/contacto`: haga ambos pasos seguidos.
 7. `CLAUDE.md` del repositorio todavía dice «Webpay apagado e invisible»; actualizarlo tras la activación (no se modificó).

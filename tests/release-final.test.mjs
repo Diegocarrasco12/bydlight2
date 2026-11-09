@@ -321,8 +321,8 @@ test("R15. plantillas: escapan el texto del cliente, sin cabeceras inyectables y
   assert.match(T.solicitudRecibida(o).html, /meta name="viewport"/)
 })
 
-test("R16. correo publico del sitio sin cambios; el codigo no contiene claves ni restos de Gmail OAuth", () => {
-  assert.equal(SITE.email, "bydlightsolutions@gmail.com")
+test("R16. correo publico oficial contacto@; el codigo no contiene claves ni restos de Gmail OAuth", () => {
+  assert.equal(SITE.email, "contacto@bydlightsolutions.com")
   const walk = (d, out = []) => {
     for (const n of readdirSync(d)) {
       const p = join(d, n)

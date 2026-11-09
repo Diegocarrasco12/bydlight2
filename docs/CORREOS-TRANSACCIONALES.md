@@ -47,6 +47,6 @@ Procedimiento completo (clave dedicada, autorizar la IP del servidor, `--init` c
 - Variables equivalentes: `MAIL_ENABLED`, `MAIL_BREVO_API_KEY`.
 
 ## Pendiente fuera del código
-- Los textos públicos (`SITE.email`, páginas legales, plantillas) siguen mostrando `bydlightsolutions@gmail.com` como contacto; las respuestas a los correos llegan a `contacto@bydlightsolutions.com`. Decisión del titular: unificar ambos (cambio de una constante en `src/lib/site.ts` y sus pruebas) o mantenerlos. Hasta entonces, vigile ambos buzones.
+- **Unificado (2026-11-09):** el correo público (`SITE.email`: páginas legales, contacto, plantillas, datos estructurados), el Reply-To y el aviso interno son `contacto@bydlightsolutions.com` (recibe Zoho Mail). Ya no queda ninguna referencia a `@gmail.com` en `src/`.
 - El formulario de **contacto** usa EmailJS (plantilla `template_jnsxd4o`): su destino se define en el panel de EmailJS (decisión D8).
 - Revisar bandeja y Spam con el correo de prueba real antes de la apertura pública.
