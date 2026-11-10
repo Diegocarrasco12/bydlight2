@@ -1,5 +1,6 @@
 import "server-only"
 import { mailCredentials, mailEnabledFlag, type MailCredentials } from "./config"
+import { previewMode } from "@/lib/preview"
 
 export type MailMessage = { to: string; subject: string; html: string; text: string; replyTo?: string; messageKey: string }
 
@@ -81,6 +82,62 @@ function brevoTransport(c: MailCredentials): MailTransport {
       throw new MailError(tag, true) // 400 y demas 4xx: mensaje o destinatario invalido; reintentar no lo arregla
     },
   }
+}
+
+export type MailCheck = {
+  configured: boolean
+  /** Brevo acepto la clave desde la IP de este servidor (GET /v3/account). */
+  keyAccepted?: boolean
+  /** El remitente configurado existe y esta activo en Brevo (GET /v3/senders). */
+  senderActive?: boolean
+  from?: string
+  problems: string[]
+}
+
+/**
+ * Diagnostico de solo lectura: no envia ningun correo ni gasta cuota. Distingue clave invalida, IP no autorizada y remitente
+ * ausente/inactivo. Nunca devuelve la clave ni cuerpos de respuesta de Brevo.
+ */
+export async function checkMailSetup(): Promise<MailCheck> {
+  const c = previewMode() ? null : mailCredentials()
+  if (!c) return { configured: false, problems: ["Sin clave API: instalar con mail-config-set.mjs --init."] }
+  const out: MailCheck = { configured: true, from: c.from, problems: [] }
+  const get = async (path: string) => {
+    try {
+      return await fetch(`https://api.brevo.com/v3/${path}`, { headers: { "api-key": c.apiKey, Accept: "application/json" }, signal: AbortSignal.timeout(20_000) })
+    } catch {
+      return null
+    }
+  }
+  const acc = await get("account")
+  if (!acc) {
+    out.problems.push("Brevo sin respuesta (red o tiempo agotado).")
+    return out
+  }
+  out.keyAccepted = acc.ok
+  if (!acc.ok) {
+    out.problems.push(
+      acc.status === 401 || acc.status === 403
+        ? `brevo ${acc.status}: clave invalida/revocada o IP del servidor no autorizada (Security > Authorised IPs).`
+        : `brevo ${acc.status}: respuesta inesperada.`,
+    )
+    return out
+  }
+  const sen = await get("senders")
+  if (!sen || !sen.ok) {
+    out.problems.push("No se pudo consultar la lista de remitentes (la clave debe poder leer remitentes).")
+    return out
+  }
+  try {
+    const j = (await sen.json()) as { senders?: { email?: string; active?: boolean }[] }
+    const mine = (j.senders ?? []).find((s) => String(s.email ?? "").toLowerCase() === c.from.toLowerCase())
+    out.senderActive = Boolean(mine?.active)
+    if (!mine) out.problems.push(`El remitente ${c.from} no existe en Brevo (o el dominio se autentica sin remitente propio: confirmar con mail-test).`)
+    else if (!mine.active) out.problems.push(`El remitente ${c.from} existe pero no esta activo/verificado en Brevo.`)
+  } catch {
+    out.problems.push("Respuesta de remitentes ilegible.")
+  }
+  return out
 }
 
 /** Transporte activo, o null si el correo no esta habilitado y configurado (nada se encola ni se envia). */

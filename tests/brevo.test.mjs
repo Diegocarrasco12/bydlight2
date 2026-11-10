@@ -251,3 +251,39 @@ test("B14. un envio interrumpido (ENVIANDO) se recupera tras 10 minutos y se ree
   assert.equal(row("k14").attempts, 2)
   assert.equal(calls.length, 1)
 })
+
+test("B15. mail-check: clave aceptada y remitente activo; solo lecturas (GET), ningun correo y sin exponer la clave", async () => {
+  script = [res(200, { email: "x@y.z" }), res(200, { senders: [{ email: "notificaciones@bydlightsolutions.com", active: true }] })]
+  const r = await transport.checkMailSetup()
+  assert.deepEqual({ configured: r.configured, keyAccepted: r.keyAccepted, senderActive: r.senderActive, problems: r.problems }, { configured: true, keyAccepted: true, senderActive: true, problems: [] })
+  assert.equal(calls.length, 2)
+  assert.ok(calls.every((c) => (c.init.method ?? "GET") === "GET" && !c.url.includes("smtp/email")))
+  assert.ok(!JSON.stringify(r).includes(KEY))
+})
+
+test("B16. mail-check: 401 distingue clave/IP, no consulta remitentes y no filtra la clave", async () => {
+  script = [res(401, { code: "unauthorized", message: "IP not authorised " + KEY })]
+  const r = await transport.checkMailSetup()
+  assert.equal(r.keyAccepted, false)
+  assert.match(r.problems[0], /IP del servidor no autorizada/)
+  assert.equal(calls.length, 1)
+  assert.ok(!JSON.stringify(r).includes(KEY))
+})
+
+test("B17. mail-check: remitente ausente o inactivo, sin clave y caida de red se informan sin lanzar errores", async () => {
+  script = [res(200, {}), res(200, { senders: [] })]
+  let r = await transport.checkMailSetup()
+  assert.equal(r.senderActive, false)
+  assert.match(r.problems[0], /no existe en Brevo/)
+  script = [res(200, {}), res(200, { senders: [{ email: "notificaciones@bydlightsolutions.com", active: false }] })]
+  r = await transport.checkMailSetup()
+  assert.match(r.problems[0], /no esta activo/)
+  script = [new Error("red")]
+  r = await transport.checkMailSetup()
+  assert.match(r.problems[0], /sin respuesta/)
+  writeCfg({ enabled: true })
+  calls.length = 0
+  r = await transport.checkMailSetup()
+  assert.equal(r.configured, false)
+  assert.equal(calls.length, 0)
+})

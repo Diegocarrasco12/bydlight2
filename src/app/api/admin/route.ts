@@ -2,7 +2,7 @@ import { verifyAdminRequest } from "@/lib/payments/adminAuth"
 import { approveQuote, auditPayments, exportCustomerData, closeOrder, listOrders, reconcilePending, releaseBalance, showOrder } from "@/lib/payments/adminOps"
 import { adminRefundsEnabled, paymentsEnabled } from "@/lib/payments/config"
 import { reconcileRefund, refundPayment } from "@/lib/payments/refunds"
-import { activeTransport } from "@/lib/mail/transport"
+import { activeTransport, checkMailSetup } from "@/lib/mail/transport"
 import { internalTo } from "@/lib/mail/notify"
 import { alertaInterna } from "@/lib/mail/templates"
 import { dispatchDue, enqueueMail, outboxStats } from "@/lib/mail/outbox"
@@ -118,6 +118,8 @@ export async function POST(req: Request) {
       return json(await monitorAndAlert())
     case "mail-status":
       return json(outboxStats())
+    case "mail-check": // diagnostico de solo lectura (clave, IP, remitente); no envia correos
+      return json(await checkMailSetup())
     case "mail-test": {
       // Correo de prueba SOLO al titular (nunca a clientes): verifica credenciales y entrega. Un envio por minuto como maximo.
       if (!activeTransport()) return json({ error: "Correo no habilitado o sin credenciales (mail.json)." }, 409)
