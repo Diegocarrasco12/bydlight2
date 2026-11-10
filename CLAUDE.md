@@ -1,9 +1,13 @@
-﻿# Protocolo Claude Code — Bydlight2
+﻿# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+# Protocolo Claude Code — Bydlight2
 
 ## Leer primero
 1. `docs/ESTADO_ACTUAL.md` (dónde quedó el proyecto; SHA desplegado y de rollback).
 2. `docs/PENDIENTES.md`. Detalle: `docs/ARQUITECTURA.md`, `docs/DESPLIEGUE.md`, `docs/DECISIONES_TECNICAS.md`, `docs/CALIDAD_Y_PRUEBAS.md`, `docs/CREDITOS-RECURSOS.md`.
-3. Producción (2026-11-06): el titular tiene desplegado `530b95c645fff70b3a2385fbc1ca4c41fe09d423` (volumen `/data`, credenciales y secreto HMAC instalados; `payments.json` con `enabled:false` y devoluciones apagadas). Anterior estable: `df19553c28e0c0c24d3d725e7eae373fa366a00c`. Webpay apagado y checkout público bloqueado por código. El modo piloto y los logos oficiales de Webpay Plus/Transbank están en `origin/main` **sin desplegar**; el titular despliega con `docs/DESPLIEGUE-WEBPAY-UBUNTU.md`. Detalle: `docs/ESTADO_ACTUAL.md`, `docs/PLAN-ACTIVACION-WEBPAY-PRODUCCION.md`.
+3. Producción (confirmada por el administrador el 2026-11-09): `b28448196fb89f9814621a709475029ae086dd21` (anterior `13aaf17`), Etapa B desplegada y base SQLite migrada a v5; cobro real cerrado en el servidor (`payments.json` con `enabled:false`, devoluciones apagadas, `mail.json` inexistente, Brevo sin configurar). Ojo: en el código las dos llaves públicas están abiertas (`ONLINE_CHECKOUT_UI=true` en `src/lib/plans.ts` y `LEGAL_PAGES_PUBLISHED=true` en `src/lib/legal.ts`), de modo que el sitio anuncia Webpay Plus aunque el servidor no cobre; los textos legales siguen pendientes de aprobación. La rama `etapa-b/checkout-publico` tiene commits locales sin push. Detalle: `docs/ESTADO_ACTUAL.md`, `docs/PENDIENTES.md`.
    Commits posteriores de documentación no implican despliegue. Verificar siempre con `status` antes de afirmar el estado real.
 
 ## Alcance
@@ -55,11 +59,20 @@ Sitio corporativo de Byd Light Solutions SpA (ingeniería y desarrollo de softwa
 contacto por EmailJS. Docker standalone en servidor Ubuntu propio (`bydlight-prod`, 127.0.0.1:8200, Cloudflare Tunnel). Español.
 
 ## Comandos
-`npm ci` · `npm test` (18 pruebas; requiere Node >= 22.13 por `node:sqlite`) · `npx tsc --noEmit` · `npm run lint` · `npm run build` · `npm run dev`.
+`npm ci` · `npm test` (170 pruebas al 2026-11-10; requiere Node >= 22.13 por `node:sqlite`) · `npx tsc --noEmit` · `npm run lint` · `npm run build` · `npm run dev`.
+Una sola prueba: `node --import ./tests/register.mjs --test --test-name-pattern="D3" tests/payments.test.mjs`.
+Otros: `npm run preview:pagos` (vista previa local de pagos), `npm run verify:prod` / `verify:pilot` (comprueban el bloqueo de checkout / modo piloto).
 Tras el build: `git checkout next-env.d.ts`. No versionar `tsconfig.tsbuildinfo`. Commits con `git add <archivos>` explícitos.
 
+## Arquitectura (lo que no se ve en un solo archivo)
+- Pruebas sin dependencias: `node:test` + cargador `tests/register.mjs`/`tests/hooks.mjs`, que ejecuta TypeScript de `src/` directamente, resuelve el alias `@/` y sustituye `server-only`, `next/navigation` y `transbank-sdk` por los stubs de `tests/stubs/`. Una importación nueva del lado servidor puede requerir un stub nuevo.
+- Pagos (`src/lib/payments/`): `availability.ts` decide qué se anuncia en público (solo constantes del código: `ONLINE_CHECKOUT_UI`, `LEGAL_PAGES_PUBLISHED`) frente a lo que el servidor permite cobrar (`config.ts`, `payments.json` en `/data`); `pilot.ts`/`access.ts` manejan el acceso piloto; `db.ts`/`store.ts`/`migrations.mjs` persisten en SQLite (`node:sqlite`); `adminAuth.ts` firma HMAC para `/api/admin` y devoluciones (`refunds.ts`, apagadas por defecto). Rutas: `src/app/api/pagos/{iniciar,retorno/[orderId],verificar}`, `/contratar`, `/orden`.
+- Contenido comercial centralizado en `src/lib/` (`services.ts`, `plans.ts`, `portfolio.ts`, `seo.ts`, `site.ts`, `legal.ts`); las páginas de `src/app/` lo consumen.
+- `next.config.ts`: `output: "standalone"` (imagen Docker), cabeceras `no-store`/`noindex` para `/orden` y `/api`, y `assets-pendientes/` y `assets-fuente/` excluidos de la imagen.
+- `AGENTS.md` es el protocolo equivalente para Codex; el bloque `nextjs-agent-rules` lo regenera `next dev` (Next 16 difiere de lo conocido: consultar `node_modules/next/dist/docs/`).
+
 ## Restricciones permanentes
-- **Webpay/Transbank: apagados e invisibles** (`ONLINE_CHECKOUT_UI=false`). No activar pagos, `/contratar`, `/orden` ni endpoints de cobro sin autorización expresa (`docs/ACTIVACION-WEBPAY.md`).
+- **Webpay/Transbank: cobro cerrado en el servidor** (`payments.json` `enabled:false`; el código ya anuncia Webpay Plus con `ONLINE_CHECKOUT_UI=true`). No activar pagos, `/contratar`, `/orden` ni endpoints de cobro sin autorización expresa (`docs/ACTIVACION-WEBPAY.md`).
 - **La palabra «WordPress» (ni «Divi») no debe aparecer** en la experiencia pública (textos, metadatos, JSON-LD, tarjetas, tecnologías).
 - No inventar clientes, cifras, testimonios, certificaciones, resultados ni licencias. Tecnologías = capacidades técnicas declaradas por el titular; proyectos demostrables solo con evidencia
   (`src/lib/portfolio.ts`). Fotos de stock = ilustrativas y rotuladas, nunca presentadas como oficinas o equipo de Bydlight.
