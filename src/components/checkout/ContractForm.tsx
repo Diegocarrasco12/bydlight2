@@ -56,7 +56,10 @@ export default function ContractForm({ plans, initialPlan, termsVersion, legalLi
   const selected = plans.find((p) => p.id === planId)
 
   return (
-    <form className="bd-form" onSubmit={onSubmit} noValidate>
+    // method/action explicitos: si el JavaScript aun no cargo (o fallo), el navegador NO debe enviar por GET (nombre,
+    // correo y mensaje irian en la URL, historial y registros). Con POST los datos viajan en el cuerpo; sin JS el
+    // endpoint responde con error y no crea nada (solo acepta JSON).
+    <form className="bd-form" method="post" action="/api/solicitudes" onSubmit={onSubmit} noValidate>
       <div className="bd-field">
         <label htmlFor="plan">Plan</label>
         <select id="plan" value={planId} onChange={(e) => setPlanId(e.target.value)}>

@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Leer primero
 1. `docs/ESTADO_ACTUAL.md` (dónde quedó el proyecto; SHA desplegado y de rollback).
 2. `docs/PENDIENTES.md`. Detalle: `docs/ARQUITECTURA.md`, `docs/DESPLIEGUE.md`, `docs/DECISIONES_TECNICAS.md`, `docs/CALIDAD_Y_PRUEBAS.md`, `docs/CREDITOS-RECURSOS.md`.
-3. Producción (confirmada por el administrador el 2026-11-09): `b28448196fb89f9814621a709475029ae086dd21` (anterior `13aaf17`), Etapa B desplegada y base SQLite migrada a v5; cobro real cerrado en el servidor (`payments.json` con `enabled:false`, devoluciones apagadas, `mail.json` inexistente, Brevo sin configurar). Ojo: en el código las dos llaves públicas están abiertas (`ONLINE_CHECKOUT_UI=true` en `src/lib/plans.ts` y `LEGAL_PAGES_PUBLISHED=true` en `src/lib/legal.ts`), de modo que el sitio anuncia Webpay Plus aunque el servidor no cobre; por decisión del titular (2026-11-10) esa publicidad y las páginas legales **se mantienen**; las gestiones legales/tributarias y la compra de $50 ya están hechas y no se repiten. Brevo: implementado y probado, sin clave instalada. La rama `etapa-b/checkout-publico` está publicada en `origin` (push del 2026-11-10; sin merge a `main`, que sigue en `b28448196fb`). Detalle: `docs/ESTADO_ACTUAL.md`, `docs/PENDIENTES.md`.
+3. Producción (confirmada por el administrador, 2026-11-10): `b28448196fb89f9814621a709475029ae086dd21` (anterior `13aaf17`), base SQLite v5, Webpay Plus en ambiente `production` con `enabled=true access=public`, devoluciones apagadas, Brevo configurado y operativo (correo de prueba recibido, cola sin fallidos). La compra real de $50 y las gestiones legales/tributarias ya están hechas y no se repiten. La publicidad Webpay (`ONLINE_CHECKOUT_UI=true` en `src/lib/plans.ts`) y las páginas legales (`LEGAL_PAGES_PUBLISHED=true` en `src/lib/legal.ts`) se mantienen por decisión del titular. **Release final preparado** (cierre 2026-11-10): `docs/deploy/RELEASE_FINAL_BYDLIGHT2_2026-11-10.md` y `docs/auditorias/CIERRE_FINAL_BYDLIGHT2_2026-11-10.md`; lo despliega el administrador con `bd-run`, y hasta entonces producción NO contiene las correcciones (formularios POST, HSTS, CSP Report-Only). Pendientes externos: Always Use HTTPS en Cloudflare y diagnóstico de los 502 intermitentes (causa no demostrada). Detalle: `docs/ESTADO_ACTUAL.md`, `docs/PENDIENTES.md`.
    Commits posteriores de documentación no implican despliegue. Verificar siempre con `status` antes de afirmar el estado real.
 
 ## Alcance
@@ -59,7 +59,7 @@ Sitio corporativo de Byd Light Solutions SpA (ingeniería y desarrollo de softwa
 contacto por EmailJS. Docker standalone en servidor Ubuntu propio (`bydlight-prod`, 127.0.0.1:8200, Cloudflare Tunnel). Español.
 
 ## Comandos
-`npm ci` · `npm test` (173 pruebas al 2026-11-10; requiere Node >= 22.13 por `node:sqlite`) · `npx tsc --noEmit` · `npm run lint` · `npm run build` · `npm run dev`.
+`npm ci` · `npm test` (195 pruebas al 2026-11-10; requiere Node >= 22.13 por `node:sqlite`) · `npx tsc --noEmit` · `npm run lint` · `npm run build` · `npm run dev`.
 Una sola prueba: `node --import ./tests/register.mjs --test --test-name-pattern="D3" tests/payments.test.mjs`.
 Otros: `npm run preview:pagos` (vista previa local de pagos), `npm run verify:prod` / `verify:pilot` (comprueban el bloqueo de checkout / modo piloto).
 Tras el build: `git checkout next-env.d.ts`. No versionar `tsconfig.tsbuildinfo`. Commits con `git add <archivos>` explícitos.

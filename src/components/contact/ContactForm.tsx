@@ -38,7 +38,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="bd-form bd-panel">
+    <form ref={formRef} onSubmit={handleSubmit} method="post" className="bd-form bd-panel">
       <div className="bd-field">
         <label htmlFor="c-nombre">Nombre</label>
         <input id="c-nombre" type="text" name="nombre" autoComplete="name" required />

@@ -17,6 +17,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Codigo ajeno o generado, fuera del sitio: BrightBean (bydlightredes) trae JS minificado de terceros (alpine, cropper);
+    // el resto son fuentes de renders, demos y capturas del navegador automatizado.
+    "bydlightredes/**",
+    "assets-fuente/**",
+    "demos/**",
+    ".playwright-mcp/**",
   ]),
 ]);
 
