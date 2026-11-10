@@ -1,4 +1,5 @@
 # SII: procedimiento tributario propuesto (NO implementado; requiere confirmación del contador)
+> **Cierre 2026-11-10:** el titular informó que el SII ya autorizó la emisión de facturas y boletas electrónicas; este pendiente administrativo queda CERRADO. El sistema sigue entregando solo el comprobante de pago; la emisión del documento tributario la hace el titular fuera del repositorio.
 
 Fecha de consulta: 2026-11-06. **No se ingresó al SII, no se modificó ninguna configuración tributaria y el sitio no emite documentos tributarios.** El sistema solo entrega un *comprobante de pago* (Transbank) y un desglose informativo del IVA; ninguno se presenta como boleta o factura.
 
