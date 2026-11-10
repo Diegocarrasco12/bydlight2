@@ -1,5 +1,7 @@
 # Despliegue manual de Bydlight2 en el servidor Ubuntu (2026-11-06)
 
+> **Corrección 2026-11-10 (permisos):** los comandos de este documento que montan `/srv/bydlight-prod/app/scripts` con `docker run -v` NO funcionan: el clon es privado de root y el contenedor corre como uid 1000 (`Cannot find module`). Documento histórico (Etapa A ya ejecutada). Para cualquier comando administrativo use `sudo bash $HOME/00-admin.sh [--tty] node /s/<script>.mjs ...` (`docs/deploy/00-admin.sh`).
+
 Modalidad: **Claude desarrolla y verifica en local; el titular ejecuta personalmente todo lo del servidor.** Solo se toca el proyecto Docker `bydlight-prod` (Bydlight2). Nunca otros contenedores, Cloudflare ni DNS. Nunca `docker system prune`, `down -v`, `git reset --hard` ni `git clean`.
 
 Datos: directorio `/srv/bydlight-prod/app` · proyecto Compose `bydlight-prod` · servicio `web` · imagen `bydlight-web:<tag>` · volumen `bydlight-prod_bydlight_data` (montado en `/data`) · puerto `127.0.0.1:8200` · versión desplegada confirmada: `df19553c28e0` · rollback = esa misma versión.
@@ -54,9 +56,7 @@ El **primer** `up` debe usar la imagen nueva (así el volumen hereda dueño `nod
 ## 7. Credenciales (solo usted, entrada oculta; nunca en chat ni en Git)
 Antes: confirmar con Transbank que `Tbk-Api-Key-Id` equivale al código de comercio productivo que usa el código.
 ```
-docker run --rm -it --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true \
-  -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/s:ro \
-  bydlight-web:<TAG> node /s/setup-payments-config.mjs /data/config/payments.json
+sudo bash "$HOME/00-admin.sh" --tty node /s/setup-payments-config.mjs /data/config/payments.json
 ```
 Pide código de comercio y API Key por entrada oculta, genera `adminSecret`, escribe `enabled:false`, `env:production`, permisos 0600, dueño uid 1000; si algo falla no escribe nada. Verificar sin mostrar secretos:
 ```

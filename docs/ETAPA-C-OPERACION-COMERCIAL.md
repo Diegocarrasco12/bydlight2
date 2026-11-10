@@ -1,6 +1,19 @@
 # Etapa C: Brevo productivo y apertura de cobros (guía operativa, 2026-11-10)
 
-Resume en orden lo que falta **hacer en el servidor y en Brevo**. No repite gestiones ni la compra de $50 (ya realizadas); no reemplaza el detalle de `BYDLIGHT-ETAPA-B-ACTIVACION.md` (Pasos 6b, 6f y 7) ni de `BREVO-CLAVE-API-PASOS.md`, a los que remite. Los comandos usan `$RUN`, definido como en el Paso 7 de la Etapa B.
+Resume en orden lo que falta **hacer en el servidor y en Brevo**. No repite gestiones ni la compra de $50 (ya realizadas); no reemplaza el detalle de `BYDLIGHT-ETAPA-B-ACTIVACION.md` (Pasos 6b, 6f y 7) ni de `BREVO-CLAVE-API-PASOS.md`, a los que remite. Los comandos usan `RUN="sudo bash $HOME/00-admin.sh"` y `RUNTTY="sudo bash $HOME/00-admin.sh --tty"` (ejecutor `docs/deploy/00-admin.sh`; ver §0b). **Ya no se monta el clon directamente en ningún comando**: con el clon privado de root (700) y el contenedor uid 1000 daba `Cannot find module`.
+
+## 0b. Ejecutor de scripts administrativos (administrador, una vez; sin desplegar código)
+`00-admin.sh` (versión 2026-11-10) copia los scripts permitidos a un directorio temporal legible, verifica su SHA-256, los monta de solo lectura en un contenedor uid 1000 sin capacidades y borra la copia al terminar; el clon conserva sus permisos. No requiere `fetch/build/up`: es un archivo de `docs/deploy/` que se copia aparte. SHA-256 (LF) esperado: `c5c3202d0caad133d15fdbfc7c3367ae1c44c53c5d1749700e83941396c4c7bb`.
+```
+# WINDOWS (carpeta docs/deploy del repositorio, rama etapa-b/checkout-publico actualizada)
+tr -d '\r' < 00-admin.sh | sha256sum
+scp 00-admin.sh bydlight:~/
+# UBUNTU
+cd ~ && sha256sum 00-admin.sh        # debe ser c5c3202d...c4c7bb; si no, NO lo ejecute
+sudo bash ~/00-admin.sh --print node /s/payments-config-set.mjs /data/config/payments.json --show   # solo muestra el comando
+sudo bash ~/00-admin.sh node /s/payments-config-set.mjs /data/config/payments.json --show           # prueba de lectura
+```
+Éxito: aparecen líneas `preparado scripts/... sha256=...` (stderr) y el resumen sin secretos con `adminRefunds: false` y `credencialesTransbank: true`. Si aparece `Cannot find module`, detenerse y enviar la salida completa. Rollback: volver a la versión anterior del archivo (no cambia nada persistente) o no usarlo.
 
 **Qué se omite por decisión del titular:** Paso 6d (compra de prueba por Webpay) y 8.2–8.3 (otra compra de $50): la compra real ya consta; no se repiten. Publicidad Webpay y páginas legales se mantienen (`ONLINE_CHECKOUT_UI=true`, `LEGAL_PAGES_PUBLISHED=true`).
 

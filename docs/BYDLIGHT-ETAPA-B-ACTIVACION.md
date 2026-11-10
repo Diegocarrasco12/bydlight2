@@ -238,8 +238,8 @@ chk "retorno Webpay inerte" "30[1238]" "$U/api/pagos/retorno/ABCDEFGHJKMN"
 **Paso 6b: instalar la clave de Brevo y probar el correo (después de `up`; el checkout sigue cerrado)**
 ```
 TAG=$(docker inspect -f '{{.Config.Image}}' bydlight-prod-web-1 | cut -d: -f2)
-RUN="docker run --rm --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/s:ro -e BYDLIGHT_URL=https://bydlightsolutions.com bydlight-web:$TAG"
-docker run --rm -it --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/s:ro bydlight-web:$TAG node /s/mail-config-set.mjs /data/config/mail.json --init
+RUN="sudo bash $HOME/00-admin.sh"   # ver docs/deploy/00-admin.sh: prepara una copia legible de los scripts (el clon es privado de root)
+sudo bash $HOME/00-admin.sh --tty node /s/mail-config-set.mjs /data/config/mail.json --init
 $RUN node /s/mail-config-set.mjs /data/config/mail.json --show
 $RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=true
 $RUN node /s/admin-remote.mjs mail-test --config-file /data/config/payments.json
@@ -274,7 +274,7 @@ curl -sS -o /dev/null -w 'tls_verify=%{ssl_verify_result} http=%{http_code}
 ' "$U/" | tee /dev/stderr | grep -q 'tls_verify=0 http=200' || f=1
 g=$(curl -s -o /dev/null -w '%{http_code}' "$U/contratar"); echo "/contratar -> $g (esperado 307: cerrado)"; [ "$g" = 307 ] || f=1
 g=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' "$U/api/solicitudes"); echo "POST /api/solicitudes sin acceso -> $g (esperado 4xx/503)"; case "$g" in 4*|503) ;; *) f=1;; esac
-$RUN node /s/payments-config-set.mjs /data/config/payments.json --show | grep -Eq 'access: (pilot|none)|enabled: false' || f=1
+$RUN node /s/payments-config-set.mjs /data/config/payments.json --show | grep -Eq '"access": "pilot"|por defecto: pilot|"enabled": false' || f=1
 [ $f = 0 ] && echo "BLOQUE 6f OK: HTTPS valido y cobros publicos cerrados" || echo "BLOQUE 6f: HAY FALLAS"
 )
 ```
@@ -290,7 +290,7 @@ Si `/contratar` no devuelve 307 con el modo piloto, ciérrelo YA: `$RUN node /s/
 **Paso 7: abrir al público (llave 2; reversible en ≤ 5 s)**
 ```
 TAG=$(docker inspect -f '{{.Config.Image}}' bydlight-prod-web-1 | cut -d: -f2)
-RUN="docker run --rm --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/s:ro -e BYDLIGHT_URL=https://bydlightsolutions.com bydlight-web:$TAG"
+RUN="sudo bash $HOME/00-admin.sh"   # ver docs/deploy/00-admin.sh: prepara una copia legible de los scripts (el clon es privado de root)
 $RUN node /s/payments-config-set.mjs /data/config/payments.json enabled=true access=public
 sleep 6
 $RUN node /s/payments-config-set.mjs /data/config/payments.json --show

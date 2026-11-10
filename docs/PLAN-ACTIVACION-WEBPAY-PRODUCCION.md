@@ -57,12 +57,12 @@ Con `enabled:false` el sitio queda **igual de cerrado que hoy**: `/contratar` �
 Definir una vez (no contiene secretos): 
 ```
 TAG=$(docker inspect -f '{{.Config.Image}}' bydlight-prod-web-1 | cut -d: -f2)
-RUN="docker run --rm --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/s:ro -e BYDLIGHT_URL=https://bydlightsolutions.com bydlight-web:$TAG"
+RUN="sudo bash $HOME/00-admin.sh"   # ver docs/deploy/00-admin.sh: prepara una copia legible de los scripts (el clon es privado de root)
 ```
 1. **Ver el estado sin secretos:** `$RUN node /s/payments-config-set.mjs /data/config/payments.json --show` (debe decir `enabled:false`, `adminRefunds:false`, `credencialesTransbank:true`, `secretoAdministrativo:true`).
 2. **Respaldo de la base** (la base se crea al recibir la primera solicitud del piloto; haga el respaldo **después** de la prueba y antes de cualquier cambio posterior). Estructura de montajes verificada localmente:
    ```
-   docker run --rm --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true      -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/w/scripts:ro      -v /srv/bydlight-prod/app/src/lib/payments/migrations.mjs:/w/src/lib/payments/migrations.mjs:ro      -e PAYMENTS_DB=/data/bydlight.db bydlight-web:$TAG      sh -c 'mkdir -p /data/backups && node /w/scripts/orders-admin.mjs backup /data/backups/prueba-$(date +%F).db'
+   $RUN node /w/scripts/orders-admin.mjs backup /data/backups/prueba-$(date +%F).db
    ```
    Verifica integridad y no sobrescribe. Restauración y política de retención: `PAGOS-SQLITE.md` (detener `web`, `restore … --yes`, `check`, iniciar). Los respaldos contienen datos personales: acceso restringido.
 3. **Abrir el piloto:** `$RUN node /s/payments-config-set.mjs /data/config/payments.json enabled=true access=pilot`. Rige en ≤ 5 s; solo entra quien tenga el enlace firmado.

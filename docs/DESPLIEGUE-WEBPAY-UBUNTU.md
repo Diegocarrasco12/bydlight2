@@ -30,7 +30,7 @@ curl -s -o /dev/null -w 'POST solicitudes: %{http_code}\n' -X POST -H 'Origin: h
 Esperado: `/` 200 · `/contratar` 307 (a `/contacto`) · `/terminos` 404 · `/vista-previa` 404 · `/api/acceso-piloto` 404 · retorno 303 · POST solicitudes **503**. Luego defina las utilidades (una sola vez por sesión) y compruebe la configuración sin ver secretos:
 ```
 TAG=$(docker inspect -f '{{.Config.Image}}' bydlight-prod-web-1 | cut -d: -f2)
-RUN="docker run --rm --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/s:ro -e BYDLIGHT_URL=https://bydlightsolutions.com bydlight-web:$TAG"
+RUN="sudo bash $HOME/00-admin.sh"   # ver docs/deploy/00-admin.sh: prepara una copia legible de los scripts (el clon es privado de root)
 $RUN node /s/payments-config-set.mjs /data/config/payments.json --show
 ```
 Debe decir `enabled: false`, `adminRefunds: false`, `credencialesTransbank: true`, `secretoAdministrativo: true`. **Aquí termina el despliegue.** No siga sin querer hacer la prueba.
@@ -71,11 +71,7 @@ Debe mostrar etapa `ANTICIPO_PAGADO`, intento `AUTORIZADO` de 50 y los eventos `
 6. **Cierre (siempre):** `$RUN node /s/payments-config-set.mjs /data/config/payments.json enabled=false`.
 7. Respaldo de la base tras la prueba (contiene datos personales: acceso restringido):
 ```
-docker run --rm --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true \
-  -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/w/scripts:ro \
-  -v /srv/bydlight-prod/app/src/lib/payments/migrations.mjs:/w/src/lib/payments/migrations.mjs:ro \
-  -e PAYMENTS_DB=/data/bydlight.db bydlight-web:$TAG \
-  sh -c 'mkdir -p /data/backups && node /w/scripts/orders-admin.mjs backup /data/backups/prueba-$(date +%F).db'
+$RUN node /w/scripts/orders-admin.mjs backup /data/backups/prueba-$(date +%F).db
 ```
 Las devoluciones siguen apagadas (`adminRefunds:false`); no se activan en este procedimiento.
 

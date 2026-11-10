@@ -18,9 +18,9 @@ Si en **Seguridad → Authorised IPs** está activo el control de IPs (Brevo pue
 3. Si su proveedor cambia la IP del servidor, los envíos darán 401 hasta actualizarla (ver «Problemas»).
 
 ## C. Instalar la clave en el servidor (sin mostrarla)
-Con `TAG` y `RUN` definidos como en el Paso 3 del procedimiento (`BYDLIGHT-ETAPA-B-ACTIVACION.md`) y **el código de la Etapa B ya desplegado**:
+Con `RUN="sudo bash $HOME/00-admin.sh"` (ejecutor `docs/deploy/00-admin.sh` copiado a `~` con su SHA-256 verificado) y **el código de la Etapa B ya desplegado**. **No monte `/srv/bydlight-prod/app/scripts` con `docker run -v`**: el clon es privado de root (700) y el contenedor corre como uid 1000, así que node falla con `Cannot find module '/s/mail-config-set.mjs'`. El ejecutor prepara una copia legible de solo lectura de los scripts, verifica su SHA-256 y la borra al terminar:
 ```
-docker run --rm -it --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true -v bydlight-prod_bydlight_data:/data -v /srv/bydlight-prod/app/scripts:/s:ro bydlight-web:$TAG node /s/mail-config-set.mjs /data/config/mail.json --init
+sudo bash $HOME/00-admin.sh --tty node /s/mail-config-set.mjs /data/config/mail.json --init
 ```
 Pegue la clave cuando la pida (no se ve al escribir; el `-it` es necesario) y Enter. Queda `enabled: false`. Si existía una configuración antigua de Gmail en `mail.json`, se descarta. Compruebe sin ver secretos:
 ```

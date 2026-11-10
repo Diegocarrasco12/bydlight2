@@ -1,5 +1,7 @@
 # Etapa A: traspaso operativo para desplegar en Ubuntu (pagos públicos cerrados)
 
+> **Corrección 2026-11-10 (permisos):** los comandos de este documento que montan `/srv/bydlight-prod/app/scripts` con `docker run -v` NO funcionan: el clon es privado de root y el contenedor corre como uid 1000 (`Cannot find module`). Documento histórico (Etapa A ya ejecutada). Para cualquier comando administrativo use `sudo bash $HOME/00-admin.sh [--tty] node /s/<script>.mjs ...` (`docs/deploy/00-admin.sh`).
+
 Preparado el 2026-11-09. **Nada de esto se ha ejecutado en producción.** Claude no tiene acceso al servidor (Kaspersky bloquea el cliente remoto; no se intentó eludirlo). Lo ejecuta el titular en la sesión SSH del servidor, con `sudo bd-run` como único mecanismo de despliegue.
 
 ## 1. Release y resultado en GitHub
@@ -95,8 +97,7 @@ for f in payments.json mail.json; do
 done
 PH=$(sudo sha256sum "$MP/config/payments.json" | cut -c1-16)
 { echo "ts=$TS"; echo "prev_sha=$PREV"; echo "payments_json_sha16=$PH"; cat /tmp/etapa-a-snap-pre.txt; } | sudo tee "$B/etapa-a-$TS.ref" >/dev/null
-docker run --rm --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true \
-  -v "$VOL":/data -v /srv/bydlight-prod/app/scripts:/s:ro "$IMG" node /s/payments-config-set.mjs /data/config/payments.json --show
+sudo bash "$HOME/00-admin.sh" node /s/payments-config-set.mjs /data/config/payments.json --show
 echo "BLOQUE 1 OK (respaldo: $B/bydlight-pre-etapa-a-$TS.db)"
 )
 ```
@@ -189,11 +190,8 @@ set -euo pipefail
 TAG=$(docker inspect -f '{{.Config.Image}}' bydlight-prod-web-1 | cut -d: -f2)
 IMG=bydlight-web:$TAG
 echo "imagen en ejecución: $IMG"
-D="docker run --rm --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges:true"
-$D -v "$VOL":/data -v /srv/bydlight-prod/app/scripts:/w/scripts:ro \
-  -v /srv/bydlight-prod/app/src/lib/payments/migrations.mjs:/w/src/lib/payments/migrations.mjs:ro \
-  -e PAYMENTS_DB=/data/bydlight.db "$IMG" node /w/scripts/orders-admin.mjs check
-$D -v "$VOL":/data -v /srv/bydlight-prod/app/scripts:/s:ro "$IMG" node /s/payments-config-set.mjs /data/config/payments.json --show
+sudo bash "$HOME/00-admin.sh" node /w/scripts/orders-admin.mjs check
+sudo bash "$HOME/00-admin.sh" node /s/payments-config-set.mjs /data/config/payments.json --show
 MP=$(docker volume inspect -f '{{.Mountpoint}}' "$VOL")
 REF=$(sudo sh -c "ls -t $B/etapa-a-*.ref | head -1")
 echo "antes:   $(sudo grep payments_json_sha16 "$REF")"
