@@ -2,6 +2,8 @@
 
 Preparado el 2026-11-09 en la rama local `etapa-b/checkout-publico` (sin push). **No se modificó producción ni se abrió ningún pago público.** La Etapa A (`13aaf17`) está desplegada y con una compra real de $50 exitosa. Este documento es autocontenido: el procedimiento de la sección 6 se pega en Ubuntu sin otros documentos.
 
+> **Decisiones definitivas del titular (2026-11-10), vigentes sobre cualquier texto posterior de este documento:** (1) la publicidad de Webpay Plus publicada **se mantiene**; (2) las páginas y textos legales publicados **se mantienen**; (3) las gestiones legales y tributarias ya fueron realizadas la semana anterior y **no se repiten**; (4) la compra controlada de $50 ya fue realizada y **no se repite**. Por eso `ONLINE_CHECKOUT_UI=true` y `LEGAL_PAGES_PUBLISHED=true` quedan como están. Evidencia en el repositorio: el encabezado de este documento registra la compra real de $50 exitosa en la Etapa A y la verificación del 2026-11-09 mostró 1 orden y 1 pago autorizado de $50 en la base de producción; **los comprobantes legales/tributarios y la aprobación de D1–D10 no están en el repositorio** (se registran por declaración del titular, no como verificados aquí). Las secciones 4 y las listas de «pendiente» que siguen son histórico de preparación, no tareas abiertas.
+
 ## 1. Qué cambia en el código (mínimo, 3 constantes)
 | Archivo | Cambio | Efecto |
 |---|---|---|

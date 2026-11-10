@@ -43,6 +43,7 @@ Una orden completa genera ≈ 7 correos (solicitud 2, cotización 1, anticipo 2,
 
 ## Instalación y operación
 Procedimiento completo (clave dedicada, autorizar la IP del servidor, `--init` con entrada oculta, prueba y apagado): **`docs/BREVO-CLAVE-API-PASOS.md`**; ubicación en la activación: Paso 6b de `BYDLIGHT-ETAPA-B-ACTIVACION.md`.
+- Diagnóstico de solo lectura (clave, IP, remitente; no envía nada): `$RUN node /s/admin-remote.mjs mail-check --config-file /data/config/payments.json` (pruebas B15–B17; requiere el código que lo incluye desplegado).
 - Estado y recuperación: `$RUN node /s/admin-remote.mjs mail-status|mail-dispatch --config-file /data/config/payments.json`. Un despachador interno corre cada 60 s.
 - Apagar (≤ 5 s): `$RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=false`.
 - Variables equivalentes: `MAIL_ENABLED`, `MAIL_BREVO_API_KEY`.

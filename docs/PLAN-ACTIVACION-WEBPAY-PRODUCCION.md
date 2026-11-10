@@ -2,6 +2,8 @@
 
 Estado: **desarrollo y pruebas locales terminados; nada desplegado, nada activado, ningún cobro real.** `payments.json` de producción (`enabled:false`, `adminRefunds:false`, credenciales y secreto instalados) no se toca desde aquí. **Procedimiento operativo para copiar y pegar en Ubuntu: `DESPLIEGUE-WEBPAY-UBUNTU.md`** (este documento es la explicación y la evidencia). Reemplaza para este flujo a `WEBPAY-PROCEDIMIENTO-ACTIVACION.md` (fases B–D) y se complementa con `DESPLIEGUE-MANUAL-UBUNTU.md` (respaldo/rollback) y `PAGOS-SQLITE.md`.
 
+> **Actualización 2026-11-10 (decisión del titular):** la prueba real de $50 ya se realizó (no se repite); la publicidad de Webpay Plus y las páginas legales actuales **se mantienen publicadas**; las gestiones legales y tributarias ya se hicieron. Este informe es histórico (2026-11-06). Estado vigente y pasos que faltan: `docs/PENDIENTES.md` y `docs/ESTADO_ACTUAL.md`.
+
 ## 1. Qué cambió (resumen)
 | Tema | Antes | Ahora |
 |---|---|---|

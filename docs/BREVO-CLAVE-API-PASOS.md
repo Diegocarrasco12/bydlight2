@@ -28,7 +28,12 @@ $RUN node /s/mail-config-set.mjs /data/config/mail.json --show
 ```
 Debe mostrar `claveApiBrevo: true`, `from: notificaciones@bydlightsolutions.com`, `replyTo` y `notifyTo: contacto@bydlightsolutions.com`.
 
-## D. Encender y probar
+## D. Diagnosticar, encender y probar
+Antes de encender, el diagnóstico de **solo lectura** `mail-check` (disponible desde el commit que lo introduce; no envía ningún correo ni gasta cuota) confirma la clave, la IP autorizada y el remitente. Funciona con `enabled=false`:
+```
+$RUN node /s/admin-remote.mjs mail-check --config-file /data/config/payments.json
+```
+Debe responder `keyAccepted: true`, `senderActive: true` y `problems: []`. Si `problems` nombra la IP o la clave, corrija la parte B o C y repita. Si el remitente figura como inexistente pero el dominio está autenticado con DKIM/DMARC, continúe con `mail-test`, que es la prueba definitiva.
 ```
 $RUN node /s/mail-config-set.mjs /data/config/mail.json enabled=true
 $RUN node /s/admin-remote.mjs mail-test --config-file /data/config/payments.json
