@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Leer primero
 1. `docs/ESTADO_ACTUAL.md` (dónde quedó el proyecto; SHA desplegado y de rollback).
 2. `docs/PENDIENTES.md`. Detalle: `docs/ARQUITECTURA.md`, `docs/DESPLIEGUE.md`, `docs/DECISIONES_TECNICAS.md`, `docs/CALIDAD_Y_PRUEBAS.md`, `docs/CREDITOS-RECURSOS.md`.
-3. Producción (confirmada por el administrador el 2026-11-09): `b28448196fb89f9814621a709475029ae086dd21` (anterior `13aaf17`), Etapa B desplegada y base SQLite migrada a v5; cobro real cerrado en el servidor (`payments.json` con `enabled:false`, devoluciones apagadas, `mail.json` inexistente, Brevo sin configurar). Ojo: en el código las dos llaves públicas están abiertas (`ONLINE_CHECKOUT_UI=true` en `src/lib/plans.ts` y `LEGAL_PAGES_PUBLISHED=true` en `src/lib/legal.ts`), de modo que el sitio anuncia Webpay Plus aunque el servidor no cobre; por decisión del titular (2026-11-10) esa publicidad y las páginas legales **se mantienen**; las gestiones legales/tributarias y la compra de $50 ya están hechas y no se repiten. Brevo: implementado y probado, sin clave instalada. La rama `etapa-b/checkout-publico` está solo en local: el push del 2026-11-10 falló con 403 (credencial de GitHub de otra cuenta, no la del titular de `Diegocarrasco12/bydlight2`); pendiente de autenticar la cuenta correcta. Detalle: `docs/ESTADO_ACTUAL.md`, `docs/PENDIENTES.md`.
+3. Producción (confirmada por el administrador el 2026-11-09): `b28448196fb89f9814621a709475029ae086dd21` (anterior `13aaf17`), Etapa B desplegada y base SQLite migrada a v5; cobro real cerrado en el servidor (`payments.json` con `enabled:false`, devoluciones apagadas, `mail.json` inexistente, Brevo sin configurar). Ojo: en el código las dos llaves públicas están abiertas (`ONLINE_CHECKOUT_UI=true` en `src/lib/plans.ts` y `LEGAL_PAGES_PUBLISHED=true` en `src/lib/legal.ts`), de modo que el sitio anuncia Webpay Plus aunque el servidor no cobre; por decisión del titular (2026-11-10) esa publicidad y las páginas legales **se mantienen**; las gestiones legales/tributarias y la compra de $50 ya están hechas y no se repiten. Brevo: implementado y probado, sin clave instalada. La rama `etapa-b/checkout-publico` está publicada en `origin` (push del 2026-11-10; sin merge a `main`, que sigue en `b28448196fb`). Detalle: `docs/ESTADO_ACTUAL.md`, `docs/PENDIENTES.md`.
    Commits posteriores de documentación no implican despliegue. Verificar siempre con `status` antes de afirmar el estado real.
 
 ## Alcance
@@ -19,7 +19,7 @@ No modificar otros proyectos, contenedores, servicios ni configuraciones globale
 2. Modificar solamente los archivos necesarios.
 3. Ejecutar pruebas, lint y build disponibles.
 4. Revisar diferencias y detectar secretos antes de publicar.
-5. Confirmar que GitHub utiliza Diegocarrasco12/bydlight2.
+5. Confirmar que GitHub utiliza Diegocarrasco12/bydlight2. La única cuenta autorizada es `Diegocarrasco12`; `dcarrascoinnpack` (la activa en `gh`) no tiene permiso de push y no se usa. El repo tiene un helper de credenciales **local** (`.git/config`, host `github.com`) que pide el token a `gh auth token --user Diegocarrasco12`; no guarda tokens y no cambia la configuración global ni la cuenta activa de `gh`.
 6. Solicitar autorización antes de push y despliegue.
 
 ## Despliegue
